@@ -1,0 +1,112 @@
+# Spec-to-Plan Traceability Checkpoint
+metadata:
+  generated: "2026-10-15"
+  source_spec: "specs/001-sticky-notes/spec.md"
+  target_plan: "specs/001-sticky-notes/plan.md"
+
+summary:
+  total_requirements: 13
+  covered_requirements: 13
+  missing_requirements: 0
+  coverage_percentage: 100.0
+
+requirements:
+  - req_id: "REQ-001"
+    req_description: "Enter text for a note"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3"
+      phase_name: "User Story 1"
+      items: [{item_id: "5.1", description: "Build create-and-view notes UI"}]
+  - req_id: "REQ-002"
+    req_description: "Reject empty or whitespace-only content"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2"
+      phase_name: "Foundational"
+      items: [{item_id: "2.1", description: "Define note domain and repository contract"}]
+  - req_id: "REQ-003"
+    req_description: "Show validation feedback and do not save invalid notes"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3"
+      phase_name: "User Story 1"
+      items: [{item_id: "4.1", description: "Add ChangeNotifier ViewModel"}]
+  - req_id: "REQ-004"
+    req_description: "Create a valid note"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3"
+      phase_name: "User Story 1"
+      items: [{item_id: "5.1", description: "Build create-and-view notes UI"}]
+  - req_id: "REQ-005"
+    req_description: "Show created note in list"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3"
+      phase_name: "User Story 1"
+      items: [{item_id: "5.1", description: "Build create-and-view notes UI"}]
+  - req_id: "REQ-006"
+    req_description: "Persist across restart"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2"
+      phase_name: "Foundational"
+      items: [{item_id: "3.1", description: "Implement local SQLite persistence"}]
+  - req_id: "REQ-007"
+    req_description: "Work without Internet"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-4"
+      phase_name: "Offline persistence and restart"
+      items: [{item_id: "6.1", description: "Verify restart and offline behavior"}]
+  - req_id: "REQ-008"
+    req_description: "Display all locally saved notes"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2"
+      phase_name: "Foundational"
+      items: [{item_id: "3.1", description: "Implement local SQLite persistence"}]
+  - req_id: "REQ-009"
+    req_description: "Display a non-error empty state"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3"
+      phase_name: "User Story 1"
+      items: [{item_id: "5.1", description: "Build create-and-view notes UI"}]
+  - req_id: "REQ-010"
+    req_description: "Handle save failure without false success"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2"
+      phase_name: "Foundational"
+      items: [{item_id: "3.1", description: "Implement local SQLite persistence"}]
+  - req_id: "REQ-011"
+    req_description: "Keep only approved create/view scope"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-5"
+      phase_name: "Polish and quality gates"
+      items: [{item_id: "7.1", description: "Complete quality gates and documentation"}]
+  - req_id: "REQ-012"
+    req_description: "Do not log sensitive data"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2"
+      phase_name: "Foundational"
+      items: [{item_id: "3.1", description: "Implement local SQLite persistence"}]
+  - req_id: "REQ-013"
+    req_description: "Preserve architecture and independent business rules"
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2"
+      phase_name: "Foundational"
+      items: [{item_id: "2.1", description: "Define note domain and repository contract"}]
+
+missing_requirements: []
+orphan_plan_items: []
+
+validation:
+  passed: true
+  errors: []
+  warnings: []

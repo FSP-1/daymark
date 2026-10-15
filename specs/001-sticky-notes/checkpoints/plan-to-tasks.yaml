@@ -1,0 +1,96 @@
+# Plan-to-Tasks Traceability Checkpoint
+metadata:
+  generated: "2026-10-15"
+  source_plan: "specs/001-sticky-notes/plan.md"
+  target_tasks: "specs/001-sticky-notes/tasks.md"
+
+summary:
+  total_plan_items: 7
+  covered_plan_items: 7
+  missing_plan_items: 0
+  coverage_percentage: 100.0
+  total_tasks_generated: 25
+  orphan_tasks: 0
+
+phases:
+  - phase_id: "Phase-1"
+    phase_name: "Setup"
+    items:
+      - item_id: "1.1"
+        description: "Establish persistence dependencies and test seams"
+        tasks: ["T001", "T002", "T003"]
+  - phase_id: "Phase-2"
+    phase_name: "Foundational"
+    items:
+      - item_id: "2.1"
+        description: "Define note domain and repository contract"
+        tasks: ["T004", "T005"]
+      - item_id: "3.1"
+        description: "Implement and test local SQLite persistence"
+        tasks: ["T006", "T007"]
+  - phase_id: "Phase-3"
+    phase_name: "User Story 1"
+    items:
+      - item_id: "4.1"
+        description: "Add the ChangeNotifier ViewModel"
+        tasks: ["T008", "T009"]
+      - item_id: "5.1"
+        description: "Build the create-and-view notes UI"
+        tasks: ["T010", "T011", "T012"]
+  - phase_id: "Phase-4"
+    phase_name: "User Story 2"
+    items:
+      - item_id: "4.1"
+        description: "Add the ChangeNotifier ViewModel"
+        tasks: ["T013", "T014"]
+      - item_id: "5.1"
+        description: "Build the create-and-view notes UI"
+        tasks: ["T013", "T014"]
+  - phase_id: "Phase-5"
+    phase_name: "User Story 3"
+    items:
+      - item_id: "6.1"
+        description: "Verify restart and offline acceptance behavior"
+        tasks: ["T015", "T016"]
+  - phase_id: "Phase-6"
+    phase_name: "User Story 4"
+    items:
+      - item_id: "4.1"
+        description: "Add the ChangeNotifier ViewModel"
+        tasks: ["T017", "T019"]
+      - item_id: "5.1"
+        description: "Build the create-and-view notes UI"
+        tasks: ["T018", "T020"]
+      - item_id: "6.1"
+        description: "Verify restart and offline acceptance behavior"
+        tasks: ["T018"]
+  - phase_id: "Phase-7"
+    phase_name: "Polish and quality gates"
+    items:
+      - item_id: "7.1"
+        description: "Complete quality gates and documentation"
+        tasks: ["T021", "T022", "T023", "T024", "T025"]
+
+missing_plan_items: []
+orphan_tasks: []
+
+upstream_trace:
+  - plan_item: "1.1"
+    tasks: ["T001", "T002", "T003"]
+  - plan_item: "2.1"
+    tasks: ["T004", "T005"]
+  - plan_item: "3.1"
+    tasks: ["T006", "T007"]
+  - plan_item: "4.1"
+    tasks: ["T008", "T009", "T013", "T014", "T017", "T019"]
+  - plan_item: "5.1"
+    tasks: ["T010", "T011", "T012", "T013", "T014", "T018", "T020"]
+  - plan_item: "6.1"
+    tasks: ["T015", "T016", "T018"]
+  - plan_item: "7.1"
+    tasks: ["T021", "T022", "T023", "T024", "T025"]
+
+validation:
+  passed: true
+  errors: []
+  warnings: []
