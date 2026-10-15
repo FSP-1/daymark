@@ -1,0 +1,38 @@
+# Daymark — Sticky Notes
+
+## Objective
+
+Allow users to create and view sticky notes in Daymark as the first usable feature of the application.
+
+## Functional scope
+
+- Users can create a note by entering its text.
+- Users can view their existing notes in the application.
+- Notes remain available after closing and reopening the application.
+- Creating and viewing notes works without an Internet connection.
+- The interface clearly communicates the empty state when no notes exist.
+
+## Boundaries
+
+- This feature covers creating and viewing notes only.
+- Editing, deleting, searching, pinning, colors, reminders, and task management are out of scope.
+- Authentication, Firebase, Cloud Firestore, remote databases, and synchronization are out of scope.
+- The feature must not introduce unrelated changes to the existing application.
+
+## Expected behavior
+
+- A note must not be created when its content is empty or contains only whitespace.
+- Successfully created notes must appear in the notes list.
+- Notes must remain available after the application is restarted.
+- If saving a note fails, the user must receive understandable feedback and the application must not falsely report success.
+- The application must handle the absence of notes without errors.
+
+## Acceptance expectations
+
+The feature is acceptable when a user can create a valid note, see it in the list, close and reopen the application, and see the same note without requiring Internet access.
+
+The feature must also handle empty input and persistence failures appropriately.
+
+## Constraints
+
+Follow the current Daymark Constitution. Define requirements and acceptance criteria before implementation. Do not prescribe the technical implementation in this functional prompt; technical decisions belong in the planning phase.
