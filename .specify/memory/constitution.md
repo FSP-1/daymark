@@ -1,98 +1,140 @@
 <!--
 Sync Impact Report
-- Version change: uninitialized template -> 1.0.0
-- Modified principles: placeholder principles -> MVVM and Separation of Concerns; Offline-First
-  Data; Test-First Quality; Secure User Data; Observable, Maintainable Delivery
-- Added sections: Technology and Architecture Constraints; Development Workflow and Quality Gates
+- Version change: 1.0.0 -> 1.1.0
+- Modified principles:
+  - MVVM and Separation of Concerns -> I. Arquitectura mantenible
+  - Offline-First Data -> IV. Funcionamiento offline-first
+  - Test-First Quality -> II. TDD obligatorio y V. Calidad y pruebas
+  - Secure User Data -> VI. Seguridad y privacidad
+  - Observable, Maintainable Delivery -> VII. Documentación y Git
+- Added principles: III. SDD antes de implementar; VIII. Alcance y finalización
+- Added sections: Migration Mode; Target Technology Stack; Constraints;
+  Development Workflow and Quality Gates
 - Removed sections: none
 - Templates requiring updates:
+  - ✅ .specify/templates/plan-template.md
   - ✅ .specify/templates/spec-template.md
   - ✅ .specify/templates/tasks-template.md
-  - ✅ .specify/templates/plan-template.md (existing Constitution Check retained and aligned)
-- Follow-up TODOs: Ratification date is unknown and is marked below for project-owner confirmation.
+- Follow-up TODOs: Ratification date remains unknown and requires project-owner confirmation.
 -->
 
 # Daymark Constitution
 
+## Migration Mode
+
+**Mode**: UPGRADE
+
+**Justification**: Daymark is an existing Flutter/Dart application. Work MUST preserve its
+repository history and evolve the current codebase incrementally, without rewriting unrelated
+functionality or introducing an unapproved backend.
+
 ## Core Principles
 
-### I. MVVM and Separation of Concerns
-Daymark MUST use MVVM with Provider and ChangeNotifier. Views MUST remain focused on
-presentation and user interaction. ViewModels MUST own presentation state and actions.
-Repositories MUST abstract persistence and synchronization. Business rules MUST remain
-independent of Flutter widgets and Firebase so they can be tested without a UI or network.
-This separation keeps the Android-first organizer maintainable and testable as features grow.
+### I. Arquitectura mantenible
+Daymark MUST remain an Android-first application developed with Flutter and Dart. The
+architecture MUST use MVVM with Provider and ChangeNotifier. Views MUST focus on presentation
+and user interaction; ViewModels MUST own presentation state and actions; repositories MUST
+separate data access from presentation; and data sources MUST remain replaceable behind those
+repositories. Business rules MUST NOT depend on widgets, Firebase, Firestore, or other
+external services. New dependencies MUST be justified in the plan, and unnecessary
+complexity MUST be rejected. This preserves testability and keeps the organizer evolvable.
 
-### II. Offline-First Data
-User-facing note, task, important-date, and reminder operations MUST work without network
-access. Local persistence MUST be the first source of truth for writes and reads, using Drift
-and SQLite where persistence is required. Remote synchronization through Cloud Firestore MUST
-be additive and recoverable: transient network failures MUST NOT discard accepted local
-changes or block ordinary local use.
+### II. TDD obligatorio
+Behavior changes MUST follow Red -> Green -> Refactor. An automated test MUST be written
+first and executed before implementation; it MUST fail for the expected reason. The minimum
+implementation MUST then be added to make the test pass, followed by refactoring without
+breaking the test suite. Contributors MUST NOT claim that a test passes unless that test was
+actually executed and passed.
 
-### III. Test-First Quality
-Every behavior change MUST begin with an automated test that fails for the intended reason,
-then be implemented minimally and refactored while the tests remain green. Changes MUST
-cover relevant loading, empty, success, and error states. A change is not complete until
-`dart format`, `flutter analyze`, and `flutter test` have been run as applicable, and no
-new failures are introduced. Tests are the executable definition of acceptance behavior.
+### III. SDD antes de implementar
+Before coding, the feature MUST define requirements, user scenarios, acceptance criteria,
+edge cases, scope boundaries, and security/privacy implications. The specification, technical
+plan, and ordered tasks MUST be reviewed and mutually consistent before implementation.
+Requirements, tests, code, and documentation MUST remain traceable and aligned. Scope MUST NOT
+expand beyond the approved specification without an explicit rationale and approval.
 
-### IV. Secure User Data
-Authentication MUST use Firebase Authentication as the identity boundary, with email/password
-and Google sign-in supported where the feature requires them. User-owned data MUST be
-scoped by the authenticated user ID in every local synchronization and Firestore access path.
-Client-side checks MUST NOT substitute for Firebase Security Rules. Passwords, credentials,
-private keys, note content, and other sensitive data MUST NOT be logged or committed.
-Logout and unsynchronized-local-data behavior MUST be specified before implementing
-authentication-sensitive features.
+### IV. Funcionamiento offline-first
+Local operations MUST work without Internet access. Local persistence MUST be the primary
+on-device source of truth, and remote synchronization MUST be decoupled from local use.
+Conflict resolution, synchronization errors, retry behavior, and pending changes MUST have
+defined behavior before synchronization is implemented. Firebase, Firestore, and any definitive
+remote database MUST NOT be added until their implementation is part of an approved
+specification and plan.
 
-### V. Observable, Maintainable Delivery
-Features MUST use existing project patterns and the smallest dependency set that satisfies
-the requirement; new packages require justification in the implementation plan. Errors MUST
-be surfaced through the project’s established notification or error-state patterns rather
-than silently ignored. Significant architectural decisions and user-visible behavior MUST
-be documented in the relevant README or `docs/decisions/` artifact. Generated files, local
-databases, build output, and secrets MUST remain out of commits.
+### V. Calidad y pruebas
+Changed Dart code MUST be formatted with `dart format`. The project MUST remain free of
+static-analysis errors under `flutter analyze`, and applicable tests MUST be run with
+`flutter test`. Bug fixes MUST include regression tests. Features MUST cover empty, loading,
+error, success, and relevant boundary states. A task MUST NOT be considered complete when
+these checks or the feature's acceptance criteria remain unverified.
 
-## Technology and Architecture Constraints
+### VI. Seguridad y privacidad
+Secrets, credentials, private keys, and service-account material MUST NOT enter the repository.
+When authentication is introduced, every user's data MUST be isolated by authenticated user ID.
+Private note content and credentials MUST NOT be logged. Before implementing remote
+synchronization, the specification MUST define logout behavior and the treatment of local
+changes that remain unsynchronized.
 
-- The application is a Flutter/Dart Android-first personal organizer; platform-specific
-  code MUST be introduced only when Flutter cannot provide the required capability.
-- The architecture MUST preserve MVVM, Provider/ChangeNotifier, repository boundaries,
-  Drift/SQLite local persistence, Firebase Authentication, and Cloud Firestore synchronization.
-- Implementations MUST preserve the offline-first contract and MUST avoid putting business
-  rules directly in widgets or Firebase callbacks.
-- The project MUST continue using the repository’s configured analyzer and lint rules unless
-  a documented, reviewed exception is necessary.
+### VII. Documentación y Git
+Technical documentation and README guidance MUST remain aligned with delivered behavior.
+Significant architectural decisions MUST be recorded in `docs/decisions/`. Changes MUST be
+small, focused, and represented by descriptive commits. Generated artifacts, local databases,
+build output, and secrets MUST NOT be committed. Unrelated changes MUST NOT be included in an
+approved feature.
+
+### VIII. Alcance y finalización
+Implementation MUST be limited to functionality approved in the current specification. A task
+is complete only after its automated tests and acceptance criteria have been verified. The
+completion report MUST identify changed files, commands executed, results, and remaining
+limitations. Unverified claims of completion are non-compliant.
+
+## Target Technology Stack
+
+| Component | Target Version | Notes |
+|-----------|----------------|-------|
+| Language | Dart SDK 3.13.5 or compatible | Version constrained by `pubspec.yaml` |
+| Framework | Flutter | Android-first; other platforms remain supported by the project |
+| State management | Provider and ChangeNotifier | Required MVVM presentation boundary |
+| Local persistence | Drift and SQLite | Must remain local-first when persistence is added |
+| Authentication | Firebase Authentication | Only after an approved specification |
+| Remote synchronization | Cloud Firestore | Only after an approved specification |
+| Testing and analysis | `flutter test`, `flutter analyze`, `dart format` | Required quality gates |
+
+## Constraints
+
+- Local behavior MUST NOT require network access.
+- Business rules MUST remain independent of Flutter widgets and external services.
+- Firebase, Firestore, and a definitive remote database are out of scope until explicitly
+  approved by specification and plan.
+- Dependency additions MUST include need, alternatives considered, and impact in the plan.
+- Platform-specific code MUST be limited to capabilities unavailable through Flutter.
+- Repository and project conventions MUST be reused unless a documented exception is approved.
 
 ## Development Workflow and Quality Gates
 
-1. A feature specification MUST state user scenarios, acceptance scenarios, edge cases,
-   functional requirements, measurable success criteria, and security/privacy implications.
-2. An implementation plan MUST include a Constitution Check covering architecture,
-   offline behavior, testing, data isolation, and documentation impact.
-3. Tasks MUST be ordered by dependency and grouped by independently testable user story.
-   Behavior tasks MUST include a failing test before implementation tasks.
-4. Before review, contributors MUST run formatting, static analysis, and the applicable test
-   suite. Reviewers MUST reject changes that bypass repository boundaries, weaken user-data
-   isolation, or leave error paths untested.
-5. Any intentional constitution violation MUST be recorded in the plan’s Complexity Tracking
-   table with the rejected simpler alternative and an owner for remediation.
+1. Create or update the feature specification before implementation.
+2. Complete the plan's Constitution Check before research and repeat it after design.
+3. Create ordered tasks with explicit dependencies; put failing tests before behavior code.
+4. Implement only the approved scope and record intentional exceptions in Complexity Tracking.
+5. Run `dart format`, `flutter analyze`, and `flutter test` as applicable before completion.
+6. Update documentation and architectural decision records when behavior or design changes.
+7. Report the changed files, commands, results, and remaining limitations.
 
 ## Governance
 
-This constitution is the highest-level project governance document for feature planning and
-implementation. When another practice conflicts with it, the conflict MUST be resolved in
-favor of this constitution or explicitly recorded as an approved exception.
+This constitution is the highest-level governance document for Daymark feature specification,
+planning, implementation, review, and completion. When another project practice conflicts with
+it, the conflict MUST be resolved in favor of this constitution or recorded as an approved
+exception.
 
-Amendments require a documented rationale, an updated Sync Impact Report, a semantic version
-change, and review of all dependent Spec Kit templates and project guidance. A MAJOR version
-is required for removing or redefining a principle; a MINOR version is required for adding
-or materially expanding a principle or mandatory section; a PATCH version is required for
-clarifications and non-semantic wording changes.
+Amendments MUST include a rationale, an updated Sync Impact Report, a semantic version change,
+and a review of dependent templates and project guidance. MAJOR increments are required for
+removing or redefining a principle. MINOR increments are required for adding a principle,
+mandatory section, or materially stronger rule. PATCH increments are reserved for
+non-semantic clarifications.
 
-Every feature plan and implementation review MUST include a Constitution Check. Compliance
-MUST be re-evaluated after design and before completion. Exceptions MUST be explicit,
-time-bounded where possible, and accompanied by a mitigation or follow-up task.
+Every plan and implementation review MUST include a Constitution Check. Compliance MUST be
+re-evaluated after design and before completion. Exceptions MUST identify the affected rule,
+reason, rejected simpler alternative, mitigation, and follow-up owner.
 
-**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): confirm original adoption date | **Last Amended**: 2026-10-15
+**Version**: 1.1.0 | **Ratified**: TODO(RATIFICATION_DATE): confirm original adoption date | **Last Amended**: 2026-10-15

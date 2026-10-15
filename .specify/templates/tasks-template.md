@@ -12,6 +12,10 @@ description: "Task list template for feature implementation"
 automated test before implementation; omit tests only for genuinely non-behavioral changes
 and document that rationale in the plan.
 
+**Completion**: Each completed story MUST verify its acceptance criteria and applicable tests.
+The final phase MUST record `dart format`, `flutter analyze`, and `flutter test` results,
+changed files, and remaining limitations.
+
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
 ## Format: `[ID] [P?] [Story] Description`

@@ -5,6 +5,12 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
+## Scope and Boundaries
+
+- **In scope**: [Specific functionality approved for this feature]
+- **Out of scope**: [Explicit exclusions, including unapproved remote services]
+- **Dependencies requiring approval**: [New packages, Firebase, Firestore, or remote databases]
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--

@@ -41,6 +41,8 @@
   logout/synchronization behavior are specified when applicable.
 - **Quality and documentation**: Formatting, analysis, tests, dependency justification, and
   README or decision-record updates are identified.
+- **Scope and completion**: Approved scope boundaries, acceptance verification, reporting of
+  commands/results, and remaining limitations are identified.
 
 ## Project Structure
 
