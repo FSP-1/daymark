@@ -1,4 +1,3 @@
-
 # Daymark — GitHub Copilot Instructions
 
 ## Project purpose
@@ -13,9 +12,11 @@ Daymark is an Android-first personal organizer built with Flutter and Dart. It m
 - Use repositories to abstract data access.
 - Keep business rules independent of Flutter widgets and Firebase.
 - Use Drift and SQLite for local persistence.
-- Use Firebase Authentication for email/password and Google sign-in.
-- Use Cloud Firestore for remote synchronization.
 - Follow an offline-first approach: local operations must not require network access.
+
+- Firebase Authentication and Cloud Firestore are planned technologies, not approved implementation scope by default.
+- Do not add or implement Firebase Authentication, Cloud Firestore, or another remote database until the feature specification and implementation plan explicitly include them and receive approval.
+- Prioritize local persistence and offline functionality.
 
 ## SDD and TDD
 
