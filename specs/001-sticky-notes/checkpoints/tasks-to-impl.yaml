@@ -1,0 +1,196 @@
+# Tasks-to-Implementation Traceability Checkpoint
+metadata:
+  generated: "2026-10-17"
+  source_tasks: "specs/001-sticky-notes/tasks.md"
+  last_updated: "2026-10-17"
+
+summary:
+  total_tasks: 25
+  completed_tasks: 25
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+
+tasks:
+  - task_id: "T001"
+    description: "Add approved dependencies"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "pubspec.yaml", change_type: "modified", description: "Added Provider, Drift, drift_flutter, drift_dev, and build_runner"}]
+    verification:
+      build_passed: true
+      test_results: {command: "flutter test", passed: 15, failed: 0, skipped: 0, failures: []}
+      notes: "Dependencies resolved successfully."
+  - task_id: "T002"
+    description: "Ignore local databases and generated Drift output"
+    status: "completed"
+    implementation:
+      files_changed: [{file: ".gitignore", change_type: "modified", description: "Ignored SQLite files and generated Drift sources"}]
+    verification: {build_passed: true, notes: "git diff --check passed."}
+  - task_id: "T003"
+    description: "Provide production/test construction seam"
+    status: "completed"
+    implementation:
+      files_changed:
+        - {file: "lib/app/app.dart", change_type: "created", description: "Injectable AppDatabase composition"}
+        - {file: "test/test_support/sticky_notes_fixtures.dart", change_type: "created", description: "Isolated restart-test database fixture"}
+    verification: {build_passed: true, notes: "Used by widget and persistence tests."}
+  - task_id: "T004"
+    description: "Write domain validation tests"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/features/sticky_notes/domain/sticky_note_test.dart", change_type: "created", description: "Valid, empty, and whitespace-only cases"}]
+    verification: {build_passed: true, test_results: {command: "flutter test test/features/sticky_notes/domain/sticky_note_test.dart", passed: 3, failed: 0, skipped: 0, failures: []}}
+  - task_id: "T005"
+    description: "Implement domain entity and repository contract"
+    status: "completed"
+    implementation:
+      files_changed:
+        - {file: "lib/features/sticky_notes/domain/sticky_note.dart", change_type: "created", description: "StickyNote validation and storage entity"}
+        - {file: "lib/features/sticky_notes/domain/sticky_notes_repository.dart", change_type: "created", description: "Persistence-independent repository interface"}
+    verification: {build_passed: true, notes: "Domain tests pass."}
+  - task_id: "T006"
+    description: "Write persistence tests"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/features/sticky_notes/data/sticky_notes_repository_test.dart", change_type: "created", description: "Empty, insert/list, invalid input, restart, and offline cases"}]
+    verification: {build_passed: true, test_results: {command: "flutter test test/features/sticky_notes/data/sticky_notes_repository_test.dart", passed: 4, failed: 0, skipped: 0, failures: []}}
+  - task_id: "T007"
+    description: "Implement Drift persistence"
+    status: "completed"
+    implementation:
+      files_changed:
+        - {file: "lib/features/sticky_notes/data/local/app_database.dart", change_type: "created", description: "SQLite schema and migrations"}
+        - {file: "lib/features/sticky_notes/data/sticky_notes_repository.dart", change_type: "created", description: "Typed local repository adapter"}
+    verification: {build_passed: true, notes: "Generated app_database.g.dart and persistence tests pass."}
+  - task_id: "T008"
+    description: "Write ViewModel tests"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/features/sticky_notes/presentation/sticky_notes_view_model_test.dart", change_type: "created", description: "Loading, creation, validation, and failure cases"}]
+    verification: {build_passed: true, test_results: {command: "flutter test test/features/sticky_notes/presentation/sticky_notes_view_model_test.dart", passed: 4, failed: 0, skipped: 0, failures: []}}
+  - task_id: "T009"
+    description: "Implement ChangeNotifier ViewModel"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "lib/features/sticky_notes/presentation/sticky_notes_view_model.dart", change_type: "created", description: "Presentation state and actions"}]
+    verification: {build_passed: true, notes: "ViewModel tests pass."}
+  - task_id: "T010"
+    description: "Write widget acceptance tests"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/features/sticky_notes/presentation/sticky_notes_page_test.dart", change_type: "created", description: "Create, empty, validation, and save-failure flows"}]
+    verification: {build_passed: true, test_results: {command: "flutter test test/features/sticky_notes/presentation/sticky_notes_page_test.dart", passed: 3, failed: 0, skipped: 0, failures: []}}
+  - task_id: "T011"
+    description: "Implement notes page and editor"
+    status: "completed"
+    implementation:
+      files_changed:
+        - {file: "lib/features/sticky_notes/presentation/sticky_notes_page.dart", change_type: "created", description: "Notes list, empty state, and feedback"}
+        - {file: "lib/features/sticky_notes/widgets/note_editor.dart", change_type: "created", description: "Text input and create action"}
+    verification: {build_passed: true, notes: "Widget tests pass."}
+  - task_id: "T012"
+    description: "Replace starter app composition"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "lib/main.dart", change_type: "modified", description: "Starts Daymark with production local database"}]
+    verification: {build_passed: true, notes: "Root widget test passes."}
+  - task_id: "T013"
+    description: "Test empty and populated viewing"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/features/sticky_notes/presentation/sticky_notes_page_test.dart", change_type: "modified", description: "Empty state and list assertions"}]
+    verification: {build_passed: true, notes: "Covered by widget acceptance suite."}
+  - task_id: "T014"
+    description: "Implement empty/list rendering"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "lib/features/sticky_notes/presentation/sticky_notes_page.dart", change_type: "created", description: "Non-error empty state and list rendering"}]
+    verification: {build_passed: true, notes: "Covered by widget acceptance suite."}
+  - task_id: "T015"
+    description: "Write restart acceptance test"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/features/sticky_notes/data/sticky_notes_repository_test.dart", change_type: "modified", description: "Reopened SQLite file assertion"}]
+    verification: {build_passed: true, notes: "Reopen test passes."}
+  - task_id: "T016"
+    description: "Add restart fixture"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/test_support/sticky_notes_fixtures.dart", change_type: "created", description: "Temporary database file/open helpers"}]
+    verification: {build_passed: true, notes: "Used by restart test."}
+  - task_id: "T017"
+    description: "Write validation/failure ViewModel tests"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/features/sticky_notes/presentation/sticky_notes_view_model_test.dart", change_type: "modified", description: "Invalid input and retained existing notes"}]
+    verification: {build_passed: true, notes: "ViewModel suite passes."}
+  - task_id: "T018"
+    description: "Write validation/failure widget assertions"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/features/sticky_notes/presentation/sticky_notes_page_test.dart", change_type: "modified", description: "Feedback and failed-save assertions"}]
+    verification: {build_passed: true, notes: "Widget suite passes."}
+  - task_id: "T019"
+    description: "Implement failure-safe ViewModel behavior"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "lib/features/sticky_notes/presentation/sticky_notes_view_model.dart", change_type: "created", description: "Validation, error, and retained-list state"}]
+    verification: {build_passed: true, notes: "ViewModel suite passes."}
+  - task_id: "T020"
+    description: "Render validation and persistence errors"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "lib/features/sticky_notes/presentation/sticky_notes_page.dart", change_type: "created", description: "User-facing error feedback"}]
+    verification: {build_passed: true, notes: "Widget suite passes."}
+  - task_id: "T021"
+    description: "Replace starter counter test"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "test/widget_test.dart", change_type: "modified", description: "Daymark screen smoke test"}]
+    verification: {build_passed: true, notes: "Full suite passes."}
+  - task_id: "T022"
+    description: "Update README"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "README.md", change_type: "modified", description: "Documented current local notes scope"}]
+    verification: {build_passed: true, notes: "Documentation-only task."}
+  - task_id: "T023"
+    description: "Record persistence decision"
+    status: "completed"
+    implementation:
+      files_changed: [{file: "docs/decisions/001-sticky-notes-local-persistence.md", change_type: "created", description: "Drift/SQLite decision record"}]
+    verification: {build_passed: true, notes: "Documentation-only task."}
+  - task_id: "T024"
+    description: "Run quality gates"
+    status: "completed"
+    implementation:
+      files_changed: []
+    verification:
+      build_passed: true
+      test_results: {command: "flutter analyze && flutter test", passed: 15, failed: 0, skipped: 0, failures: []}
+      notes: "dart format completed for all changed Dart files."
+  - task_id: "T025"
+    description: "Review scope and completion evidence"
+    status: "completed"
+    implementation:
+      files_changed: []
+    verification: {build_passed: true, notes: "git diff --check passed; no secrets or remote services added."}
+
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-001"
+    requirement: "REQ-001 through REQ-013"
+    plan_phase: "Phase-1 through Phase-5"
+    plan_item: "1.1 through 7.1"
+    tasks: ["T001", "T025"]
+    files: ["pubspec.yaml", "lib/", "test/", "README.md", "docs/decisions/"]
+    status: "complete"
+
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "Hot restart could not be executed because no Flutter app was connected and Windows Flutter launch failed due to missing Visual Studio toolchain."
+  blocking_issues: []

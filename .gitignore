@@ -32,6 +32,10 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+*.sqlite
+*.sqlite3
+*.db
+lib/**/*.g.dart
 
 # Symbolication related
 app.*.symbols
