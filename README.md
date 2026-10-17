@@ -2,6 +2,19 @@
 
 Daymark is an Android-first personal organizer built with Flutter and Dart.
 
+## Stack and architecture
+
+- Flutter and Dart, optimized for Android-first use.
+- MVVM with `Provider` and `ChangeNotifier`.
+- Views handle presentation and interaction; ViewModels handle presentation
+  state and actions.
+- Repositories isolate local persistence from the domain and UI.
+- Drift over SQLite provides durable, offline-first local storage.
+- Business rules remain independent of Flutter widgets and remote services.
+
+Firebase, Firestore, authentication, synchronization, and remote databases are
+explicitly outside the approved scope at this stage.
+
 ## Current functionality
 
 The first feature provides local sticky notes:
@@ -30,3 +43,17 @@ dart format lib test
 flutter analyze
 flutter test
 ```
+
+## SDD and TDD workflow
+
+Feature work follows the approved Spec-Driven Development flow:
+
+1. Define the feature in `specs/<feature>/spec.md`.
+2. Create the technical plan and requirement mapping in `plan.md`.
+3. Generate executable tasks in `tasks.md`.
+4. Implement only the approved scope.
+5. Validate requirements, tests, analysis, formatting, and documentation.
+
+Implementation follows TDD: **Red -> Green -> Refactor**. A regression or new
+behavior should have an automated test before its implementation, and test
+results are reported only after the command has actually been executed.

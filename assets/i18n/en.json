@@ -1,0 +1,54 @@
+{
+  "app": {
+    "name": "daymark.",
+    "language": "Language",
+    "spanish": "Spanish",
+    "english": "English"
+  },
+  "navigation": {
+    "home": "Home",
+    "notes": "Notes",
+    "tasks": "Tasks",
+    "dates": "Dates",
+    "settings": "Settings"
+  },
+  "home": {
+    "welcome": "A place for your little ideas.",
+    "description": "Write, draw, and keep your moments offline.",
+    "stickyNotes": "Sticky Notes",
+    "stickyNotesDescription": "Write down an idea before it gets away.",
+    "growing": "Your space is growing",
+    "comingSoon": "Tasks and important dates will live here."
+  },
+  "notes": {
+    "title": "sticky notes",
+    "search": "Search notes",
+    "dateFilter": "Filter by date",
+    "clearFilters": "Clear filters",
+    "empty": "No notes yet",
+    "emptyDescription": "Write or draw your first idea.",
+    "noMatches": "No matches",
+    "noMatchesDescription": "Try different text or a different date.",
+    "drawingIncluded": "Drawing included",
+    "addNote": "Add note",
+    "titleLabel": "Title",
+    "subtitleLabel": "Subtitle",
+    "noteLabel": "Note",
+    "noteHint": "Write a note",
+    "drawingOptional": "Add a drawing (optional)",
+    "size": "Size",
+    "clearDrawing": "Clear drawing",
+    "erase": "Erase",
+    "usePen": "Use pen"
+  },
+  "settings": {
+    "title": "Settings",
+    "languageTitle": "App language",
+    "languageDescription": "Choose your preferred language for Daymark."
+  },
+  "errors": {
+    "emptyNote": "Note content cannot be empty.",
+    "saveNote": "Unable to save the note. Please try again.",
+    "loadNotes": "Unable to load notes. Please try again."
+  }
+}

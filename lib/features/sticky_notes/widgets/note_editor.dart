@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/drawing/drawing_canvas.dart';
 import '../../../core/drawing/drawing_stroke.dart';
+import '../../../core/localization/app_localizations.dart';
 
 class NoteEditor extends StatelessWidget {
   const NoteEditor({
@@ -25,6 +26,7 @@ class NoteEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
     return Card(
       color: const Color(0xfffff4a8),
       elevation: 4,
@@ -44,21 +46,25 @@ class NoteEditor extends StatelessWidget {
             TextField(
               key: const Key('note-title'),
               controller: titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
+              decoration: InputDecoration(
+                labelText: strings.notes('titleLabel'),
+              ),
             ),
             TextField(
               key: const Key('note-subtitle'),
               controller: subtitleController,
-              decoration: const InputDecoration(labelText: 'Subtitle'),
+              decoration: InputDecoration(
+                labelText: strings.notes('subtitleLabel'),
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
               key: const Key('note-content'),
               controller: controller,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Note',
-                hintText: 'Write a note',
+              decoration: InputDecoration(
+                labelText: strings.notes('noteLabel'),
+                hintText: strings.notes('noteHint'),
                 border: InputBorder.none,
               ),
             ),
@@ -71,9 +77,10 @@ class NoteEditor extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: FilledButton.icon(
+                key: const Key('add-note'),
                 onPressed: onSubmit,
                 icon: const Icon(Icons.add),
-                label: const Text('Add note'),
+                label: Text(strings.notes('addNote')),
               ),
             ),
           ],

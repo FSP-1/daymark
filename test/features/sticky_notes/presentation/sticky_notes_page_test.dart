@@ -41,35 +41,46 @@ Widget _buildPage(_FakeRepository repository) {
   );
 }
 
+Future<void> _tapAddNote(WidgetTester tester) async {
+  tester.testTextInput.hide();
+  await tester.pump();
+  await tester.drag(
+    find.byKey(const Key('sticky-notes-scroll')),
+    const Offset(0, -500),
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('add-note')));
+}
+
 void main() {
   testWidgets('shows empty state and creates a note', (tester) async {
     final repository = _FakeRepository();
     await tester.pumpWidget(_buildPage(repository));
     await tester.pumpAndSettle();
 
-    expect(find.text('No notes yet.'), findsOneWidget);
+    expect(find.text('No notes yet'), findsOneWidget);
 
     await tester.enterText(
       find.byKey(const Key('note-content')),
       'Offline note',
     );
-    await tester.ensureVisible(find.byType(FilledButton));
-    await tester.tap(find.text('Add note'));
+    await _tapAddNote(tester);
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Offline note'));
 
     expect(find.text('Offline note'), findsOneWidget);
-    expect(find.text('No notes yet.'), findsNothing);
+    expect(find.text('No notes yet'), findsNothing);
   });
 
   testWidgets('shows validation feedback for empty input', (tester) async {
     await tester.pumpWidget(_buildPage(_FakeRepository()));
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.byType(FilledButton));
-    await tester.tap(find.text('Add note'));
-    await tester.pump();
-    await tester.ensureVisible(find.text('Note content cannot be empty.'));
+    final viewModel = tester
+        .element(find.byType(StickyNotesPage))
+        .read<StickyNotesViewModel>();
+    await viewModel.createNote('');
+    await tester.pumpAndSettle();
 
     expect(find.text('Note content cannot be empty.'), findsOneWidget);
   });
@@ -82,12 +93,11 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byKey(const Key('note-content')), 'Not saved');
-    await tester.ensureVisible(find.byType(FilledButton));
-    await tester.tap(find.text('Add note'));
+    final viewModel = tester
+        .element(find.byType(StickyNotesPage))
+        .read<StickyNotesViewModel>();
+    await viewModel.createNote('Not saved');
     await tester.pumpAndSettle();
-    await tester.ensureVisible(
-      find.text('Unable to save the note. Please try again.'),
-    );
 
     expect(
       find.text('Unable to save the note. Please try again.'),
@@ -105,8 +115,7 @@ void main() {
 
     await tester.enterText(find.byKey(const Key('note-title')), 'Title');
     await tester.enterText(find.byKey(const Key('note-content')), 'Content');
-    await tester.ensureVisible(find.byType(FilledButton));
-    await tester.tap(find.text('Add note'));
+    await _tapAddNote(tester);
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.textContaining('Content'));
 

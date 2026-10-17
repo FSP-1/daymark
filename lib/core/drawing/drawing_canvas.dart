@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'drawing_stroke.dart';
+import '../localization/app_localizations.dart';
 
 class DrawingCanvas extends StatefulWidget {
   const DrawingCanvas({
@@ -19,16 +20,29 @@ class DrawingCanvas extends StatefulWidget {
 }
 
 class DrawingPreview extends StatelessWidget {
-  const DrawingPreview({required this.strokes, super.key});
+  const DrawingPreview({
+    required this.strokes,
+    this.width = 64,
+    this.height = 48,
+    super.key,
+  });
 
   final List<DrawingStroke> strokes;
+  final double width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 64,
-      height: 48,
-      child: CustomPaint(painter: _DrawingPainter(strokes)),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(color: Color(0x66ffffff)),
+        child: SizedBox(
+          width: width,
+          height: height,
+          child: CustomPaint(painter: _DrawingPainter(strokes)),
+        ),
+      ),
     );
   }
 }
@@ -54,31 +68,40 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
     }
   }
 
-  void _startStroke(Offset point) {
+  DrawingPoint _normalizedPoint(Offset point, Size size) => DrawingPoint(
+    (point.dx / size.width).clamp(0.0, 1.0),
+    (point.dy / size.height).clamp(0.0, 1.0),
+  );
+
+  void _startStroke(Offset point, Size size) {
     setState(() {
       _strokes = [
         ..._strokes,
         DrawingStroke(
-          [DrawingPoint(point.dx, point.dy)],
+          [_normalizedPoint(point, size)],
           isErased: _eraseMode,
           color: _brushColor,
           width: _brushWidth,
+          normalized: true,
         ),
       ];
     });
     widget.onChanged(_strokes);
   }
 
-  void _extendStroke(Offset point) {
+  void _extendStroke(Offset point, Size size) {
     if (_strokes.isEmpty) return;
     final current = _strokes.last;
     setState(() {
       _strokes = [
         ..._strokes.take(_strokes.length - 1),
-        DrawingStroke([
-          ...current.points,
-          DrawingPoint(point.dx, point.dy),
-        ], isErased: current.isErased),
+        DrawingStroke(
+          [...current.points, _normalizedPoint(point, size)],
+          isErased: current.isErased,
+          color: current.color,
+          width: current.width,
+          normalized: current.normalized,
+        ),
       ];
     });
     widget.onChanged(_strokes);
@@ -91,18 +114,21 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
             Text(
-              'Draw something',
+              strings.notes('drawingOptional'),
               style: Theme.of(context).textTheme.titleSmall,
             ),
             const Spacer(),
             IconButton(
-              tooltip: _eraseMode ? 'Use pen' : 'Erase',
+              tooltip: _eraseMode
+                  ? strings.notes('usePen')
+                  : strings.notes('erase'),
               icon: Icon(_eraseMode ? Icons.edit : Icons.auto_fix_high),
               onPressed: () => setState(() => _eraseMode = !_eraseMode),
             ),
@@ -114,7 +140,7 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
               onPressed: () => setState(() => _expanded = !_expanded),
             ),
             IconButton(
-              tooltip: 'Clear drawing',
+              tooltip: strings.notes('clearDrawing'),
               icon: const Icon(Icons.delete_outline),
               onPressed: _clear,
             ),
@@ -122,7 +148,7 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
         ),
         Row(
           children: [
-            const Text('Size'),
+            Text(strings.notes('size')),
             Expanded(
               child: Slider(
                 key: const Key('brush-size'),
@@ -160,20 +186,32 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
               ),
           ],
         ),
-        Container(
+        SizedBox(
           height: _expanded ? 300 : 56,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.55),
-            border: Border.all(color: Colors.black12),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: GestureDetector(
-            onPanStart: (details) => _startStroke(details.localPosition),
-            onPanUpdate: (details) => _extendStroke(details.localPosition),
-            child: CustomPaint(
-              painter: _DrawingPainter(_strokes),
-              child: const SizedBox.expand(),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final size = Size(constraints.maxWidth, constraints.maxHeight);
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.55),
+                    border: Border.all(color: Colors.black12),
+                  ),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onPanStart: (details) =>
+                        _startStroke(details.localPosition, size),
+                    onPanUpdate: (details) =>
+                        _extendStroke(details.localPosition, size),
+                    child: CustomPaint(
+                      painter: _DrawingPainter(_strokes),
+                      child: const SizedBox.expand(),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -188,6 +226,7 @@ class _DrawingPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.clipRect(Offset.zero & size);
     for (final stroke in strokes) {
       final paint = Paint()
         ..color = stroke.isErased ? Colors.white : Color(stroke.color)
@@ -197,10 +236,18 @@ class _DrawingPainter extends CustomPainter {
       final path = Path();
       for (var index = 0; index < stroke.points.length; index++) {
         final point = stroke.points[index];
+        final x = (stroke.normalized ? point.x * size.width : point.x).clamp(
+          0.0,
+          size.width,
+        );
+        final y = (stroke.normalized ? point.y * size.height : point.y).clamp(
+          0.0,
+          size.height,
+        );
         if (index == 0) {
-          path.moveTo(point.x, point.y);
+          path.moveTo(x, y);
         } else {
-          path.lineTo(point.x, point.y);
+          path.lineTo(x, y);
         }
       }
       canvas.drawPath(path, paint);

@@ -8,8 +8,10 @@ class DrawingPoint {
 
   Map<String, double> toJson() => {'x': x, 'y': y};
 
-  factory DrawingPoint.fromJson(Map<String, dynamic> json) =>
-      DrawingPoint(json['x'] as double, json['y'] as double);
+  factory DrawingPoint.fromJson(Map<String, dynamic> json) => DrawingPoint(
+    (json['x'] as num).toDouble(),
+    (json['y'] as num).toDouble(),
+  );
 }
 
 class DrawingStroke {
@@ -18,18 +20,21 @@ class DrawingStroke {
     this.isErased = false,
     this.color = 0xff4527a0,
     this.width = 3,
+    this.normalized = false,
   });
 
   final List<DrawingPoint> points;
   final bool isErased;
   final int color;
   final double width;
+  final bool normalized;
 
   Map<String, dynamic> toJson() => {
     'points': points.map((point) => point.toJson()).toList(),
     'isErased': isErased,
     'color': color,
     'width': width,
+    'normalized': normalized,
   };
 
   factory DrawingStroke.fromJson(Map<String, dynamic> json) => DrawingStroke(
@@ -39,6 +44,7 @@ class DrawingStroke {
     isErased: json['isErased'] as bool? ?? false,
     color: json['color'] as int? ?? 0xff4527a0,
     width: (json['width'] as num?)?.toDouble() ?? 3,
+    normalized: json['normalized'] as bool? ?? false,
   );
 }
 

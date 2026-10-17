@@ -10,7 +10,7 @@ void main() {
     await tester.pumpWidget(DaymarkApp(database: database));
     await tester.pumpAndSettle();
 
-    expect(find.text('Daymark'), findsOneWidget);
+    expect(find.text('daymark.'), findsOneWidget);
     await tester.tap(find.byKey(const Key('notes-nav')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('note-content')), findsOneWidget);

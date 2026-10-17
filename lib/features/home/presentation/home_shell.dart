@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../sticky_notes/presentation/sticky_notes_page.dart';
+import '../../settings/presentation/settings_page.dart';
+import '../../../core/localization/app_localizations.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({required this.stickyNotesPage, super.key});
+  const HomeShell({
+    required this.stickyNotesPage,
+    required this.locale,
+    required this.onLocaleChanged,
+    super.key,
+  });
 
   final StickyNotesPage stickyNotesPage;
+  final Locale locale;
+  final ValueChanged<Locale> onLocaleChanged;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -19,15 +28,14 @@ class _HomeShellState extends State<HomeShell> {
     final pages = [
       _HomeOverview(onOpenNotes: () => setState(() => _selectedIndex = 1)),
       widget.stickyNotesPage,
-      const _FeaturePlaceholder(
-        title: 'Tasks',
-        icon: Icons.check_circle_outline,
-      ),
-      const _FeaturePlaceholder(
-        title: 'Important dates',
-        icon: Icons.event_outlined,
+      _FeaturePlaceholder(title: 'tasks', icon: Icons.check_circle_outline),
+      _FeaturePlaceholder(title: 'dates', icon: Icons.event_outlined),
+      SettingsPage(
+        locale: widget.locale,
+        onLocaleChanged: widget.onLocaleChanged,
       ),
     ];
+    final strings = AppLocalizations.of(context);
 
     return Scaffold(
       body: IndexedStack(index: _selectedIndex, children: pages),
@@ -35,20 +43,27 @@ class _HomeShellState extends State<HomeShell> {
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) =>
             setState(() => _selectedIndex = index),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+        destinations: [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            label: strings.navigation('home'),
+          ),
           NavigationDestination(
             key: Key('notes-nav'),
             icon: Icon(Icons.sticky_note_2_outlined),
-            label: 'Notes',
+            label: strings.navigation('notes'),
           ),
           NavigationDestination(
             icon: Icon(Icons.check_circle_outline),
-            label: 'Tasks',
+            label: strings.navigation('tasks'),
           ),
           NavigationDestination(
             icon: Icon(Icons.event_outlined),
-            label: 'Dates',
+            label: strings.navigation('dates'),
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            label: strings.navigation('settings'),
           ),
         ],
       ),
@@ -63,6 +78,7 @@ class _HomeOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
     return SafeArea(
       child: DecoratedBox(
         decoration: const BoxDecoration(
@@ -75,7 +91,7 @@ class _HomeOverview extends StatelessWidget {
         child: Column(
           children: [
             AppBar(
-              title: const Text('Daymark'),
+              title: Text(strings.appName),
               backgroundColor: Colors.transparent,
               elevation: 0,
             ),
@@ -85,8 +101,23 @@ class _HomeOverview extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      children: [
+                        Text(
+                          strings.appName,
+                          style: Theme.of(context).textTheme.displaySmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xff4c3b68),
+                              ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text('☀', style: TextStyle(fontSize: 24)),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
                     Text(
-                      'Make space for what matters.',
+                      strings.home('welcome'),
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
                             color: const Color(0xff39275f),
@@ -95,21 +126,68 @@ class _HomeOverview extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Your personal organizer, ready to work offline.',
+                      strings.home('description'),
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     const SizedBox(height: 28),
                     Card(
                       color: const Color(0xffffe9a8),
                       elevation: 5,
-                      child: ListTile(
-                        leading: const Icon(Icons.sticky_note_2_outlined),
-                        title: const Text('Sticky Notes'),
-                        subtitle: const Text(
-                          'Capture an idea or draw a thought.',
-                        ),
-                        trailing: const Icon(Icons.arrow_forward),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(22),
                         onTap: onOpenNotes,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      strings.home('stickyNotes'),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      strings.home('stickyNotesDescription'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Transform.rotate(
+                                    angle: -0.12,
+                                    child: const Icon(
+                                      Icons.sticky_note_2,
+                                      size: 54,
+                                      color: Color(0xffffd86b),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: -6,
+                                    bottom: -4,
+                                    child: Transform.rotate(
+                                      angle: 0.12,
+                                      child: const Icon(
+                                        Icons.edit,
+                                        size: 24,
+                                        color: Color(0xff6f5a85),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -118,10 +196,8 @@ class _HomeOverview extends StatelessWidget {
                       elevation: 2,
                       child: ListTile(
                         leading: const Icon(Icons.auto_awesome_outlined),
-                        title: const Text('More features are coming soon'),
-                        subtitle: const Text(
-                          'Tasks and important dates will live here.',
-                        ),
+                        title: Text(strings.home('growing')),
+                        subtitle: Text(strings.home('comingSoon')),
                       ),
                     ),
                   ],
@@ -143,10 +219,11 @@ class _FeaturePlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
     return SafeArea(
       child: Column(
         children: [
-          AppBar(title: Text(title)),
+          AppBar(title: Text(strings.navigation(title))),
           Expanded(
             child: Center(
               child: Column(
@@ -154,7 +231,7 @@ class _FeaturePlaceholder extends StatelessWidget {
                 children: [
                   Icon(icon, size: 56),
                   const SizedBox(height: 16),
-                  Text('$title is coming soon.'),
+                  Text(strings.home('comingSoon')),
                 ],
               ),
             ),
