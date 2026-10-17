@@ -112,6 +112,27 @@ offline repository and MVVM boundaries.
 - [ ] T038 [Plan:10.1] Implement `lib/features/home/presentation/home_shell.dart` and update `lib/app/app.dart` to compose Home without bypassing Provider/MVVM.
 - [ ] T039 [Plan:10.1] Update README, decision documentation, traceability checkpoints, and run all quality gates.
 
+## Phase 11: Session language settings and filter placement
+
+**Purpose**: Make the search flow easier to scan and add the approved Spanish/English
+session setting without introducing remote configuration or preference persistence.
+
+- [ ] T040 [Plan:11.1] Write failing localization tests for loading `assets/i18n/es.json` and
+  `assets/i18n/en.json`, required current UI keys, and switching the active locale without
+  network access.
+- [ ] T041 [Plan:11.1] Implement `lib/core/localization/app_localizations.dart`, register
+  both JSON assets in `pubspec.yaml`, and configure Flutter's supported locale delegates in
+  `lib/app/app.dart`.
+- [ ] T042 [Plan:11.1] Write failing widget tests for the Settings destination and Spanish/English
+  selector, then implement `lib/features/settings/presentation/settings_page.dart` and wire
+  the session-scoped locale through `lib/features/home/presentation/home_shell.dart`.
+- [ ] T043 [Plan:11.1] Move the search/date filter controls below the note editor in
+  `lib/features/sticky_notes/presentation/sticky_notes_page.dart`; verify filtered results
+  render below the controls and localize the affected labels and messages.
+- [ ] T044 [Plan:11.1] Update README and requirement traceability for REQ-028 through REQ-032,
+  run `dart format`, `flutter analyze`, `flutter test`, and verify no generated files or
+  remote dependencies were introduced.
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -195,5 +216,10 @@ T022 and T023 can run in parallel with each other after the feature code stabili
 | REQ-025 | T035 |
 | REQ-026 | T037–T038 |
 | REQ-027 | T037–T039 |
+| REQ-028 | T043–T044 |
+| REQ-029 | T042–T044 |
+| REQ-030 | T040–T042 |
+| REQ-031 | T040–T041 |
+| REQ-032 | T041–T044 |
 
 Every REQ-001 through REQ-027 is mapped to at least one executable task.

@@ -213,6 +213,16 @@ then apply text, date, and combined filters and verify only matching notes are d
   and clearly marked placeholders for future features.
 - **REQ-027**: Home navigation MUST use a bottom navigation structure and keep feature state
   behind the existing Provider/MVVM boundaries.
+- **REQ-028**: The notes filter controls MUST appear below the note editor, and filtered
+  results MUST be rendered below those controls.
+- **REQ-029**: The application MUST provide a Settings entry in the bottom navigation
+  without introducing functional screens for unapproved future features.
+- **REQ-030**: Settings MUST allow the user to switch the interface language between
+  Spanish and English during the active application session.
+- **REQ-031**: Spanish and English interface strings MUST be stored in separate local JSON
+  assets and loaded without network access.
+- **REQ-032**: The selected locale MUST be applied to application-owned labels and to
+  supported Flutter Material, Widgets, and Cupertino localization delegates.
 
 ### Security & Privacy Considerations
 
@@ -259,6 +269,12 @@ then apply text, date, and combined filters and verify only matching notes are d
 - **SC-009**: Future dates are never offered by the date filter.
 - **SC-010**: A saved drawing reappears after reopening the local store.
 - **SC-011**: Home reaches Sticky Notes in one bottom-navigation interaction.
+- **SC-012**: The notes editor, filter controls, and filtered results appear in that order
+  in the notes view.
+- **SC-013**: A user can switch between Spanish and English from Settings without restarting
+  the application.
+- **SC-014**: Localization tests verify that both JSON assets load successfully without
+  network access and provide the strings required by the current UI.
 
 ## Assumptions
 
@@ -269,5 +285,7 @@ then apply text, date, and combined filters and verify only matching notes are d
 - The application can be closed and reopened in the acceptance environment to verify
   persistence.
 - The user can retry after a save failure, while previously saved notes remain readable.
+- The selected language only needs to remain active for the current application session;
+  persistence of this preference is outside the current scope.
 - Ordering of notes is not a product requirement for this feature and will be defined during
   planning only if the existing application requires a deterministic order.

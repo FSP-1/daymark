@@ -23,7 +23,8 @@ can run without a network or remote service.
 **Performance Goals**: Opening the notes view and displaying a small local collection must
 complete within one user interaction without network access; no server latency is permitted  
 **Constraints**: Offline-first; no Firebase, Firestore, authentication, remote databases, or
-synchronization; only create/view/filter notes; no note content in logs; preserve MVVM boundaries
+synchronization; only create/view/filter notes plus session-scoped language settings; no note
+content in logs; preserve MVVM boundaries
 **Scale/Scope**: Initial local single-user collection suitable for ordinary personal notes;
 no multi-user or cloud behavior in this feature
 
@@ -149,6 +150,17 @@ configuration, Flutter test conventions, and the repository's current minimal st
 
 - **Requirements**: REQ-026, REQ-027
 - **Description**: Replace the direct notes root with a Home shell using bottom navigation.
+
+### Step 11: [Cross-cutting] Add session-scoped localization and Settings
+
+- **Requirements**: REQ-028, REQ-029, REQ-030, REQ-031, REQ-032
+- **Design inputs**: `assets/i18n/es.json`, `assets/i18n/en.json`, Constitution IV, VII,
+  and VIII
+- **Description**: Place the notes filter below the editor and render results below the
+  filter. Add a Settings destination and a session-scoped locale state in the application
+  shell. Load Spanish and English strings from local JSON assets through a small
+  localization adapter, and configure Flutter's Material, Widgets, and Cupertino
+  delegates. Do not add remote configuration or persist the language preference yet.
   Provide a Sticky Notes destination and clearly marked future-feature placeholders while
   preserving the existing injected repository and Provider composition.
 
@@ -159,17 +171,22 @@ lib/
 ├── main.dart
 ├── app/
 │   └── app.dart
+├── core/
+│   ├── filtering/
+│   │   └── search_filter.dart
+│   ├── drawing/
+│   │   ├── drawing_stroke.dart
+│   │   └── drawing_canvas.dart
+│   └── localization/
+│       └── app_localizations.dart
 └── features/
-    ├── core/
-    │   ├── filtering/
-    │   │   └── search_filter.dart
-    │   └── drawing/
-    │       ├── drawing_stroke.dart
-    │       └── drawing_canvas.dart
-    └── features/
-        ├── home/
-        │   └── presentation/home_shell.dart
-        └── sticky_notes/
+    ├── home/
+    │   └── presentation/
+    │       └── home_shell.dart
+    ├── settings/
+    │   └── presentation/
+    │       └── settings_page.dart
+    └── sticky_notes/
         ├── data/
         │   ├── local/
         │   │   ├── app_database.dart
@@ -183,6 +200,11 @@ lib/
         │   └── sticky_notes_page.dart
         └── widgets/
             └── note_editor.dart
+
+assets/
+└── i18n/
+    ├── es.json
+    └── en.json
 test/
 ├── features/
 │   └── sticky_notes/
