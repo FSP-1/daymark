@@ -5,8 +5,9 @@
 ## Summary
 
 Replace the starter counter screen with the first Daymark sticky-notes workflow: create and
-view locally persisted notes, reject empty content, show an explicit empty state, and report
-local save failures without false success. The implementation will establish the minimum
+view locally persisted notes, reject empty content, show an explicit empty state, record
+creation metadata, support optional title/subtitle fields, and report local save failures
+without false success. The implementation will establish the minimum
 MVVM layers required by the Constitution, use a repository over Drift/SQLite for durable
 offline storage, and inject dependencies so unit, persistence, and widget acceptance tests
 can run without a network or remote service.
@@ -22,7 +23,7 @@ can run without a network or remote service.
 **Performance Goals**: Opening the notes view and displaying a small local collection must
 complete within one user interaction without network access; no server latency is permitted  
 **Constraints**: Offline-first; no Firebase, Firestore, authentication, remote databases, or
-synchronization; only create/view notes; no note content in logs; preserve MVVM boundaries  
+synchronization; only create/view/filter notes; no note content in logs; preserve MVVM boundaries
 **Scale/Scope**: Initial local single-user collection suitable for ordinary personal notes;
 no multi-user or cloud behavior in this feature
 
@@ -123,6 +124,34 @@ configuration, Flutter test conventions, and the repository's current minimal st
   changed Dart files, run analyzer and full tests, review generated/untracked artifacts,
   and report commands, results, changed files, and remaining limitations.
 
+### Step 8: [Cross-cutting] Add reusable metadata filtering
+
+- **Requirements**: REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020,
+  REQ-021
+- **Design inputs**: Amended `spec.md`; Constitution I, III, IV, and VIII
+- **Description**: Extend the local note schema, domain entity, repository, ViewModel, and
+  editor with creation timestamp, optional title, and optional subtitle. Add a generic
+  filtering utility outside the Sticky Notes feature that accepts text/date selectors and
+  applies all active criteria with AND semantics. Keep it reusable for other features and
+  avoid embedding note-specific behavior in the utility. Add unit, persistence, ViewModel,
+  and widget tests for metadata, localized date display, text/date/combined filters, and
+  clearing filters.
+
+### Step 9: [Cross-cutting] Add bounded date filtering and creative note editor
+
+- **Requirements**: REQ-022, REQ-023, REQ-024, REQ-025
+- **Description**: Bound date-range selection to the current local day, add a Flutter-only
+  freehand canvas with erase and clear operations, serialize strokes for local Drift
+  persistence, and present notes in post-it-style cards. Keep drawing state in the
+  editor/ViewModel boundary and avoid logging or remote transmission.
+
+### Step 10: [Cross-cutting] Add the Home navigation shell
+
+- **Requirements**: REQ-026, REQ-027
+- **Description**: Replace the direct notes root with a Home shell using bottom navigation.
+  Provide a Sticky Notes destination and clearly marked future-feature placeholders while
+  preserving the existing injected repository and Provider composition.
+
 ## Project Structure
 
 ```text
@@ -131,7 +160,16 @@ lib/
 ├── app/
 │   └── app.dart
 └── features/
-    └── sticky_notes/
+    ├── core/
+    │   ├── filtering/
+    │   │   └── search_filter.dart
+    │   └── drawing/
+    │       ├── drawing_stroke.dart
+    │       └── drawing_canvas.dart
+    └── features/
+        ├── home/
+        │   └── presentation/home_shell.dart
+        └── sticky_notes/
         ├── data/
         │   ├── local/
         │   │   ├── app_database.dart

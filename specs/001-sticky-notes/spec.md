@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-sticky-notes`  
 **Created**: 2026-10-15  
-**Status**: Draft  
+**Status**: Amended
 **Input**: `prompts/first/sticky-notes.txt`
 
 ## Scope and Boundaries
@@ -15,14 +15,22 @@
   - Communicating clearly when no notes exist.
   - Rejecting empty or whitespace-only note content.
   - Communicating persistence failures without falsely reporting success.
+  - Recording the creation date for each note.
+  - Optionally capturing a title and subtitle while keeping content mandatory.
+  - Filtering notes by text and/or creation date through a reusable filtering capability.
+  - Limiting date filtering to today and earlier dates.
+  - Drawing freehand content on a note with local persistence and erase/clear controls.
+  - Presenting notes as creative post-it-style cards and providing a Home entry point.
 - **Out of scope**:
-  - Editing, deleting, searching, pinning, colors, reminders, and task management.
+  - Editing, deleting, pinning, reminders, and task management.
   - Authentication and user accounts.
   - Firebase Authentication, Cloud Firestore, remote databases, and synchronization.
   - Unrelated changes to the existing application.
 - **Dependencies requiring approval**:
   - No remote service or authentication dependency is approved for this feature.
   - Any new package or persistence dependency requires justification in the technical plan.
+  - The reusable filter MUST remain independent of Sticky Notes so other features can use
+    or extend it later.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -111,6 +119,35 @@ or induce a persistence failure and verify the resulting feedback and note list.
    understandable error feedback is shown, the note is not presented as successfully
    created, and existing notes remain available.
 
+---
+
+### User Story 5 - Add note metadata and filter notes (Priority: P1)
+
+As a Daymark user, I want to optionally add a title and subtitle, know when a note was
+created, and filter notes by text or creation date so that I can find relevant notes later.
+
+**Why this priority**: Metadata and retrieval are necessary for a usable notes collection
+as soon as more than one note exists.
+
+**Independent Test**: Create notes with and without optional metadata, verify creation dates,
+then apply text, date, and combined filters and verify only matching notes are displayed.
+
+**Acceptance Scenarios**:
+
+1. **Given** a note has valid content and optional title or subtitle, **When** the user
+   saves it, **Then** the note is persisted with those metadata values and its creation
+   timestamp.
+2. **Given** a note has valid content but no title or subtitle, **When** the user saves it,
+   **Then** the note is saved successfully and content remains the required field.
+3. **Given** saved notes have different creation dates, **When** the user filters by a date
+   or date range, **Then** only notes created in that selection are displayed.
+4. **Given** saved notes contain different titles, subtitles, or content, **When** the user
+   enters text in the filter, **Then** notes matching any of those text fields are displayed.
+5. **Given** both text and date criteria are active, **When** the user filters the collection,
+   **Then** only notes matching both criteria are displayed.
+6. **Given** no filter criteria are active, **When** the user views the collection, **Then**
+   all locally saved notes are displayed.
+
 ### Edge Cases
 
 - A note containing leading or trailing whitespace MUST be handled consistently; validation
@@ -120,6 +157,10 @@ or induce a persistence failure and verify the resulting feedback and note list.
 - Opening the notes view before any note has been saved MUST produce the empty state, not
   an exception or an empty-looking failure state.
 - A persistence failure MUST leave the user able to retry or continue viewing existing notes.
+- A missing title or subtitle MUST NOT prevent saving a note when content is valid.
+- A date filter MUST use the note creation date and MUST behave consistently at date
+  boundaries in the device's local timezone.
+- Clearing filter criteria MUST restore the complete local collection.
 - Reopening after a successful save MUST not lose the saved note because the device is offline.
 - The feature MUST NOT create duplicate visible notes merely because the notes view is opened
   or refreshed.
@@ -151,6 +192,27 @@ or induce a persistence failure and verify the resulting feedback and note list.
 - **REQ-012**: The feature MUST NOT log note content, credentials, or other sensitive data.
 - **REQ-013**: The implementation MUST preserve the approved project architecture and MUST
   keep note business rules independent of presentation and external services.
+- **REQ-014**: The application MUST assign and persist a creation timestamp when a note is
+  created.
+- **REQ-015**: The application MUST allow title and subtitle to be omitted while requiring
+  non-whitespace content.
+- **REQ-016**: The notes view MUST display the localized creation date for each note.
+- **REQ-017**: The application MUST provide a reusable filtering function independent of
+  Sticky Notes that can filter items by text and/or creation date.
+- **REQ-018**: The notes view MUST allow filtering by text across title, subtitle, and content.
+- **REQ-019**: The notes view MUST allow filtering by a creation date or date range.
+- **REQ-020**: When text and date filters are both active, the application MUST display only
+  notes matching both criteria.
+- **REQ-021**: Clearing all filter criteria MUST restore every locally saved note.
+- **REQ-022**: Date filtering MUST NOT allow dates later than the current local calendar date.
+- **REQ-023**: A note editor MUST provide a freehand drawing canvas with local stroke persistence.
+- **REQ-024**: The drawing canvas MUST provide an erase mode and a clear-drawing action.
+- **REQ-025**: Note presentation MUST use post-it-style cards with visual hierarchy beyond plain
+  list rows while preserving readable content and localized dates.
+- **REQ-026**: The application MUST provide a Home entry point with navigation to Sticky Notes
+  and clearly marked placeholders for future features.
+- **REQ-027**: Home navigation MUST use a bottom navigation structure and keep feature state
+  behind the existing Provider/MVVM boundaries.
 
 ### Security & Privacy Considerations
 
@@ -162,6 +224,8 @@ or induce a persistence failure and verify the resulting feedback and note list.
   messages beyond what is necessary to identify a failure without exposing the content.
 - **SP-004**: Secrets, credentials, private keys, and generated local databases MUST NOT be
   committed to the repository.
+- **SP-005**: The reusable filtering capability MUST not log or transmit note content.
+- **SP-006**: Drawing data MUST remain local and MUST NOT be logged or transmitted.
 
 ### Key Entities
 
@@ -170,6 +234,8 @@ or induce a persistence failure and verify the resulting feedback and note list.
   non-whitespace character.
 - **Notes Collection**: The locally available set of sticky notes displayed by the notes view.
   It can be empty and MUST have an explicit empty-state presentation.
+- **Search Filter**: A reusable text/date criteria object and filtering operation that can be
+  applied to different feature entities through field and date selectors.
 
 ## Success Criteria *(mandatory)*
 
@@ -187,6 +253,12 @@ or induce a persistence failure and verify the resulting feedback and note list.
   or less, including when the collection is empty.
 - **SC-006**: The feature introduces zero remote-service, authentication, or synchronization
   dependencies.
+- **SC-007**: Users can find a matching note using text and/or creation date filters in one
+  interaction after entering criteria.
+- **SC-008**: 100% of saved notes display a localized creation date and retain it after restart.
+- **SC-009**: Future dates are never offered by the date filter.
+- **SC-010**: A saved drawing reappears after reopening the local store.
+- **SC-011**: Home reaches Sticky Notes in one bottom-navigation interaction.
 
 ## Assumptions
 
@@ -199,4 +271,3 @@ or induce a persistence failure and verify the resulting feedback and note list.
 - The user can retry after a save failure, while previously saved notes remain readable.
 - Ordering of notes is not a product requirement for this feature and will be defined during
   planning only if the existing application requires a deterministic order.
-

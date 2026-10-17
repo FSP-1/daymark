@@ -9,7 +9,7 @@ import 'package:daymark/features/sticky_notes/presentation/sticky_notes_view_mod
 
 class _FakeRepository implements StickyNotesRepository {
   _FakeRepository([Iterable<StickyNote> initialNotes = const []])
-      : notes = initialNotes.toList();
+    : notes = initialNotes.toList();
 
   final List<StickyNote> notes;
   Object? saveError;
@@ -23,6 +23,9 @@ class _FakeRepository implements StickyNotesRepository {
     final saved = StickyNote.fromStorage(
       id: notes.length + 1,
       content: note.content,
+      title: note.title,
+      subtitle: note.subtitle,
+      createdAt: note.createdAt,
     );
     notes.add(saved);
     return saved;
@@ -46,9 +49,14 @@ void main() {
 
     expect(find.text('No notes yet.'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField), 'Offline note');
+    await tester.enterText(
+      find.byKey(const Key('note-content')),
+      'Offline note',
+    );
+    await tester.ensureVisible(find.byType(FilledButton));
     await tester.tap(find.text('Add note'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Offline note'));
 
     expect(find.text('Offline note'), findsOneWidget);
     expect(find.text('No notes yet.'), findsNothing);
@@ -58,22 +66,78 @@ void main() {
     await tester.pumpWidget(_buildPage(_FakeRepository()));
     await tester.pumpAndSettle();
 
+    await tester.ensureVisible(find.byType(FilledButton));
     await tester.tap(find.text('Add note'));
     await tester.pump();
+    await tester.ensureVisible(find.text('Note content cannot be empty.'));
 
     expect(find.text('Note content cannot be empty.'), findsOneWidget);
   });
 
-  testWidgets('shows save failure without displaying the failed note', (tester) async {
+  testWidgets('shows save failure without displaying the failed note', (
+    tester,
+  ) async {
     final repository = _FakeRepository()..saveError = Exception('failed');
     await tester.pumpWidget(_buildPage(repository));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), 'Not saved');
+    await tester.enterText(find.byKey(const Key('note-content')), 'Not saved');
+    await tester.ensureVisible(find.byType(FilledButton));
     await tester.tap(find.text('Add note'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(
+      find.text('Unable to save the note. Please try again.'),
+    );
 
-    expect(find.text('Unable to save the note. Please try again.'), findsOneWidget);
+    expect(
+      find.text('Unable to save the note. Please try again.'),
+      findsOneWidget,
+    );
     expect(find.byType(ListTile), findsNothing);
+  });
+
+  testWidgets('accepts optional title and displays creation date', (
+    tester,
+  ) async {
+    final repository = _FakeRepository();
+    await tester.pumpWidget(_buildPage(repository));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('note-title')), 'Title');
+    await tester.enterText(find.byKey(const Key('note-content')), 'Content');
+    await tester.ensureVisible(find.byType(FilledButton));
+    await tester.tap(find.text('Add note'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.textContaining('Content'));
+
+    expect(find.text('Title'), findsAtLeastNWidgets(1));
+    expect(find.textContaining('Content'), findsOneWidget);
+    final localizations = MaterialLocalizations.of(
+      tester.element(find.byType(StickyNotesPage)),
+    );
+    expect(
+      find.textContaining(localizations.formatMediumDate(DateTime.now())),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('filters notes by text', (tester) async {
+    final repository = _FakeRepository([
+      StickyNote.create(content: 'Shopping', createdAt: DateTime(2026, 10, 17)),
+      StickyNote.create(content: 'Project', createdAt: DateTime(2026, 10, 18)),
+    ]);
+    await tester.pumpWidget(_buildPage(repository));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('note-search')), 'shopping');
+    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.text('Shopping'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+
+    expect(find.text('Shopping'), findsOneWidget);
+    expect(find.text('Project'), findsNothing);
   });
 }

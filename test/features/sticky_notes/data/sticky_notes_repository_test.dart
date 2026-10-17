@@ -27,17 +27,28 @@ void main() {
   });
 
   test('saves and lists a note', () async {
-    await repository.saveNote(StickyNote.create('Offline note'));
+    final createdAt = DateTime(2026, 10, 17);
+    await repository.saveNote(
+      StickyNote.create(
+        content: 'Offline note',
+        title: 'Title',
+        subtitle: 'Subtitle',
+        createdAt: createdAt,
+      ),
+    );
 
     final notes = await repository.listNotes();
 
     expect(notes, hasLength(1));
     expect(notes.single.content, 'Offline note');
+    expect(notes.single.title, 'Title');
+    expect(notes.single.subtitle, 'Subtitle');
+    expect(notes.single.createdAt, createdAt);
   });
 
   test('rejects invalid notes before persistence', () async {
     expect(
-      () => repository.saveNote(StickyNote.create(' \t')),
+      () => repository.saveNote(StickyNote.create(content: ' \t')),
       throwsA(isA<InvalidStickyNoteException>()),
     );
     expect(await repository.listNotes(), isEmpty);
@@ -47,7 +58,7 @@ void main() {
     final file = createTemporaryStickyNotesDatabaseFile();
     final firstDatabase = openTemporaryStickyNotesDatabase(file);
     await DriftStickyNotesRepository(firstDatabase)
-        .saveNote(StickyNote.create('Persistent note'));
+        .saveNote(StickyNote.create(content: 'Persistent note'));
     await firstDatabase.close();
 
     final reopenedDatabase = openTemporaryStickyNotesDatabase(file);

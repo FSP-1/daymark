@@ -22,6 +22,9 @@ class _FakeRepository implements StickyNotesRepository {
     final saved = StickyNote.fromStorage(
       id: notes.length + 1,
       content: note.content,
+      title: note.title,
+      subtitle: note.subtitle,
+      createdAt: note.createdAt,
     );
     notes.add(saved);
     return saved;
@@ -73,5 +76,32 @@ void main() {
       viewModel.errorMessage,
       'Unable to save the note. Please try again.',
     );
+  });
+
+  test('filters notes by text and date and clears filters', () async {
+    final repository = _FakeRepository([
+      StickyNote.create(
+        content: 'Shopping',
+        title: 'Weekend',
+        createdAt: DateTime(2026, 10, 17),
+      ),
+      StickyNote.create(
+        content: 'Project',
+        title: 'Work',
+        createdAt: DateTime(2026, 10, 18),
+      ),
+    ]);
+    final viewModel = StickyNotesViewModel(repository);
+    await viewModel.load();
+
+    viewModel.setFilter(
+      text: 'shopping',
+      fromDate: DateTime(2026, 10, 17),
+      toDate: DateTime(2026, 10, 17),
+    );
+
+    expect(viewModel.visibleNotes.single.content, 'Shopping');
+    viewModel.clearFilter();
+    expect(viewModel.visibleNotes, hasLength(2));
   });
 }

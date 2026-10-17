@@ -5,6 +5,7 @@ import '../features/sticky_notes/data/local/app_database.dart';
 import '../features/sticky_notes/data/sticky_notes_repository.dart';
 import '../features/sticky_notes/presentation/sticky_notes_page.dart';
 import '../features/sticky_notes/presentation/sticky_notes_view_model.dart';
+import '../features/home/presentation/home_shell.dart';
 
 class DaymarkApp extends StatefulWidget {
   const DaymarkApp({required this.database, super.key});
@@ -37,7 +38,7 @@ class _DaymarkAppState extends State<DaymarkApp> {
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
       home: ChangeNotifierProvider(
         create: (_) => StickyNotesViewModel(_repository)..load(),
-        child: const StickyNotesPage(),
+        child: const HomeShell(stickyNotesPage: StickyNotesPage()),
       ),
     );
   }

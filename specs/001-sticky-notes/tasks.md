@@ -6,7 +6,7 @@ description: "Standalone task list for the Sticky Notes feature"
 
 **Input artifacts**: [spec.md](./spec.md), [plan.md](./plan.md), [research.md](./research.md)  
 **Tests**: Required by the specification and Constitution; follow Red-Green-Refactor ordering.  
-**Scope**: Create and view locally persisted notes only; no remote services, authentication, synchronization, or unrelated behavior.
+**Scope**: Create, view, and filter locally persisted notes with optional metadata; no remote services, authentication, synchronization, or unrelated behavior.
 
 ## Phase 1: Setup (Shared Infrastructure)
 
@@ -86,6 +86,32 @@ description: "Standalone task list for the Sticky Notes feature"
 - [ ] T024 [Plan:7.1] Run `dart format` on changed files under `lib/` and `test/`, then run `flutter analyze` and `flutter test`; resolve failures without expanding feature scope.
 - [ ] T025 [Plan:7.1] Review `git diff` for `lib/`, `test/`, `pubspec.yaml`, `.gitignore`, `README.md`, and `docs/decisions/001-sticky-notes-local-persistence.md`; verify no note content, credentials, secrets, or generated local databases are logged or committed, and record commands, results, changed files, and limitations in the feature completion report.
 
+## Phase 8: User Story 5 — Metadata and reusable filtering
+
+**Purpose**: Add creation metadata and reusable text/date filtering while preserving the
+offline repository and MVVM boundaries.
+
+- [ ] T026 [Plan:8.1] Write failing domain, persistence, and reusable-filter tests for creation dates, optional title/subtitle, inclusive date ranges, combined text/date criteria, and clearing criteria.
+- [ ] T027 [Plan:8.1] Extend `StickyNote`, the Drift schema/migration, repository mapping, and fixtures for nullable title/subtitle and persisted creation timestamps; make the metadata tests pass.
+- [ ] T028 [Plan:8.1] Implement the generic `SearchFilter` and `filterItems<T>` utility under `lib/core/filtering/`, independent of Sticky Notes, and make its focused tests pass.
+- [ ] T029 [Plan:8.1] Add ViewModel filter state and visible-note projection with AND semantics across text and date criteria; make focused ViewModel tests pass.
+- [ ] T030 [Plan:8.1] Add optional title/subtitle inputs, localized creation-date display, text search, date-range selection, clear-filter behavior, and a distinct no-match state to the notes UI; make widget acceptance tests pass.
+- [ ] T031 [Plan:8.1] Update README, traceability checkpoints, and task status for REQ-014 through REQ-021, then run formatting, analysis, the full test suite, and final scope/security review.
+
+## Phase 9: Bounded dates, drawing, and post-it presentation
+
+- [ ] T032 [Plan:9.1] Write failing tests for rejecting future date ranges, drawing stroke serialization, erase/clear behavior, and drawing persistence.
+- [ ] T033 [Plan:9.1] Add the reusable drawing stroke model and canvas interaction layer under `lib/core/drawing/`, with tests independent of Sticky Notes widgets.
+- [ ] T034 [Plan:9.1] Migrate the Drift schema to store optional serialized drawing data and map it through the domain model and repository.
+- [ ] T035 [Plan:9.1] Extend the note editor with a post-it visual treatment, drawing canvas, erase mode, and clear action; add widget coverage for the new controls.
+- [ ] T036 [Plan:9.1] Bound `showDateRangePicker` to today and reject programmatic future ranges in the filtering boundary.
+
+## Phase 10: Home navigation shell
+
+- [ ] T037 [Plan:10.1] Write failing widget tests for Home bottom navigation, Sticky Notes routing, and future-feature placeholders.
+- [ ] T038 [Plan:10.1] Implement `lib/features/home/presentation/home_shell.dart` and update `lib/app/app.dart` to compose Home without bypassing Provider/MVVM.
+- [ ] T039 [Plan:10.1] Update README, decision documentation, traceability checkpoints, and run all quality gates.
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -155,5 +181,19 @@ T022 and T023 can run in parallel with each other after the feature code stabili
 | REQ-011 | T011, T014, T020–T025 |
 | REQ-012 | T007, T019, T023, T025 |
 | REQ-013 | T003–T005, T009, T011, T019 |
+| REQ-014 | T026–T027 |
+| REQ-015 | T026–T027 |
+| REQ-016 | T026–T030 |
+| REQ-017 | T026–T028 |
+| REQ-018 | T026, T029–T030 |
+| REQ-019 | T026, T028–T030 |
+| REQ-020 | T026, T029–T030 |
+| REQ-021 | T026, T029–T031 |
+| REQ-022 | T032, T036 |
+| REQ-023 | T032–T035 |
+| REQ-024 | T032–T035 |
+| REQ-025 | T035 |
+| REQ-026 | T037–T038 |
+| REQ-027 | T037–T039 |
 
-Every REQ-001 through REQ-013 is mapped to at least one executable task.
+Every REQ-001 through REQ-027 is mapped to at least one executable task.

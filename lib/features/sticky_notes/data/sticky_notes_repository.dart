@@ -15,14 +15,18 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
 
   @override
   Future<List<StickyNote>> listNotes() async {
-    final rows = await (database.select(database.notes)
-          ..orderBy([(note) => OrderingTerm.asc(note.id)]))
-        .get();
+    final rows = await (database.select(
+      database.notes,
+    )..orderBy([(note) => OrderingTerm.asc(note.id)])).get();
     return rows
         .map(
           (row) => StickyNote.fromStorage(
             id: row.id,
+            title: row.title,
+            subtitle: row.subtitle,
             content: row.content,
+            createdAt: row.createdAt,
+            drawingData: row.drawingData,
           ),
         )
         .toList();
@@ -34,9 +38,24 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
       throw const InvalidStickyNoteException();
     }
 
-    final id = await database.into(database.notes).insert(
-          NotesCompanion.insert(content: note.content),
+    final id = await database
+        .into(database.notes)
+        .insert(
+          NotesCompanion.insert(
+            title: Value(note.title),
+            subtitle: Value(note.subtitle),
+            content: note.content,
+            createdAt: Value(note.createdAt),
+            drawingData: Value(note.drawingData),
+          ),
         );
-    return StickyNote.fromStorage(id: id, content: note.content);
+    return StickyNote.fromStorage(
+      id: id,
+      title: note.title,
+      subtitle: note.subtitle,
+      content: note.content,
+      createdAt: note.createdAt,
+      drawingData: note.drawingData,
+    );
   }
 }
