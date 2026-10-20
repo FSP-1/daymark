@@ -20,12 +20,20 @@ class Notes extends Table {
   TextColumn get drawingData => text().nullable()();
 }
 
-@DriftDatabase(tables: [Notes])
+class AppPreferences extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  TextColumn get style => text().withDefault(const Constant('soft'))();
+
+  TextColumn get palette => text().withDefault(const Constant('vanilla'))();
+}
+
+@DriftDatabase(tables: [Notes, AppPreferences])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -38,6 +46,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 3) {
         await migrator.addColumn(notes, notes.drawingData);
+      }
+      if (from < 4) {
+        await migrator.createTable(appPreferences);
       }
     },
   );

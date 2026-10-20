@@ -15,7 +15,7 @@
   buttons, inputs, and Settings.
 - Local persistence and restoration across application restarts.
 - Safe defaults for missing or invalid saved values.
-- Responsive and accessible selection controls and a compact current-theme preview.
+- Responsive and accessible selection controls.
 - A compact UI Style dropdown with exactly one selected style visible at a time.
 - A localized description of the selected style; the three large style previews must
   not be rendered simultaneously.
@@ -59,10 +59,9 @@ that feel coherent.
 
 ### User Story 3 — Preview and apply appearance
 
-As a user, I want to preview the resulting appearance and see changes immediately.
+As a user, I want to see appearance changes immediately.
 
-1. Settings shows a preview using the current style and palette.
-2. Selecting either preference updates `MaterialApp` without restarting.
+1. Selecting either preference updates `MaterialApp` without restarting.
 3. The active theme applies consistently to existing screens and controls.
 4. Layout remains usable on small and large Android screens.
 
@@ -85,7 +84,7 @@ As a user, I want my appearance choices to remain after closing and reopening Da
 - **REQ-003**: Style and palette MUST be independent preferences.
 - **REQ-004**: Every style/palette combination MUST produce a valid `ThemeData`.
 - **REQ-005**: Settings MUST provide accessible controls for all three styles and six
-  palettes, including selected-state indication and visual previews.
+  palettes, including selected-state indication.
 - **REQ-006**: Selecting a style or palette MUST update the active application theme
   immediately without restarting.
 - **REQ-007**: The active theme MUST apply consistently to Home, Sticky Notes, note
@@ -122,7 +121,7 @@ As a user, I want my appearance choices to remain after closing and reopening Da
   database and invalid/missing values use defaults.
 - **SC-005**: Existing Sticky Notes tests remain green with no schema changes to Notes.
 - **SC-006**: No new network, authentication, cloud, or synchronization dependency is added.
-- **SC-007**: Settings selection controls expose selected values and previews in widget tests.
+- **SC-007**: Settings selection controls expose selected values in widget tests.
 - **SC-008**: Widget tests confirm a single style dropdown exposes exactly three
   options and displays the selected style description.
 - **SC-009**: Theme tests confirm the style tokens and heading font families differ

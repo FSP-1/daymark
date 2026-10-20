@@ -79,15 +79,10 @@ class _HomeOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
     return SafeArea(
       child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xfff4efff), Color(0xfffff8ec)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+        decoration: BoxDecoration(color: colors.surface),
         child: Column(
           children: [
             AppBar(
@@ -108,7 +103,7 @@ class _HomeOverview extends StatelessWidget {
                           style: Theme.of(context).textTheme.displaySmall
                               ?.copyWith(
                                 fontWeight: FontWeight.w800,
-                                color: const Color(0xff4c3b68),
+                                color: colors.primary,
                               ),
                         ),
                         const SizedBox(width: 8),
@@ -120,7 +115,7 @@ class _HomeOverview extends StatelessWidget {
                       strings.home('welcome'),
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
-                            color: const Color(0xff39275f),
+                            color: colors.primary,
                             fontWeight: FontWeight.w800,
                           ),
                     ),
@@ -131,7 +126,7 @@ class _HomeOverview extends StatelessWidget {
                     ),
                     const SizedBox(height: 28),
                     Card(
-                      color: const Color(0xffffe9a8),
+                      color: colors.secondaryContainer,
                       elevation: 5,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(22),
@@ -163,10 +158,10 @@ class _HomeOverview extends StatelessWidget {
                                 children: [
                                   Transform.rotate(
                                     angle: -0.12,
-                                    child: const Icon(
+                                    child: Icon(
                                       Icons.sticky_note_2,
                                       size: 54,
-                                      color: Color(0xffffd86b),
+                                      color: colors.tertiaryContainer,
                                     ),
                                   ),
                                   Positioned(
@@ -174,10 +169,10 @@ class _HomeOverview extends StatelessWidget {
                                     bottom: -4,
                                     child: Transform.rotate(
                                       angle: 0.12,
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.edit,
                                         size: 24,
-                                        color: Color(0xff6f5a85),
+                                        color: colors.primary,
                                       ),
                                     ),
                                   ),
@@ -192,7 +187,7 @@ class _HomeOverview extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Card(
-                      color: const Color(0xffdcecff),
+                      color: colors.surfaceContainerHighest,
                       elevation: 2,
                       child: ListTile(
                         leading: const Icon(Icons.auto_awesome_outlined),

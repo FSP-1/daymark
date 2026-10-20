@@ -82,6 +82,6 @@ discoverability, selected-state semantics, and responsive behavior.
 - Pure tests for the three styles, six palettes, semantic tokens, and all combinations.
 - Repository tests for persistence, restoration, invalid values, and missing values.
 - ViewModel tests for independent updates and reset behavior.
-- Widget tests for Settings selection, the single dropdown, selected-state indicators, previews, and
+- Widget tests for Settings selection, the single dropdown, and selected-state indicators.
   immediate theme updates.
 - Full regression suite for Sticky Notes and Home navigation.

@@ -28,7 +28,7 @@ definitions and passed to `MaterialApp`
    resulting `ThemeData` to `MaterialApp`.
 7. `SettingsPage` renders one compact style dropdown, a localized description of
    the current style, palette swatches, current selection, and a resulting-theme
-   preview. It does not render three large style previews simultaneously.
+   and does not render a separate preview card or three large style previews.
 
 ## Implementation Steps
 
@@ -51,11 +51,11 @@ definitions and passed to `MaterialApp`
 - Load preferences before the main shell, expose immutable active configuration, persist
   each change independently, and use safe defaults for invalid/missing records.
 
-### Step 4: Build Settings selection and preview UI
+### Step 4: Build Settings selection UI
 
 - **Requirements**: REQ-005, REQ-006, REQ-014
 - Replace the language-only Settings content with one compact style dropdown,
-  selected-style description, palette selectors, semantic preview, reset action,
+  selected-style description, palette selectors, reset action,
   responsive wrapping, and accessible labels.
 - Centralize style typography in `AppStyleTokens` and compose heading/body families
   through `ThemeData`; use documented Android generic families and fallbacks rather

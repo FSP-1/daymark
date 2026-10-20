@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "daymark.",
+    "name": "Daymark.",
     "language": "Language",
     "spanish": "Spanish",
     "english": "English"
@@ -21,7 +21,7 @@
     "comingSoon": "Tasks and important dates will live here."
   },
   "notes": {
-    "title": "sticky notes",
+    "title": "Sticky Notes",
     "search": "Search notes",
     "dateFilter": "Filter by date",
     "clearFilters": "Clear filters",
@@ -44,7 +44,23 @@
   "settings": {
     "title": "Settings",
     "languageTitle": "App language",
-    "languageDescription": "Choose your preferred language for Daymark."
+    "languageDescription": "Choose your preferred language for Daymark.",
+    "styleTitle": "Visual style",
+    "styleDescription": "Soft, expressive, or clean depending on the selected style.",
+    "softDescription": "Rounded forms, gentle shadows, and a calm reading experience.",
+    "playfulDescription": "Expressive headings, creative shapes, and a cheerful touch.",
+    "minimalDescription": "Clean hierarchy, simple shapes, and restrained decoration.",
+    "paletteTitle": "Color palette",
+    "reset": "Reset appearance",
+    "soft": "Soft",
+    "playful": "Playful",
+    "minimal": "Minimal",
+    "vanilla": "Vanilla",
+    "sage": "Sage",
+    "rose": "Rose",
+    "sky": "Sky",
+    "lavender": "Lavender",
+    "peach": "Peach"
   },
   "errors": {
     "emptyNote": "Note content cannot be empty.",

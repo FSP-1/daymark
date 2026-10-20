@@ -191,7 +191,6 @@ class _StickyNotesPageState extends State<StickyNotesPage> {
                                   ? note.title!
                                   : note.content,
                               style: const TextStyle(
-                                fontFamily: 'cursive',
                                 fontSize: 18,
                                 fontStyle: FontStyle.italic,
                                 fontWeight: FontWeight.w600,

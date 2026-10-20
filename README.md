@@ -31,6 +31,10 @@ The first feature provides local sticky notes:
   areas, and Settings.
 - Change the application language between Spanish and English from Settings.
 - Store Spanish and English interface strings in local JSON assets.
+- Choose one of three appearance styles (Soft, Playful, or Minimal).
+- Choose one of six color palettes (Vanilla, Sage, Rose, Sky, Lavender, or Peach).
+- Apply appearance changes immediately across the application.
+- Restore appearance preferences after restarting the app while offline.
 - Keep notes available after closing and reopening the app.
 - Create and view notes without an Internet connection.
 - Show validation and persistence error feedback without reporting false success.
@@ -51,6 +55,28 @@ selected locale.
 The selected language currently applies for the active application session. A
 future approved feature may persist this preference locally; no remote service is
 used for language selection.
+
+## Appearance customization
+
+Feature 002 centralizes visual customization under [lib/core/theme/](lib/core/theme/):
+
+- `app_styles.dart` defines the three component-treatment styles.
+- `theme_presets.dart` defines the six semantic color palettes.
+- `app_theme.dart` composes any style/palette combination into `ThemeData`.
+
+Appearance preferences are managed by `ThemeViewModel` and stored in a separate
+Drift `AppPreferences` table. The existing `Notes` table and note serialization
+are unchanged. Preferences load before the main shell is rendered, so the app
+does not show the default theme while saved values are being restored. Missing
+or invalid values fall back to Soft + Vanilla.
+
+Settings provides one compact UI Style dropdown, a localized description of the
+selected style, selected-state indicators, a reset action, and responsive palette
+swatches. Typography is centralized in the style
+tokens: Soft uses warm serif headings, Playful uses the Android generic `cursive`
+family with a sans-serif fallback, and Minimal uses a neutral sans-serif
+hierarchy. No font dependency or unverified font asset is included; Comic Sans MS
+is not assumed to be installed on Android.
 
 ## Development checks
 

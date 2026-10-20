@@ -58,6 +58,11 @@ void main() {
     await tester.pumpWidget(_buildPage(repository));
     await tester.pumpAndSettle();
 
+    await tester.drag(
+      find.byKey(const Key('sticky-notes-scroll')),
+      const Offset(0, -500),
+    );
+    await tester.pumpAndSettle();
     expect(find.text('No notes yet'), findsOneWidget);
 
     await tester.enterText(
@@ -81,6 +86,11 @@ void main() {
         .read<StickyNotesViewModel>();
     await viewModel.createNote('');
     await tester.pumpAndSettle();
+    await tester.drag(
+      find.byKey(const Key('sticky-notes-scroll')),
+      const Offset(0, -500),
+    );
+    await tester.pumpAndSettle();
 
     expect(find.text('Note content cannot be empty.'), findsOneWidget);
   });
@@ -97,6 +107,11 @@ void main() {
         .element(find.byType(StickyNotesPage))
         .read<StickyNotesViewModel>();
     await viewModel.createNote('Not saved');
+    await tester.pumpAndSettle();
+    await tester.drag(
+      find.byKey(const Key('sticky-notes-scroll')),
+      const Offset(0, -500),
+    );
     await tester.pumpAndSettle();
 
     expect(

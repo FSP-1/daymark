@@ -42,9 +42,9 @@ description: "Standalone task list for Customizable UI Styles and Color Themes"
 ## Phase 4: Settings UI
 
 - [x] T011 [Plan:4] Write failing widget tests for the compact style dropdown, six palette
-  swatches, selection indicators, preview, reset, accessibility labels, and immediate updates in
+  swatches, selection indicators, reset, accessibility labels, and immediate updates in
   `test/features/settings/presentation/settings_page_test.dart`.
-- [x] T012 [Plan:4] Implement responsive style/palette selectors and preview in
+- [x] T012 [Plan:4] Implement responsive style/palette selectors in
   `lib/features/settings/presentation/settings_page.dart`.
 - [x] T013 [Plan:4] Add localized strings for style and palette names in both JSON assets
   and verify the Settings widget uses them.

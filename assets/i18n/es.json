@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "daymark.",
+    "name": "Daymark.",
     "language": "Idioma",
     "spanish": "Español",
     "english": "Inglés"
@@ -21,7 +21,7 @@
     "comingSoon": "Las tareas y fechas importantes estarán aquí."
   },
   "notes": {
-    "title": "notas adhesivas",
+    "title": "Notas Adhesivas",
     "search": "Buscar notas",
     "dateFilter": "Filtrar por fecha",
     "clearFilters": "Limpiar filtros",
@@ -44,7 +44,23 @@
   "settings": {
     "title": "Ajustes",
     "languageTitle": "Idioma de la aplicación",
-    "languageDescription": "Elige el idioma que prefieras para Daymark."
+    "languageDescription": "Elige el idioma que prefieras para Daymark.",
+    "styleTitle": "Estilo visual",
+    "styleDescription": "Suave, expresivo o limpio según el estilo seleccionado.",
+    "softDescription": "Formas redondeadas, sombras suaves y una lectura tranquila.",
+    "playfulDescription": "Titulares expresivos, formas creativas y un toque alegre.",
+    "minimalDescription": "Una jerarquía limpia, formas sencillas y poca decoración.",
+    "paletteTitle": "Paleta de color",
+    "reset": "Restablecer apariencia",
+    "soft": "Suave",
+    "playful": "Juguetón",
+    "minimal": "Minimalista",
+    "vanilla": "Vainilla",
+    "sage": "Salvia",
+    "rose": "Rosa",
+    "sky": "Cielo",
+    "lavender": "Lavanda",
+    "peach": "Melocotón"
   },
   "errors": {
     "emptyNote": "El contenido de la nota no puede estar vacío.",
