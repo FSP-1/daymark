@@ -3,7 +3,8 @@
     "name": "Daymark.",
     "language": "Idioma",
     "spanish": "Español",
-    "english": "Inglés"
+    "english": "Inglés",
+    "loading": "Cargando..."
   },
   "navigation": {
     "home": "Inicio",

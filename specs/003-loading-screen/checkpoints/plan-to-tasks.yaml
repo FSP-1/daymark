@@ -1,0 +1,15 @@
+feature: 003-loading-screen
+plan: specs/003-loading-screen/plan.md
+tasks: specs/003-loading-screen/tasks.md
+status: ready-for-review
+plan_items:
+  - id: 1.1
+    tasks: [T001, T002, T003, T004]
+  - id: 2.1
+    tasks: [T005, T006, T007, T008, T009]
+  - id: 3.1
+    tasks: [T010, T011, T012, T013, T014]
+  - id: 4.1
+    tasks: [T015, T016, T017, T018]
+  - id: 5.1
+    tasks: [T019, T020, T021, T022, T023, T024, T025]

@@ -14,6 +14,7 @@ class AppLocalizations {
       'language': 'Language',
       'spanish': 'Spanish',
       'english': 'English',
+      'loading': 'Loading...',
     },
     'navigation': {
       'home': 'Home',
@@ -91,6 +92,7 @@ class AppLocalizations {
   String get language => _read('app.language', 'Language');
   String get spanish => _read('app.spanish', 'Spanish');
   String get english => _read('app.english', 'English');
+  String get loading => _read('app.loading', 'Loading...');
 
   String navigation(String key) => _read('navigation.$key', key);
   String home(String key) => _read('home.$key', key);
