@@ -35,6 +35,9 @@ The first feature provides local sticky notes:
 - Choose one of six color palettes (Vanilla, Sage, Rose, Sky, Lavender, or Peach).
 - Apply appearance changes immediately across the application.
 - Restore appearance preferences after restarting the app while offline.
+- Show a branded Flutter loading screen during startup and use the Daymark symbol
+  for the in-app loading composition; the Android launcher uses the separate icon
+  asset and adaptive background resources.
 - Keep notes available after closing and reopening the app.
 - Create and view notes without an Internet connection.
 - Show validation and persistence error feedback without reporting false success.

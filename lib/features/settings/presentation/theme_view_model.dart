@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_styles.dart';
 import '../../../core/theme/theme_presets.dart';
@@ -11,13 +12,27 @@ class ThemeViewModel extends ChangeNotifier {
   AppStyle style = AppStyle.soft;
   AppPalette palette = AppPalette.vanilla;
   bool isLoading = true;
+  Object? error;
 
   Future<void> load() async {
     isLoading = true;
+    error = null;
     notifyListeners();
-    final preferences = await repository.load();
-    style = preferences.style;
-    palette = preferences.palette;
+    try {
+      final preferences = await repository.load();
+      style = preferences.style;
+      palette = preferences.palette;
+    } catch (exception, stackTrace) {
+      error = exception;
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: exception,
+          stack: stackTrace,
+          library: 'daymark',
+          context: ErrorDescription('restoring appearance preferences'),
+        ),
+      );
+    }
     isLoading = false;
     notifyListeners();
   }

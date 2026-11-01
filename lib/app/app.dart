@@ -10,6 +10,7 @@ import '../features/home/presentation/home_shell.dart';
 import '../features/settings/data/theme_preferences_repository.dart';
 import '../features/settings/presentation/theme_view_model.dart';
 import '../core/localization/app_localizations.dart';
+import '../core/loading/app_loading_screen.dart';
 import '../core/theme/app_theme.dart';
 
 class DaymarkApp extends StatefulWidget {
@@ -48,13 +49,6 @@ class _DaymarkAppState extends State<DaymarkApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (_themeViewModel.isLoading) {
-      return const MaterialApp(
-        title: 'daymark.',
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
-      );
-    }
-
     return MaterialApp(
       title: 'daymark.',
       locale: _locale,
@@ -69,17 +63,19 @@ class _DaymarkAppState extends State<DaymarkApp> {
         style: _themeViewModel.style,
         palette: _themeViewModel.palette,
       ),
-      home: ChangeNotifierProvider(
-        create: (_) => StickyNotesViewModel(_repository)..load(),
-        child: ChangeNotifierProvider.value(
-          value: _themeViewModel,
-          child: HomeShell(
-            stickyNotesPage: const StickyNotesPage(),
-            locale: _locale,
-            onLocaleChanged: (locale) => setState(() => _locale = locale),
-          ),
-        ),
-      ),
+      home: _themeViewModel.isLoading
+          ? const Scaffold(body: AppLoadingScreen())
+          : ChangeNotifierProvider(
+              create: (_) => StickyNotesViewModel(_repository)..load(),
+              child: ChangeNotifierProvider.value(
+                value: _themeViewModel,
+                child: HomeShell(
+                  stickyNotesPage: const StickyNotesPage(),
+                  locale: _locale,
+                  onLocaleChanged: (locale) => setState(() => _locale = locale),
+                ),
+              ),
+            ),
     );
   }
 }
