@@ -17,7 +17,9 @@ explicitly outside the approved scope at this stage.
 
 ## Current functionality
 
-The first feature provides local sticky notes:
+Daymark currently provides local sticky notes and Daily recurring activities.
+
+### Sticky Notes
 
 - Create notes containing at least one non-whitespace character.
 - Optionally add a title and subtitle; every note records its localized creation date.
@@ -42,9 +44,26 @@ The first feature provides local sticky notes:
 - Create and view notes without an Internet connection.
 - Show validation and persistence error feedback without reporting false success.
 
-Notes are currently stored locally on the device. Authentication, Firebase, Firestore,
-remote databases, synchronization, editing, deleting, pinning, colors,
-reminders, and task management are not part of the current feature.
+### Daily activities
+
+- Create, edit, and delete recurring activities stored locally with Drift/SQLite.
+- Choose `Anytime` or a specific local wall-clock time.
+- Select and persist an activity icon from the built-in Daily icon catalog.
+- Mark activities complete or incomplete for the current local calendar date.
+- Preserve completion history across dates without duplicating recurring activities.
+- Enable optional local notifications for specific-time activities.
+- Request notification permission only when the user enables reminders; notification
+  failures do not block local activity CRUD or completion tracking.
+- Use responsive activity cards and a scrollable, localized create/edit dialog with
+  icon selection, schedule controls, reminder settings, and delete confirmation.
+- Support Daily UI strings in Spanish and English across the existing theme styles and
+  color palettes.
+
+Daily remains offline-first. Authentication, Firebase, Firestore, remote databases,
+cloud synchronization, weekly/custom recurrence, snoozing, and remote notifications
+are not part of the current scope. Operating-system alarm restrictions may delay or
+prevent local notifications; Android build and emulator verification is performed by
+the implementation owner.
 
 ## Localization and settings
 
@@ -100,6 +119,10 @@ Feature work follows the approved Spec-Driven Development flow:
 3. Generate executable tasks in `tasks.md`.
 4. Implement only the approved scope.
 5. Validate requirements, tests, analysis, formatting, and documentation.
+
+Feature specifications and implementation artifacts are tracked under
+[`specs/`](specs/), including the implemented Daily feature in
+[`specs/004-daily/`](specs/004-daily/).
 
 Implementation follows TDD: **Red -> Green -> Refactor**. A regression or new
 behavior should have an automated test before its implementation, and test

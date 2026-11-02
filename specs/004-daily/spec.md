@@ -2,7 +2,7 @@
 
 **Feature Branch**: `004-daily`  
 **Created**: 2026-11-01  
-**Status**: Draft for implementation  
+**Status**: Implemented
 **Input**: Daymark Daily feature request
 
 ## Scope and Boundaries
@@ -14,6 +14,9 @@
 - Persisting completion history without duplicating the recurring activity for each day.
 - Two scheduling modes: Anytime and Specific time.
 - Optional local notifications only for Specific time activities.
+- User-selectable activity icons persisted with each activity.
+- A responsive Daily activity list and rounded create/edit dialog with accessible
+  icon, schedule, reminder, completion, and delete controls.
 - A reusable, feature-independent notification service and observer/event mechanism.
 - English and Spanish localization for every user-facing Daily and notification string.
 - Integration with the existing MVVM, Provider/ChangeNotifier, Drift/SQLite,
@@ -61,8 +64,10 @@ schedule labels.
 2. **Given** a valid activity name, **when** the user saves it as Anytime, **then**
    it is persisted and displayed without a scheduled time or notification control.
 3. **Given** a valid activity name and time, **when** the user saves it as Specific
-   time, **then** the configured time is displayed.
-4. **Given** the device is offline, **when** the user creates or views activities,
+   time, **then** the configured time and compact reminder state are displayed.
+4. **Given** an activity icon is selected, **when** the user saves or reopens the
+   activity, **then** the selected icon is preserved.
+5. **Given** the device is offline, **when** the user creates or views activities,
    **then** all local CRUD behavior remains available.
 
 ### User Story 2 - Edit and delete activities (Priority: P1)
@@ -82,6 +87,8 @@ delete it, and verify the resulting local collection and notification operations
    deleted, **then** its notification is cancelled and the activity disappears.
 4. **Given** an Anytime activity, **when** it is edited, **then** notification
    controls remain unavailable until Specific time is selected.
+5. **Given** an existing activity, **when** the user changes its icon and saves,
+   **then** the new icon is persisted and displayed.
 
 ### User Story 3 - Track completion by calendar date (Priority: P1)
 
@@ -150,6 +157,12 @@ locales, then inspect labels, contrast, semantics, and touch targets.
    is conveyed by more than color alone and the toggle has an accessible state label.
 4. **Given** a narrow or large display, **when** the list and editor render, **then**
    controls remain usable without clipping or inaccessible overflow.
+5. **Given** the activity editor is open with limited vertical space or the keyboard
+   visible, **when** the user scrolls the form, **then** all fields and actions remain
+   reachable without a layout overflow.
+6. **Given** a selected activity icon, **when** the icon grid renders, **then** the
+   selected icon has a subtle theme-based surface and clear selection border while
+   unselected icons avoid strong filled backgrounds.
 
 ## Functional Requirements
 
@@ -160,6 +173,8 @@ locales, then inspect labels, contrast, semantics, and touch targets.
 - **REQ-003**: Anytime activities MUST NOT expose or schedule notifications.
 - **REQ-004**: Specific time activities MUST display their configured time and MAY have
   notifications enabled or disabled independently.
+- **REQ-004a**: Each activity MUST preserve a user-selected `iconKey` from the
+  `DailyActivityIcons` catalog; unknown keys MUST fall back safely to the default icon.
 - **REQ-005**: Editing a scheduled activity MUST update its persisted values and
   notification schedule consistently.
 - **REQ-006**: Deleting an activity MUST remove it and cancel its notification, if any.
@@ -185,6 +200,12 @@ locales, then inspect labels, contrast, semantics, and touch targets.
 - **REQ-016**: Every new user-facing string MUST exist in English and Spanish resources.
 - **REQ-017**: Daily MUST use existing MVVM, Provider/ChangeNotifier, repositories,
   centralized theme tokens, and accessible Material controls.
+- **REQ-017a**: Daily activity cards MUST use a consistent responsive layout with the
+  selected icon, prominent title, compact schedule/reminder metadata, edit control,
+  and completion control aligned in one row.
+- **REQ-017b**: The create/edit form MUST use a scrollable rounded dialog, responsive
+  icon grid, segmented schedule selector, conditional reminder section, and separate
+  primary, secondary, and destructive actions without hardcoded colors.
 - **REQ-018**: Daily MUST preserve existing Sticky Notes behavior and MUST NOT alter
   existing Notes columns or semantics.
 - **REQ-019**: The implementation MUST include tests for domain rules, persistence,
@@ -218,6 +239,8 @@ Use two new tables in a later implementation migration; do not modify `Notes`.
 - `scheduledHour`: nullable integer 0–23; required only for Specific time.
 - `scheduledMinute`: nullable integer 0–59; required only for Specific time.
 - `notificationsEnabled`: boolean; always false for Anytime.
+- `iconKey`: required stable key from `DailyActivityIcons`; defaults to `repeat` for
+  records created before icon selection was introduced.
 - `createdAt`, `updatedAt`: local timestamps for deterministic ordering/auditing.
 
 ### `DailyCompletions`
