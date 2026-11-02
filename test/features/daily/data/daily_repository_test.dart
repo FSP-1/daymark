@@ -19,9 +19,11 @@ void main() {
         notificationsEnabled: false,
         createdAt: now,
         updatedAt: now,
+        iconKey: 'walk',
       ),
     );
 
+    expect((await repository.listActivities()).single.iconKey, 'walk');
     await repository.setCompleted(
       activityId: activity.id!,
       localDate: '2026-11-01',

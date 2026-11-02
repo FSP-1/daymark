@@ -27,6 +27,7 @@ class DriftDailyRepository implements DailyRepository {
     final companion = db.DailyActivitiesCompanion(
       id: activity.id == null ? const Value.absent() : Value(activity.id!),
       name: Value(activity.name.trim()),
+      iconKey: Value(activity.iconKey),
       scheduleMode: Value(activity.schedule.mode.name),
       scheduledHour: Value(activity.schedule.hour),
       scheduledMinute: Value(activity.schedule.minute),
@@ -107,6 +108,7 @@ class DriftDailyRepository implements DailyRepository {
     return DailyActivity(
       id: row.id,
       name: row.name,
+      iconKey: row.iconKey,
       schedule: schedule,
       notificationsEnabled:
           row.notificationsEnabled && schedule.hasSpecificTime,

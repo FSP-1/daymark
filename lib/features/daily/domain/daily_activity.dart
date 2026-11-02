@@ -8,6 +8,7 @@ class DailyActivity {
     required this.notificationsEnabled,
     required this.createdAt,
     required this.updatedAt,
+    this.iconKey = 'repeat',
   });
 
   final int? id;
@@ -16,6 +17,7 @@ class DailyActivity {
   final bool notificationsEnabled;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String iconKey;
 
   bool get isValid =>
       name.trim().isNotEmpty &&
@@ -29,6 +31,7 @@ class DailyActivity {
     bool? notificationsEnabled,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? iconKey,
   }) {
     return DailyActivity(
       id: id ?? this.id,
@@ -37,6 +40,7 @@ class DailyActivity {
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      iconKey: iconKey ?? this.iconKey,
     );
   }
 }

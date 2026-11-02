@@ -33,6 +33,8 @@ class DailyActivities extends Table {
 
   TextColumn get name => text()();
 
+  TextColumn get iconKey => text().withDefault(const Constant('repeat'))();
+
   TextColumn get scheduleMode => text()();
 
   IntColumn get scheduledHour => integer().nullable()();
@@ -58,12 +60,14 @@ class DailyCompletions extends Table {
   Set<Column<Object>> get primaryKey => {activityId, localDate};
 }
 
-@DriftDatabase(tables: [Notes, AppPreferences, DailyActivities, DailyCompletions])
+@DriftDatabase(
+  tables: [Notes, AppPreferences, DailyActivities, DailyCompletions],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -83,6 +87,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 5) {
         await migrator.createTable(dailyActivities);
         await migrator.createTable(dailyCompletions);
+      }
+      if (from < 6) {
+        await migrator.addColumn(dailyActivities, dailyActivities.iconKey);
       }
     },
   );

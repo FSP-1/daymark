@@ -92,6 +92,7 @@ class DailyViewModel extends ChangeNotifier {
     required String name,
     required DailySchedule schedule,
     required bool notificationsEnabled,
+    String iconKey = 'repeat',
   }) async {
     final existing = id == null
         ? null
@@ -103,6 +104,7 @@ class DailyViewModel extends ChangeNotifier {
       notificationsEnabled: schedule.hasSpecificTime && notificationsEnabled,
       createdAt: existing?.createdAt ?? _now(),
       updatedAt: _now(),
+      iconKey: iconKey,
     );
     if (!activity.isValid) {
       errorMessage = 'invalidDaily';
