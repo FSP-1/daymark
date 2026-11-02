@@ -55,9 +55,23 @@ class PlatformNotificationService implements NotificationService {
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
-      final granted = await android?.requestNotificationsPermission() ?? false;
+      if (android == null) {
+        return const NotificationCapability(
+          availability: NotificationAvailability.unavailable,
+          message: 'Android notification API unavailable',
+        );
+      }
+
+      if (await android.areNotificationsEnabled() == true) {
+        return const NotificationCapability(
+          availability: NotificationAvailability.available,
+        );
+      }
+
+      await android.requestNotificationsPermission();
+      final enabledAfterRequest = await android.areNotificationsEnabled();
       return NotificationCapability(
-        availability: granted
+        availability: enabledAfterRequest == true
             ? NotificationAvailability.available
             : NotificationAvailability.denied,
       );

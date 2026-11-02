@@ -65,6 +65,8 @@ class AppLocalizations {
       'anytime': 'Anytime',
       'specificTime': 'Specific time',
       'notifications': 'Enable notifications',
+      'notificationEnabled': 'Reminder enabled',
+      'notificationDisabled': 'No reminder',
       'completed': 'Completed',
       'incomplete': 'Incomplete',
       'delete': 'Delete activity',

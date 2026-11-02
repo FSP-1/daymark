@@ -55,6 +55,8 @@
     "anytime": "En cualquier momento",
     "specificTime": "Hora específica",
     "notifications": "Activar notificaciones",
+    "notificationEnabled": "Recordatorio activado",
+    "notificationDisabled": "Sin recordatorio",
     "completed": "Completada",
     "incomplete": "Incompleta",
     "delete": "Eliminar actividad",

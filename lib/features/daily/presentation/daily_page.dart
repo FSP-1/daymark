@@ -144,60 +144,33 @@ class _DailyList extends StatelessWidget {
             ),
             subtitle: Text(
               activity.schedule.hasSpecificTime
-                  ? schedule
+                  ? '$schedule · ${activity.notificationsEnabled ? strings.daily('notificationEnabled') : strings.daily('notificationDisabled')}'
                   : '${strings.daily('anytime')} · '
                         '${completed ? strings.daily('completed') : strings.daily('incomplete')}',
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (activity.schedule.hasSpecificTime)
-                  Semantics(
-                    label: strings.daily('notifications'),
-                    toggled: activity.notificationsEnabled,
-                    child: Switch(
-                      key: ValueKey('daily-notification-${activity.id}'),
-                      value: activity.notificationsEnabled,
-                      onChanged: (enabled) async {
-                        final changed = await viewModel.setNotificationsEnabled(
-                          activity,
-                          enabled,
-                        );
-                        if (!changed && context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(strings.daily('permissionDenied')),
-                            ),
-                          );
-                        }
-                      },
+            trailing: PopupMenuButton<String>(
+              onSelected: (value) async {
+                if (value == 'edit') {
+                  final viewModel = context.read<DailyViewModel>();
+                  await showDialog<void>(
+                    context: context,
+                    builder: (_) => ChangeNotifierProvider.value(
+                      value: viewModel,
+                      child: _DailyEditorDialog(activity: activity),
                     ),
-                  ),
-                PopupMenuButton<String>(
-                  onSelected: (value) async {
-                    if (value == 'edit') {
-                      final viewModel = context.read<DailyViewModel>();
-                      await showDialog<void>(
-                        context: context,
-                        builder: (_) => ChangeNotifierProvider.value(
-                          value: viewModel,
-                          child: _DailyEditorDialog(activity: activity),
-                        ),
-                      );
-                    } else {
-                      await _confirmDelete(context, activity);
-                    }
-                  },
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: Text(strings.daily('edit')),
-                    ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Text(strings.daily('delete')),
-                    ),
-                  ],
+                  );
+                } else {
+                  await _confirmDelete(context, activity);
+                }
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Text(strings.daily('edit')),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text(strings.daily('delete')),
                 ),
               ],
             ),
