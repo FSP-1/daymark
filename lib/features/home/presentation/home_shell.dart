@@ -4,6 +4,7 @@ import '../../sticky_notes/presentation/sticky_notes_page.dart';
 import '../../settings/presentation/settings_page.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../daily/presentation/daily_page.dart';
+import 'home_feature_grid.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({
@@ -32,6 +33,7 @@ class _HomeShellState extends State<HomeShell> {
       _HomeOverview(
         onOpenNotes: () => setState(() => _selectedIndex = 1),
         onOpenDaily: () => setState(() => _selectedIndex = 2),
+        onOpenDates: () => setState(() => _selectedIndex = 3),
       ),
       widget.stickyNotesPage,
       widget.dailyPage,
@@ -79,15 +81,36 @@ class _HomeShellState extends State<HomeShell> {
 }
 
 class _HomeOverview extends StatelessWidget {
-  const _HomeOverview({required this.onOpenNotes, required this.onOpenDaily});
+  const _HomeOverview({
+    required this.onOpenNotes,
+    required this.onOpenDaily,
+    required this.onOpenDates,
+  });
 
   final VoidCallback onOpenNotes;
   final VoidCallback onOpenDaily;
+  final VoidCallback onOpenDates;
 
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
+    final featureNotes = Color.alphaBlend(
+      colors.tertiary.withValues(alpha: 0.22),
+      colors.surface,
+    );
+    final featureDaily = Color.alphaBlend(
+      colors.secondary.withValues(alpha: 0.28),
+      colors.surface,
+    );
+    final featureDates = Color.alphaBlend(
+      colors.primary.withValues(alpha: 0.16),
+      colors.surface,
+    );
+    final featureFuture = Color.alphaBlend(
+      colors.tertiary.withValues(alpha: 0.12),
+      colors.surface,
+    );
     return SafeArea(
       child: DecoratedBox(
         decoration: BoxDecoration(color: colors.surface),
@@ -133,88 +156,42 @@ class _HomeOverview extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     const SizedBox(height: 28),
-                    Card(
-                      color: colors.secondaryContainer,
-                      elevation: 5,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(22),
-                        onTap: onOpenNotes,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      strings.home('stickyNotes'),
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    SizedBox(height: 6),
-                                    Text(
-                                      strings.home('stickyNotesDescription'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Transform.rotate(
-                                    angle: -0.12,
-                                    child: Icon(
-                                      Icons.sticky_note_2,
-                                      size: 54,
-                                      color: colors.tertiaryContainer,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: -6,
-                                    bottom: -4,
-                                    child: Transform.rotate(
-                                      angle: 0.12,
-                                      child: Icon(
-                                        Icons.edit,
-                                        size: 24,
-                                        color: colors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward),
-                            ],
-                          ),
+                    HomeFeatureGrid(
+                      features: [
+                        HomeFeature(
+                          title: strings.home('stickyNotes'),
+                          description: strings.home('stickyNotesDescription'),
+                          icon: Icons.sticky_note_2_outlined,
+                          backgroundColor: featureNotes,
+                          foregroundColor: colors.onSurface,
+                          onTap: onOpenNotes,
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Card(
-                      color: colors.primaryContainer,
-                      elevation: 3,
-                      child: ListTile(
-                        key: const Key('daily-fast-travel'),
-                        leading: const Icon(Icons.check_circle_outline),
-                        title: Text(strings.daily('title')),
-                        subtitle: Text(strings.daily('emptyDescription')),
-                        trailing: const Icon(Icons.arrow_forward),
-                        onTap: onOpenDaily,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Card(
-                      color: colors.surfaceContainerHighest,
-                      elevation: 2,
-                      child: ListTile(
-                        leading: const Icon(Icons.auto_awesome_outlined),
-                        title: Text(strings.home('growing')),
-                        subtitle: Text(strings.home('comingSoon')),
-                      ),
+                        HomeFeature(
+                          key: const Key('daily-fast-travel'),
+                          title: strings.daily('title'),
+                          description: strings.home('dailyDescription'),
+                          icon: Icons.check_circle_outline,
+                          backgroundColor: featureDaily,
+                          foregroundColor: colors.onSurface,
+                          onTap: onOpenDaily,
+                        ),
+                        HomeFeature(
+                          title: strings.navigation('dates'),
+                          description: strings.home('datesDescription'),
+                          icon: Icons.event_outlined,
+                          backgroundColor: featureDates,
+                          foregroundColor: colors.onSurface,
+                          onTap: onOpenDates,
+                        ),
+                        HomeFeature(
+                          title: strings.home('growing'),
+                          description: strings.home('comingSoon'),
+                          icon: Icons.auto_awesome_outlined,
+                          backgroundColor: featureFuture,
+                          foregroundColor: colors.onSurface,
+                          onTap: () {},
+                        ),
+                      ],
                     ),
                   ],
                 ),

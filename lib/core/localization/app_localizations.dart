@@ -29,6 +29,8 @@ class AppLocalizations {
       'description': 'Write, draw, and keep your moments offline.',
       'stickyNotes': 'Sticky Notes',
       'stickyNotesDescription': 'Write down an idea before it gets away.',
+      'dailyDescription': 'Small steps make a meaningful day.',
+      'datesDescription': 'Keep important moments close at hand.',
       'growing': 'Your space is growing',
       'comingSoon': 'Tasks and important dates will live here.',
     },

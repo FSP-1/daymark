@@ -31,6 +31,8 @@ Daymark currently provides local sticky notes and Daily recurring activities.
 - Create a freehand drawing with erase and clear controls; drawing data is persisted locally.
 - Use the Home screen and bottom navigation to reach Sticky Notes, future feature
   areas, and Settings.
+- Use Home as the feature launcher with a responsive two-column grid for Sticky
+  Notes, Daily, Important Dates, and future features.
 - Change the application language between Spanish and English from Settings.
 - Store Spanish and English interface strings in local JSON assets.
 - Choose one of three appearance styles (Soft, Playful, or Minimal).
