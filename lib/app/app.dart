@@ -12,6 +12,11 @@ import '../features/settings/presentation/theme_view_model.dart';
 import '../core/localization/app_localizations.dart';
 import '../core/loading/app_loading_screen.dart';
 import '../core/theme/app_theme.dart';
+import '../core/notifications/platform_notification_service.dart';
+import '../features/daily/data/daily_notification_coordinator.dart';
+import '../features/daily/data/daily_repository.dart';
+import '../features/daily/presentation/daily_page.dart';
+import '../features/daily/presentation/daily_view_model.dart';
 
 class DaymarkApp extends StatefulWidget {
   const DaymarkApp({required this.database, super.key});
@@ -69,10 +74,20 @@ class _DaymarkAppState extends State<DaymarkApp> {
               create: (_) => StickyNotesViewModel(_repository)..load(),
               child: ChangeNotifierProvider.value(
                 value: _themeViewModel,
-                child: HomeShell(
-                  stickyNotesPage: const StickyNotesPage(),
-                  locale: _locale,
-                  onLocaleChanged: (locale) => setState(() => _locale = locale),
+                child: ChangeNotifierProvider(
+                  create: (_) => DailyViewModel(
+                    repository: DriftDailyRepository(widget.database),
+                    notifications: DailyNotificationCoordinator(
+                      PlatformNotificationService(),
+                    ),
+                  )..load(),
+                  child: HomeShell(
+                    stickyNotesPage: const StickyNotesPage(),
+                    dailyPage: const DailyPage(),
+                    locale: _locale,
+                    onLocaleChanged: (locale) =>
+                        setState(() => _locale = locale),
+                  ),
                 ),
               ),
             ),

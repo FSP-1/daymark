@@ -28,12 +28,42 @@ class AppPreferences extends Table {
   TextColumn get palette => text().withDefault(const Constant('vanilla'))();
 }
 
-@DriftDatabase(tables: [Notes, AppPreferences])
+class DailyActivities extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  TextColumn get name => text()();
+
+  TextColumn get scheduleMode => text()();
+
+  IntColumn get scheduledHour => integer().nullable()();
+
+  IntColumn get scheduledMinute => integer().nullable()();
+
+  BoolColumn get notificationsEnabled =>
+      boolean().withDefault(const Constant(false))();
+
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+class DailyCompletions extends Table {
+  IntColumn get activityId => integer()();
+
+  TextColumn get localDate => text()();
+
+  DateTimeColumn get completedAt => dateTime().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {activityId, localDate};
+}
+
+@DriftDatabase(tables: [Notes, AppPreferences, DailyActivities, DailyCompletions])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -49,6 +79,10 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 4) {
         await migrator.createTable(appPreferences);
+      }
+      if (from < 5) {
+        await migrator.createTable(dailyActivities);
+        await migrator.createTable(dailyCompletions);
       }
     },
   );

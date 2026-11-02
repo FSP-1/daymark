@@ -20,6 +20,7 @@ class AppLocalizations {
       'home': 'Home',
       'notes': 'Notes',
       'tasks': 'Tasks',
+      'daily': 'Daily',
       'dates': 'Dates',
       'settings': 'Settings',
     },
@@ -52,6 +53,27 @@ class AppLocalizations {
       'erase': 'Erase',
       'usePen': 'Use pen',
     },
+    'daily': {
+      'title': 'Daily',
+      'empty': 'No daily activities yet',
+      'emptyDescription': 'Add something you want to accomplish every day.',
+      'add': 'Add activity',
+      'edit': 'Edit activity',
+      'name': 'Activity',
+      'nameHint': 'e.g. Read for 30 minutes',
+      'schedule': 'Schedule',
+      'anytime': 'Anytime',
+      'specificTime': 'Specific time',
+      'notifications': 'Enable notifications',
+      'completed': 'Completed',
+      'incomplete': 'Incomplete',
+      'delete': 'Delete activity',
+      'deleteConfirmation': 'Delete this daily activity?',
+      'cancel': 'Cancel',
+      'save': 'Save',
+      'permissionDenied':
+          'Notifications are not available. You can try again in settings.',
+    },
     'settings': {
       'title': 'Ajustes',
       'languageDescription': 'Elige el idioma que prefieras para Daymark.',
@@ -80,6 +102,13 @@ class AppLocalizations {
       'emptyNote': 'Note content cannot be empty.',
       'saveNote': 'Unable to save the note. Please try again.',
       'loadNotes': 'Unable to load notes. Please try again.',
+      'invalidDaily': 'Enter an activity name and a valid time.',
+      'loadDaily': 'Unable to load daily activities. Please try again.',
+      'saveDaily': 'Unable to save the activity. Please try again.',
+      'deleteDaily': 'Unable to delete the activity. Please try again.',
+      'completionDaily': 'Unable to update completion. Please try again.',
+      'notificationUnavailable':
+          'The activity was saved, but notifications are unavailable.',
     },
   });
 
@@ -97,6 +126,8 @@ class AppLocalizations {
   String navigation(String key) => _read('navigation.$key', key);
   String home(String key) => _read('home.$key', key);
   String notes(String key) => _read('notes.$key', key);
+  String daily(String key) => _read('daily.$key', key);
+  String notification(String key) => _read('notification.$key', key);
   String settings(String key) => _read('settings.$key', key);
   String error(String key) => _read('errors.$key', key);
 

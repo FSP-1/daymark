@@ -3,18 +3,21 @@ import 'package:flutter/material.dart';
 import '../../sticky_notes/presentation/sticky_notes_page.dart';
 import '../../settings/presentation/settings_page.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../daily/presentation/daily_page.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({
     required this.stickyNotesPage,
     required this.locale,
     required this.onLocaleChanged,
+    required this.dailyPage,
     super.key,
   });
 
   final StickyNotesPage stickyNotesPage;
   final Locale locale;
   final ValueChanged<Locale> onLocaleChanged;
+  final DailyPage dailyPage;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -26,9 +29,12 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      _HomeOverview(onOpenNotes: () => setState(() => _selectedIndex = 1)),
+      _HomeOverview(
+        onOpenNotes: () => setState(() => _selectedIndex = 1),
+        onOpenDaily: () => setState(() => _selectedIndex = 2),
+      ),
       widget.stickyNotesPage,
-      _FeaturePlaceholder(title: 'tasks', icon: Icons.check_circle_outline),
+      widget.dailyPage,
       _FeaturePlaceholder(title: 'dates', icon: Icons.event_outlined),
       SettingsPage(
         locale: widget.locale,
@@ -54,8 +60,9 @@ class _HomeShellState extends State<HomeShell> {
             label: strings.navigation('notes'),
           ),
           NavigationDestination(
+            key: const Key('daily-nav'),
             icon: Icon(Icons.check_circle_outline),
-            label: strings.navigation('tasks'),
+            label: strings.navigation('daily'),
           ),
           NavigationDestination(
             icon: Icon(Icons.event_outlined),
@@ -72,9 +79,10 @@ class _HomeShellState extends State<HomeShell> {
 }
 
 class _HomeOverview extends StatelessWidget {
-  const _HomeOverview({required this.onOpenNotes});
+  const _HomeOverview({required this.onOpenNotes, required this.onOpenDaily});
 
   final VoidCallback onOpenNotes;
+  final VoidCallback onOpenDaily;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +99,7 @@ class _HomeOverview extends StatelessWidget {
               elevation: 0,
             ),
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,6 +191,19 @@ class _HomeOverview extends StatelessWidget {
                             ],
                           ),
                         ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      color: colors.primaryContainer,
+                      elevation: 3,
+                      child: ListTile(
+                        key: const Key('daily-fast-travel'),
+                        leading: const Icon(Icons.check_circle_outline),
+                        title: Text(strings.daily('title')),
+                        subtitle: Text(strings.daily('emptyDescription')),
+                        trailing: const Icon(Icons.arrow_forward),
+                        onTap: onOpenDaily,
                       ),
                     ),
                     const SizedBox(height: 12),
