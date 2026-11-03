@@ -60,14 +60,36 @@ class DailyCompletions extends Table {
   Set<Column<Object>> get primaryKey => {activityId, localDate};
 }
 
+class JournalEntries extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  TextColumn get title => text().nullable()();
+
+  TextColumn get content => text()();
+
+  DateTimeColumn get entryDate => dateTime()();
+
+  TextColumn get drawingData => text().nullable()();
+
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}
+
 @DriftDatabase(
-  tables: [Notes, AppPreferences, DailyActivities, DailyCompletions],
+  tables: [
+    Notes,
+    AppPreferences,
+    DailyActivities,
+    DailyCompletions,
+    JournalEntries,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -90,6 +112,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 6) {
         await migrator.addColumn(dailyActivities, dailyActivities.iconKey);
+      }
+      if (from < 7) {
+        await migrator.createTable(journalEntries);
       }
     },
   );

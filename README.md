@@ -17,7 +17,8 @@ explicitly outside the approved scope at this stage.
 
 ## Current functionality
 
-Daymark currently provides local sticky notes and Daily recurring activities.
+Daymark currently provides local sticky notes, Daily recurring activities, and a
+private Personal Journal.
 
 ### Sticky Notes
 
@@ -66,6 +67,27 @@ cloud synchronization, weekly/custom recurrence, snoozing, and remote notificati
 are not part of the current scope. Operating-system alarm restrictions may delay or
 prevent local notifications; Android build and emulator verification is performed by
 the implementation owner.
+
+### Personal Journal
+
+- Open Journal from the Home launcher or bottom navigation.
+- Browse entries in reverse chronological order with localized month grouping.
+- Keep multiple entries on the same date.
+- Create entries with optional titles, text, dates, and drawings.
+- Reuse the shared `core/drawing` canvas, preview, and serialization.
+- Read entries in a dedicated view and edit them without losing the updated
+  content when returning to reading mode.
+- Remove drawings explicitly while editing an entry.
+- Delete entries after confirmation; associated drawing data is removed locally.
+- Protect unsaved editor changes with a discard confirmation.
+- Show localized loading, validation, save, load, and delete feedback.
+- Persist journal entries and drawings in the local Drift/SQLite database.
+- Support English and Spanish and the existing appearance styles and palettes.
+
+Personal Journal remains entirely offline. Cloud synchronization, accounts,
+sharing, exporting, rich text, audio, and AI assistance are outside the current
+scope. The complete feature specification is documented in
+[specs/005-personal-journal/spec.md](specs/005-personal-journal/spec.md).
 
 ## Localization and settings
 
@@ -124,7 +146,8 @@ Feature work follows the approved Spec-Driven Development flow:
 
 Feature specifications and implementation artifacts are tracked under
 [`specs/`](specs/), including the implemented Daily feature in
-[`specs/004-daily/`](specs/004-daily/).
+[`specs/004-daily/`](specs/004-daily/) and the implemented Personal Journal in
+[`specs/005-personal-journal/`](specs/005-personal-journal/).
 
 Implementation follows TDD: **Red -> Green -> Refactor**. A regression or new
 behavior should have an automated test before its implementation, and test

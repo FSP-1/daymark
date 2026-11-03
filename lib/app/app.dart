@@ -17,6 +17,9 @@ import '../features/daily/data/daily_notification_coordinator.dart';
 import '../features/daily/data/daily_repository.dart';
 import '../features/daily/presentation/daily_page.dart';
 import '../features/daily/presentation/daily_view_model.dart';
+import '../features/journal/data/journal_repository.dart';
+import '../features/journal/presentation/journal_page.dart';
+import '../features/journal/presentation/journal_view_model.dart';
 
 class DaymarkApp extends StatefulWidget {
   const DaymarkApp({required this.database, super.key});
@@ -81,12 +84,18 @@ class _DaymarkAppState extends State<DaymarkApp> {
                       PlatformNotificationService(),
                     ),
                   )..load(),
-                  child: HomeShell(
-                    stickyNotesPage: const StickyNotesPage(),
-                    dailyPage: const DailyPage(),
-                    locale: _locale,
-                    onLocaleChanged: (locale) =>
-                        setState(() => _locale = locale),
+                  child: ChangeNotifierProvider(
+                    create: (_) => JournalViewModel(
+                      DriftJournalRepository(widget.database),
+                    )..load(),
+                    child: HomeShell(
+                      stickyNotesPage: const StickyNotesPage(),
+                      dailyPage: const DailyPage(),
+                      journalPage: const JournalPage(),
+                      locale: _locale,
+                      onLocaleChanged: (locale) =>
+                          setState(() => _locale = locale),
+                    ),
                   ),
                 ),
               ),

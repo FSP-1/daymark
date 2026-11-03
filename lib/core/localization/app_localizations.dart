@@ -23,6 +23,7 @@ class AppLocalizations {
       'daily': 'Daily',
       'dates': 'Dates',
       'settings': 'Settings',
+      'journal': 'Journal',
     },
     'home': {
       'welcome': 'A place for your little ideas.',
@@ -89,6 +90,31 @@ class AppLocalizations {
       'permissionDenied':
           'Notifications are not available. You can try again in settings.',
     },
+    'journal': {
+      'title': 'Journal',
+      'subtitle': 'A quiet place for your days, in your own words.',
+      'newEntry': 'New entry',
+      'edit': 'Edit entry',
+      'save': 'Save',
+      'date': 'Date',
+      'titleHint': 'Give this day a title',
+      'contentHint': 'Write freely...',
+      'reading': 'Entry',
+      'untitled': 'Untitled day',
+      'empty': 'Your journal is waiting',
+      'emptyDescription': 'Keep a thought, a memory, or a small moment from today.',
+      'delete': 'Delete entry',
+      'deleteConfirmation': 'Delete this journal entry? This cannot be undone.',
+      'cancel': 'Cancel',
+      'discard': 'Discard',
+      'discardTitle': 'Discard changes?',
+      'discardDescription': 'Your changes have not been saved.',
+      'drawingEntry': 'Entry with drawing',
+      'emptyJournal': 'Write something or add a drawing before saving.',
+      'saveJournal': 'Unable to save the entry. Please try again.',
+      'loadJournal': 'Unable to load the journal. Please try again.',
+      'deleteJournal': 'Unable to delete the entry. Please try again.',
+    },
     'settings': {
       'title': 'Ajustes',
       'languageDescription': 'Elige el idioma que prefieras para Daymark.',
@@ -142,6 +168,7 @@ class AppLocalizations {
   String home(String key) => _read('home.$key', key);
   String notes(String key) => _read('notes.$key', key);
   String daily(String key) => _read('daily.$key', key);
+  String journal(String key) => _read('journal.$key', key);
   String notification(String key) => _read('notification.$key', key);
   String settings(String key) => _read('settings.$key', key);
   String error(String key) => _read('errors.$key', key);

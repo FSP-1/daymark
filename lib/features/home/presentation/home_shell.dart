@@ -4,6 +4,7 @@ import '../../sticky_notes/presentation/sticky_notes_page.dart';
 import '../../settings/presentation/settings_page.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../daily/presentation/daily_page.dart';
+import '../../journal/presentation/journal_page.dart';
 import 'home_feature_grid.dart';
 
 class HomeShell extends StatefulWidget {
@@ -12,6 +13,7 @@ class HomeShell extends StatefulWidget {
     required this.locale,
     required this.onLocaleChanged,
     required this.dailyPage,
+    required this.journalPage,
     super.key,
   });
 
@@ -19,6 +21,7 @@ class HomeShell extends StatefulWidget {
   final Locale locale;
   final ValueChanged<Locale> onLocaleChanged;
   final DailyPage dailyPage;
+  final JournalPage journalPage;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -34,10 +37,11 @@ class _HomeShellState extends State<HomeShell> {
         onOpenNotes: () => setState(() => _selectedIndex = 1),
         onOpenDaily: () => setState(() => _selectedIndex = 2),
         onOpenDates: () => setState(() => _selectedIndex = 3),
+        onOpenJournal: () => setState(() => _selectedIndex = 3),
       ),
       widget.stickyNotesPage,
       widget.dailyPage,
-      _FeaturePlaceholder(title: 'dates', icon: Icons.event_outlined),
+      widget.journalPage,
       SettingsPage(
         locale: widget.locale,
         onLocaleChanged: widget.onLocaleChanged,
@@ -67,8 +71,9 @@ class _HomeShellState extends State<HomeShell> {
             label: strings.navigation('daily'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.event_outlined),
-            label: strings.navigation('dates'),
+            key: const Key('journal-nav'),
+            icon: Icon(Icons.menu_book_outlined),
+            label: strings.navigation('journal'),
           ),
           NavigationDestination(
             icon: Icon(Icons.settings_outlined),
@@ -85,11 +90,13 @@ class _HomeOverview extends StatelessWidget {
     required this.onOpenNotes,
     required this.onOpenDaily,
     required this.onOpenDates,
+    required this.onOpenJournal,
   });
 
   final VoidCallback onOpenNotes;
   final VoidCallback onOpenDaily;
   final VoidCallback onOpenDates;
+  final VoidCallback onOpenJournal;
 
   @override
   Widget build(BuildContext context) {
@@ -159,6 +166,15 @@ class _HomeOverview extends StatelessWidget {
                     HomeFeatureGrid(
                       features: [
                         HomeFeature(
+                          key: const Key('journal-fast-travel'),
+                          title: strings.navigation('journal'),
+                          description: strings.journal('subtitle'),
+                          icon: Icons.menu_book_outlined,
+                          backgroundColor: featureFuture,
+                          foregroundColor: colors.onSurface,
+                          onTap: onOpenJournal,
+                        ),
+                        HomeFeature(
                           title: strings.home('stickyNotes'),
                           description: strings.home('stickyNotesDescription'),
                           icon: Icons.sticky_note_2_outlined,
@@ -199,37 +215,6 @@ class _HomeOverview extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _FeaturePlaceholder extends StatelessWidget {
-  const _FeaturePlaceholder({required this.title, required this.icon});
-
-  final String title;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final strings = AppLocalizations.of(context);
-    return SafeArea(
-      child: Column(
-        children: [
-          AppBar(title: Text(strings.navigation(title))),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: 56),
-                  const SizedBox(height: 16),
-                  Text(strings.home('comingSoon')),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
