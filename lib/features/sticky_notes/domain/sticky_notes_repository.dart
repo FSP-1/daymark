@@ -4,4 +4,6 @@ abstract interface class StickyNotesRepository {
   Future<List<StickyNote>> listNotes();
 
   Future<StickyNote> saveNote(StickyNote note);
+
+  Future<void> deleteNote(int id);
 }

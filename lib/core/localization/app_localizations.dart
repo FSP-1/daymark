@@ -37,6 +37,12 @@ class AppLocalizations {
     },
     'notes': {
       'title': 'sticky notes',
+      'listDescription': 'Keep your ideas close and easy to revisit.',
+      'reading': 'Note',
+      'editNote': 'Edit note',
+      'untitled': 'Untitled note',
+      'deleteNote': 'Delete note',
+      'deleteConfirmation': 'Delete this note? This cannot be undone.',
       'search': 'Search notes',
       'dateFilter': 'Filter by date',
       'clearFilters': 'Clear filters',
@@ -143,6 +149,7 @@ class AppLocalizations {
     'errors': {
       'emptyNote': 'Note content cannot be empty.',
       'saveNote': 'Unable to save the note. Please try again.',
+      'deleteNote': 'Unable to delete the note. Please try again.',
       'loadNotes': 'Unable to load notes. Please try again.',
       'invalidDaily': 'Enter an activity name and a valid time.',
       'loadDaily': 'Unable to load daily activities. Please try again.',

@@ -19,7 +19,7 @@ freehand drawing using the existing `core/drawing` implementation.
 - Multiple entries on the same date.
 - Optional title and text body.
 - User-selectable entry date, defaulting to today.
-- Drawing creation, preview, editing, and removal.
+- Drawing creation, editing, and removal, with attached-drawing indicators in the index.
 - Dedicated reading view with edit and delete actions.
 - Delete confirmation and local cleanup of drawing data.
 - Drift/SQLite persistence and schema migration.
@@ -46,7 +46,7 @@ quickly.
 3. **Given** multiple entries share a date, **when** the index is opened,
    **then** every entry is displayed separately.
 4. **Given** an entry contains only a drawing, **when** it appears in the
-   index, **then** a localized drawing-entry preview is shown.
+   index, **then** a localized attached-drawing icon is shown.
 
 ### User Story 2 - Write and edit entries (P1)
 
@@ -72,7 +72,8 @@ As a user, I want drawings to feel part of the journal page.
 1. **Given** the editor is open, **when** the user draws, **then** the
    existing `DrawingCanvas` tools are used.
 2. **Given** an entry has a drawing, **when** it is listed or read, **then**
-   `DrawingPreview` renders the serialized strokes.
+   the index shows a localized attached-drawing icon and the reading view shows
+   the serialized drawing.
 3. **Given** an existing drawing is cleared and saved, **then** its persisted
    drawing data becomes null.
 4. **Given** an entry is opened, **then** a dedicated reading view shows its
@@ -99,8 +100,9 @@ As a user, I want drawings to feel part of the journal page.
   editable.
 - **REQ-004**: An entry MUST be valid when it contains non-whitespace text or
   at least one drawing; a title MUST remain optional.
-- **REQ-005**: Journal MUST reuse `DrawingCanvas`, `DrawingPreview`,
-  `DrawingStroke`, `encodeDrawing`, and `decodeDrawing`.
+- **REQ-005**: Journal MUST reuse `DrawingCanvas`, `DrawingStroke`,
+  `encodeDrawing`, and `decodeDrawing`; the index MUST use an attached-drawing
+  icon rather than a drawing preview.
 - **REQ-006**: Clearing a drawing during edit MUST persist a null drawing value.
 - **REQ-007**: Entries MUST be ordered newest-first and grouped by month while
   supporting multiple entries on the same date.
@@ -151,7 +153,7 @@ Notes data.
 Journal strings are defined in `assets/i18n/en.json` and `assets/i18n/es.json`.
 The interface uses the existing `ThemeData`, semantic color scheme, typography,
 and responsive layout. The index emphasizes month grouping, dates, title
-hierarchy, excerpts, and drawing previews while keeping the writing experience
+hierarchy, excerpts, and attached-drawing indicators while keeping the writing experience
 minimal.
 
 ## Validation

@@ -26,10 +26,11 @@ private Personal Journal.
 - Create notes containing at least one non-whitespace character.
 - Optionally add a title and subtitle; every note records its localized creation date.
 - View saved notes and an explicit empty state.
+- Open a separate note editor from the notes list instead of mixing creation
+  controls with browsing.
 - Filter notes by text across title, subtitle, and content, or by a creation-date range.
 - Date filtering is limited to today and earlier.
-- The search and date-filter controls appear below the note editor; matching notes
-  are rendered directly below those controls.
+- Notes with drawings show a localized drawing icon instead of a drawing preview.
 - Create a freehand drawing with erase and clear controls; drawing data is persisted locally.
 - Use the Home screen and bottom navigation to reach Sticky Notes, future feature
   areas, and Settings.
@@ -75,7 +76,9 @@ the implementation owner.
 - Browse entries in reverse chronological order with localized month grouping.
 - Keep multiple entries on the same date.
 - Create entries with optional titles, text, dates, and drawings.
-- Reuse the shared `core/drawing` canvas, preview, and serialization.
+- Reuse the shared `core/drawing` canvas and serialization.
+- Show a localized drawing icon in the journal index instead of a drawing preview;
+  the complete drawing remains available in the reading view.
 - Read entries in a dedicated view and edit them without losing the updated
   content when returning to reading mode.
 - Remove drawings explicitly while editing an entry.

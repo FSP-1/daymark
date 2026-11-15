@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import 'package:daymark/core/drawing/drawing_canvas.dart';
 import 'package:daymark/features/sticky_notes/domain/sticky_note.dart';
 import 'package:daymark/features/sticky_notes/domain/sticky_notes_repository.dart';
 import 'package:daymark/features/sticky_notes/presentation/sticky_notes_page.dart';
@@ -21,14 +22,25 @@ class _FakeRepository implements StickyNotesRepository {
   Future<StickyNote> saveNote(StickyNote note) async {
     if (saveError != null) throw saveError!;
     final saved = StickyNote.fromStorage(
-      id: notes.length + 1,
+      id: note.id ?? notes.length + 1,
       content: note.content,
       title: note.title,
       subtitle: note.subtitle,
       createdAt: note.createdAt,
+      drawingData: note.drawingData,
     );
-    notes.add(saved);
+    final index = notes.indexWhere((item) => item.id == saved.id);
+    if (index == -1) {
+      notes.add(saved);
+    } else {
+      notes[index] = saved;
+    }
     return saved;
+  }
+
+  @override
+  Future<void> deleteNote(int id) async {
+    notes.removeWhere((note) => note.id == id);
   }
 }
 
@@ -44,12 +56,14 @@ Widget _buildPage(_FakeRepository repository) {
 Future<void> _tapAddNote(WidgetTester tester) async {
   tester.testTextInput.hide();
   await tester.pump();
-  await tester.drag(
-    find.byKey(const Key('sticky-notes-scroll')),
-    const Offset(0, -500),
-  );
+  await tester.ensureVisible(find.byKey(const Key('add-note')));
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('add-note')));
+}
+
+Future<void> _openEditor(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('add-note-action')));
+  await tester.pumpAndSettle();
 }
 
 void main() {
@@ -58,13 +72,9 @@ void main() {
     await tester.pumpWidget(_buildPage(repository));
     await tester.pumpAndSettle();
 
-    await tester.drag(
-      find.byKey(const Key('sticky-notes-scroll')),
-      const Offset(0, -500),
-    );
-    await tester.pumpAndSettle();
     expect(find.text('No notes yet'), findsOneWidget);
 
+    await _openEditor(tester);
     await tester.enterText(
       find.byKey(const Key('note-content')),
       'Offline note',
@@ -81,15 +91,8 @@ void main() {
     await tester.pumpWidget(_buildPage(_FakeRepository()));
     await tester.pumpAndSettle();
 
-    final viewModel = tester
-        .element(find.byType(StickyNotesPage))
-        .read<StickyNotesViewModel>();
-    await viewModel.createNote('');
-    await tester.pumpAndSettle();
-    await tester.drag(
-      find.byKey(const Key('sticky-notes-scroll')),
-      const Offset(0, -500),
-    );
+    await _openEditor(tester);
+    await _tapAddNote(tester);
     await tester.pumpAndSettle();
 
     expect(find.text('Note content cannot be empty.'), findsOneWidget);
@@ -102,16 +105,9 @@ void main() {
     await tester.pumpWidget(_buildPage(repository));
     await tester.pumpAndSettle();
 
+    await _openEditor(tester);
     await tester.enterText(find.byKey(const Key('note-content')), 'Not saved');
-    final viewModel = tester
-        .element(find.byType(StickyNotesPage))
-        .read<StickyNotesViewModel>();
-    await viewModel.createNote('Not saved');
-    await tester.pumpAndSettle();
-    await tester.drag(
-      find.byKey(const Key('sticky-notes-scroll')),
-      const Offset(0, -500),
-    );
+    await _tapAddNote(tester);
     await tester.pumpAndSettle();
 
     expect(
@@ -128,6 +124,7 @@ void main() {
     await tester.pumpWidget(_buildPage(repository));
     await tester.pumpAndSettle();
 
+    await _openEditor(tester);
     await tester.enterText(find.byKey(const Key('note-title')), 'Title');
     await tester.enterText(find.byKey(const Key('note-content')), 'Content');
     await _tapAddNote(tester);
@@ -143,6 +140,21 @@ void main() {
       find.textContaining(localizations.formatMediumDate(DateTime.now())),
       findsOneWidget,
     );
+  });
+
+  testWidgets('uses an icon instead of a drawing preview', (tester) async {
+    final repository = _FakeRepository([
+      StickyNote.fromStorage(
+        id: 1,
+        content: 'Drawn note',
+        drawingData: 'drawing',
+      ),
+    ]);
+    await tester.pumpWidget(_buildPage(repository));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.draw_outlined), findsOneWidget);
+    expect(find.byType(DrawingPreview), findsNothing);
   });
 
   testWidgets('filters notes by text', (tester) async {

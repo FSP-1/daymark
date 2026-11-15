@@ -22,7 +22,7 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: SizedBox(
-            width: 320,
+            width: 384,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: HomeFeatureGrid(features: features),

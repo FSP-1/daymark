@@ -38,17 +38,32 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
       throw const InvalidStickyNoteException();
     }
 
-    final id = await database
-        .into(database.notes)
-        .insert(
-          NotesCompanion.insert(
-            title: Value(note.title),
-            subtitle: Value(note.subtitle),
-            content: note.content,
-            createdAt: Value(note.createdAt),
-            drawingData: Value(note.drawingData),
-          ),
-        );
+    final id = note.id == null
+        ? await database
+              .into(database.notes)
+              .insert(
+                NotesCompanion.insert(
+                  title: Value(note.title),
+                  subtitle: Value(note.subtitle),
+                  content: note.content,
+                  createdAt: Value(note.createdAt),
+                  drawingData: Value(note.drawingData),
+                ),
+              )
+        : note.id!;
+    if (note.id != null) {
+      await (database.update(
+        database.notes,
+      )..where((row) => row.id.equals(note.id!))).write(
+        NotesCompanion(
+          title: Value(note.title),
+          subtitle: Value(note.subtitle),
+          content: Value(note.content),
+          createdAt: Value(note.createdAt),
+          drawingData: Value(note.drawingData),
+        ),
+      );
+    }
     return StickyNote.fromStorage(
       id: id,
       title: note.title,
@@ -57,5 +72,12 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
       createdAt: note.createdAt,
       drawingData: note.drawingData,
     );
+  }
+
+  @override
+  Future<void> deleteNote(int id) async {
+    await (database.delete(
+      database.notes,
+    )..where((row) => row.id.equals(id))).go();
   }
 }

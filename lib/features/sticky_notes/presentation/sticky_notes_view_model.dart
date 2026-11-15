@@ -52,25 +52,49 @@ class StickyNotesViewModel extends ChangeNotifier {
       subtitle: subtitle,
       drawingData: drawingData,
     );
+    await saveNote(note);
+  }
+
+  Future<StickyNote?> saveNote(StickyNote note) async {
     if (!note.isValid) {
       status = StickyNotesStatus.validationError;
       errorMessage = 'Note content cannot be empty.';
       notifyListeners();
-      return;
+      return null;
     }
-
     errorMessage = null;
     try {
-      await repository.saveNote(note);
+      final saved = await repository.saveNote(note);
       notes = await repository.listNotes();
       status = notes.isEmpty
           ? StickyNotesStatus.empty
           : StickyNotesStatus.ready;
+      notifyListeners();
+      return saved;
     } catch (_) {
       status = StickyNotesStatus.error;
       errorMessage = 'Unable to save the note. Please try again.';
+      notifyListeners();
+      return null;
     }
-    notifyListeners();
+  }
+
+  Future<bool> deleteNote(int id) async {
+    errorMessage = null;
+    try {
+      await repository.deleteNote(id);
+      notes = await repository.listNotes();
+      status = notes.isEmpty
+          ? StickyNotesStatus.empty
+          : StickyNotesStatus.ready;
+      notifyListeners();
+      return true;
+    } catch (_) {
+      status = StickyNotesStatus.error;
+      errorMessage = 'Unable to delete the note. Please try again.';
+      notifyListeners();
+      return false;
+    }
   }
 
   void setFilter({String text = '', DateTime? fromDate, DateTime? toDate}) {

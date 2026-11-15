@@ -20,6 +20,8 @@
   - Filtering notes by text and/or creation date through a reusable filtering capability.
   - Limiting date filtering to today and earlier dates.
   - Drawing freehand content on a note with local persistence and erase/clear controls.
+  - A separate note editor opened from the notes list.
+  - A drawing-attached indicator icon on notes instead of a drawing preview.
   - Presenting notes as creative post-it-style cards and providing a Home entry point.
 - **Out of scope**:
   - Editing, deleting, pinning, reminders, and task management.
@@ -208,13 +210,14 @@ then apply text, date, and combined filters and verify only matching notes are d
 - **REQ-023**: A note editor MUST provide a freehand drawing canvas with local stroke persistence.
 - **REQ-024**: The drawing canvas MUST provide an erase mode and a clear-drawing action.
 - **REQ-025**: Note presentation MUST use post-it-style cards with visual hierarchy beyond plain
-  list rows while preserving readable content and localized dates.
+  list rows while preserving readable content and localized dates; notes with drawings MUST
+  show an icon indicator instead of a drawing preview.
 - **REQ-026**: The application MUST provide a Home entry point with navigation to Sticky Notes
   and clearly marked placeholders for future features.
 - **REQ-027**: Home navigation MUST use a bottom navigation structure and keep feature state
   behind the existing Provider/MVVM boundaries.
-- **REQ-028**: The notes filter controls MUST appear below the note editor, and filtered
-  results MUST be rendered below those controls.
+- **REQ-028**: The notes view MUST provide a clear action to open a separate note editor;
+  search and date-filter controls MUST remain in the notes list above filtered results.
 - **REQ-029**: The application MUST provide a Settings entry in the bottom navigation
   without introducing functional screens for unapproved future features.
 - **REQ-030**: Settings MUST allow the user to switch the interface language between

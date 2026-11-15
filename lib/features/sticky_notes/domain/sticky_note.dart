@@ -59,4 +59,28 @@ class StickyNote {
   final StickyNoteValidationError? validationError;
 
   bool get isValid => validationError == null;
+
+  StickyNote copyWith({
+    String? content,
+    String? title,
+    String? subtitle,
+    DateTime? createdAt,
+    String? drawingData,
+    bool clearTitle = false,
+    bool clearSubtitle = false,
+    bool clearDrawing = false,
+  }) {
+    final nextContent = content ?? this.content;
+    return StickyNote._(
+      id: id,
+      title: clearTitle ? null : title ?? this.title,
+      subtitle: clearSubtitle ? null : subtitle ?? this.subtitle,
+      content: nextContent,
+      createdAt: createdAt ?? this.createdAt,
+      drawingData: clearDrawing ? null : drawingData ?? this.drawingData,
+      validationError: nextContent.trim().isEmpty
+          ? StickyNoteValidationError.empty
+          : null,
+    );
+  }
 }

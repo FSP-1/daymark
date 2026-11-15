@@ -17,6 +17,7 @@ class JournalPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(strings.journal('title'))),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'journal-add',
         onPressed: () => _openEditor(context),
         icon: const Icon(Icons.add),
         label: Text(strings.journal('newEntry')),
@@ -178,8 +179,13 @@ class _EntryCard extends StatelessWidget {
               if (entry.drawingData?.isNotEmpty == true)
                 Padding(
                   padding: const EdgeInsets.only(left: 12),
-                  child: DrawingPreview(
-                    strokes: decodeDrawing(entry.drawingData),
+                  child: Tooltip(
+                    message: strings.journal('drawingEntry'),
+                    child: Icon(
+                      Icons.draw_outlined,
+                      semanticLabel: strings.journal('drawingEntry'),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
             ],

@@ -14,7 +14,12 @@ void main() {
     expect(find.text('daymark.'), findsAtLeastNWidgets(1));
     await tester.tap(find.byKey(const Key('notes-nav')));
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('add-note-action')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('add-note-action')));
+    await tester.pumpAndSettle();
     expect(find.byKey(const Key('note-content')), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byType(NavigationDestination).first);
     await tester.pumpAndSettle();

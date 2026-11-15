@@ -46,7 +46,7 @@ class HomeFeatureGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             final feature = features[index];
             final textTheme = Theme.of(context).textTheme;
-            final compact = cardHeight < 140;
+            final compact = cardHeight < 168;
             return Material(
               key: feature.key,
               color: feature.backgroundColor,

@@ -20,14 +20,25 @@ class _FakeRepository implements StickyNotesRepository {
       throw saveError!;
     }
     final saved = StickyNote.fromStorage(
-      id: notes.length + 1,
+      id: note.id ?? notes.length + 1,
       content: note.content,
       title: note.title,
       subtitle: note.subtitle,
       createdAt: note.createdAt,
+      drawingData: note.drawingData,
     );
-    notes.add(saved);
+    final index = notes.indexWhere((item) => item.id == saved.id);
+    if (index == -1) {
+      notes.add(saved);
+    } else {
+      notes[index] = saved;
+    }
     return saved;
+  }
+
+  @override
+  Future<void> deleteNote(int id) async {
+    notes.removeWhere((note) => note.id == id);
   }
 }
 
@@ -76,6 +87,25 @@ void main() {
       viewModel.errorMessage,
       'Unable to save the note. Please try again.',
     );
+  });
+
+  test('updates and deletes an existing note', () async {
+    final repository = _FakeRepository([
+      StickyNote.fromStorage(id: 1, content: 'Before'),
+    ]);
+    final viewModel = StickyNotesViewModel(repository);
+    await viewModel.load();
+
+    final saved = await viewModel.saveNote(
+      viewModel.notes.single.copyWith(content: 'After'),
+    );
+
+    expect(saved?.content, 'After');
+    expect(viewModel.notes.single.content, 'After');
+
+    expect(await viewModel.deleteNote(1), isTrue);
+    expect(viewModel.status, StickyNotesStatus.empty);
+    expect(viewModel.notes, isEmpty);
   });
 
   test('filters notes by text and date and clears filters', () async {

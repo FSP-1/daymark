@@ -69,4 +69,22 @@ void main() {
 
     expect(notes.single.content, 'Persistent note');
   });
+
+  test('updates and deletes a note with its drawing data', () async {
+    final saved = await repository.saveNote(
+      StickyNote.create(content: 'Before', drawingData: 'drawing'),
+    );
+
+    final updated = await repository.saveNote(
+      saved.copyWith(content: 'After', clearDrawing: true),
+    );
+
+    expect(updated.content, 'After');
+    expect(updated.drawingData, equals(null));
+    expect((await repository.listNotes()).single.drawingData, equals(null));
+
+    await repository.deleteNote(saved.id!);
+
+    expect(await repository.listNotes(), isEmpty);
+  });
 }
