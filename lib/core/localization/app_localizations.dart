@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 class AppLocalizations {
@@ -102,7 +102,8 @@ class AppLocalizations {
       'reading': 'Entry',
       'untitled': 'Untitled day',
       'empty': 'Your journal is waiting',
-      'emptyDescription': 'Keep a thought, a memory, or a small moment from today.',
+      'emptyDescription':
+          'Keep a thought, a memory, or a small moment from today.',
       'delete': 'Delete entry',
       'deleteConfirmation': 'Delete this journal entry? This cannot be undone.',
       'cancel': 'Cancel',

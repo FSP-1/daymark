@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../features/sticky_notes/data/local/app_database.dart';
@@ -63,9 +62,7 @@ class _DaymarkAppState extends State<DaymarkApp> {
       supportedLocales: const [Locale('es'), Locale('en')],
       localizationsDelegates: const [
         AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
       ],
       theme: buildAppTheme(
         style: _themeViewModel.style,

@@ -5,6 +5,7 @@ Daymark is an Android-first personal organizer built with Flutter and Dart.
 ## Stack and architecture
 
 - Flutter and Dart, optimized for Android-first use.
+- Official Material widgets are provided by the `material_ui` package.
 - MVVM with `Provider` and `ChangeNotifier`.
 - Views handle presentation and interaction; ViewModels handle presentation
   state and actions.
@@ -124,6 +125,10 @@ family with a sans-serif fallback, and Minimal uses a neutral sans-serif
 hierarchy. No font dependency or unverified font asset is included; Comic Sans MS
 is not assumed to be installed on Android.
 
+Home feature cards use compact natural content flow: the icon and navigation
+affordance share the top row, titles and descriptions follow without an expanding
+spacer, and each icon has a subtle theme-derived rounded background.
+
 ## Development checks
 
 Run these commands before submitting changes:
@@ -133,6 +138,12 @@ dart format lib test
 flutter analyze
 flutter test
 ```
+
+Android tooling is configured with Android Gradle Plugin 9.3.1, Kotlin 2.4.20,
+and Gradle 9.5.0, which meet the current Flutter compatibility minimums.
+Android debug builds and emulator verification are run by the implementation
+owner.
+
 
 ## SDD and TDD workflow
 

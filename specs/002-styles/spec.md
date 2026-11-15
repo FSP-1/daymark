@@ -13,6 +13,9 @@
 - Independent selection of style and palette from Settings.
 - Immediate application to Home, Sticky Notes, editor, saved note cards, navigation,
   buttons, inputs, and Settings.
+- Home feature cards use compact natural content flow, a top-right navigation
+  indicator, and a subtle rounded icon container while inheriting semantic theme
+  colors.
 - Local persistence and restoration across application restarts.
 - Safe defaults for missing or invalid saved values.
 - Responsive and accessible selection controls.
@@ -111,6 +114,9 @@ As a user, I want my appearance choices to remain after closing and reopening Da
 - **REQ-019**: Any future bundled font MUST have a documented open license and be
   registered centrally; the current implementation MUST remain functional without
   downloading fonts or relying on Comic Sans MS being installed.
+- **REQ-020**: Home feature cards MUST keep icon, title, and description in natural
+  vertical order without an expanding spacer, place navigation affordance in the
+  upper-right, and provide a subtle theme-derived icon background.
 
 ## Measurable Success Criteria
 
@@ -133,3 +139,6 @@ As a user, I want my appearance choices to remain after closing and reopening Da
 - Do not log preference contents beyond non-sensitive identifiers needed for diagnostics.
 - Do not store note content in theme preference records.
 - Do not add generated databases or secrets to the repository.
+- Android tooling MUST remain compatible with the supported Flutter toolchain;
+  the current project uses Android Gradle Plugin 9.3.1, Kotlin 2.4.20, and
+  Gradle 9.5.0.

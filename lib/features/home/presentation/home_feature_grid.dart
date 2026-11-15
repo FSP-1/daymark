@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class HomeFeature {
   const HomeFeature({
@@ -31,7 +31,7 @@ class HomeFeatureGrid extends StatelessWidget {
       builder: (context, constraints) {
         const spacing = 14.0;
         final cardWidth = (constraints.maxWidth - spacing) / 2;
-        final cardHeight = cardWidth * 1.05;
+        final cardHeight = cardWidth * 0.92;
 
         return GridView.builder(
           shrinkWrap: true,
@@ -46,6 +46,7 @@ class HomeFeatureGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             final feature = features[index];
             final textTheme = Theme.of(context).textTheme;
+            final compact = cardHeight < 140;
             return Material(
               key: feature.key,
               color: feature.backgroundColor,
@@ -54,49 +55,57 @@ class HomeFeatureGrid extends StatelessWidget {
               child: InkWell(
                 onTap: feature.onTap,
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(compact ? 8 : 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        feature.icon,
-                        size: 26,
-                        color: feature.foregroundColor,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: feature.foregroundColor.withValues(
+                                alpha: 0.08,
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Icon(
+                              feature.icon,
+                              size: 23,
+                              color: feature.foregroundColor,
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_outward_rounded,
+                            size: 19,
+                            color: feature.foregroundColor.withValues(
+                              alpha: 0.65,
+                            ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              feature.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: feature.foregroundColor,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Flexible(
-                              child: Text(
-                                feature.description,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: feature.foregroundColor,
-                                ),
-                              ),
-                            ),
-                          ],
+                      SizedBox(height: compact ? 8 : 14),
+                      Text(
+                        feature.title,
+                        maxLines: compact ? 1 : 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: feature.foregroundColor,
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 22,
-                          color: feature.foregroundColor,
+                      const SizedBox(height: 4),
+                      Text(
+                        feature.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: feature.foregroundColor.withValues(
+                            alpha: 0.78,
+                          ),
+                          height: 1.3,
                         ),
                       ),
                     ],

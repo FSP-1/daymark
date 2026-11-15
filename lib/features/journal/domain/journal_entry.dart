@@ -34,7 +34,8 @@ class JournalEntryModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  bool get isValid => content.trim().isNotEmpty || drawingData?.isNotEmpty == true;
+  bool get isValid =>
+      content.trim().isNotEmpty || drawingData?.isNotEmpty == true;
 
   JournalEntryModel copyWith({
     String? title,

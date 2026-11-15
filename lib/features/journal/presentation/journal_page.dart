@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/drawing/drawing_canvas.dart';
@@ -52,9 +52,8 @@ class JournalPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    MaterialLocalizations.of(context).formatMonthYear(
-                      model.entries[index].entryDate,
-                    ),
+                    MaterialLocalizations.of(context)
+                        .formatMonthYear(model.entries[index].entryDate),
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       letterSpacing: 1.4,
                       fontWeight: FontWeight.w700,

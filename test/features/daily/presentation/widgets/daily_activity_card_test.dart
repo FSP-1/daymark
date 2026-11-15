@@ -1,7 +1,7 @@
 import 'package:daymark/features/daily/domain/daily_activity.dart';
 import 'package:daymark/features/daily/domain/daily_schedule.dart';
 import 'package:daymark/features/daily/presentation/widgets/daily_activity_card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
