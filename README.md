@@ -34,7 +34,7 @@ Personal Journal, and a Calendar for browsing dated notes and journal entries.
 - Create or edit a freehand drawing in a separate dialog. Saving the drawing shows
   a preview in the note editor, and saving the note persists drawing changes locally.
 - Use the bottom navigation to reach Home, Sticky Notes, Calendar, Daily, and
-  Journal. Open Settings from the gear in Home.
+  Journal. Each destination shows Settings and icon help in the top bar.
 - Use Home as the feature launcher with a responsive two-column grid.
 - Change the application language between Spanish and English from Settings.
 - Store Spanish and English interface strings in local JSON assets.
@@ -104,6 +104,8 @@ scope. The complete feature specification is documented in
   from Calendar.
 - Existing notes remain available in Sticky Notes. Their creation timestamps
   are preserved separately from their optional Calendar dates.
+
+See the [Calendar specification](specs/007-calendar/spec.md).
 
 ## Localization and settings
 

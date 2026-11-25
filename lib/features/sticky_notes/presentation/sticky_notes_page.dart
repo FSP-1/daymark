@@ -16,7 +16,9 @@ const _noteColors = [
 ];
 
 class StickyNotesPage extends StatefulWidget {
-  const StickyNotesPage({super.key});
+  const StickyNotesPage({this.showAppBar = true, super.key});
+
+  final bool showAppBar;
 
   @override
   State<StickyNotesPage> createState() => _StickyNotesPageState();
@@ -64,7 +66,9 @@ class _StickyNotesPageState extends State<StickyNotesPage> {
         viewModel.status != StickyNotesStatus.loading;
 
     return Scaffold(
-      appBar: AppBar(title: Text(strings.notes('title'))),
+      appBar: widget.showAppBar
+          ? AppBar(title: Text(strings.notes('title')))
+          : null,
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('add-note-action'),
         heroTag: 'sticky-notes-add',

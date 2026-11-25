@@ -9,14 +9,16 @@ import '../domain/journal_entry.dart';
 import 'journal_view_model.dart';
 
 class JournalPage extends StatelessWidget {
-  const JournalPage({super.key});
+  const JournalPage({this.showAppBar = true, super.key});
+
+  final bool showAppBar;
 
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
     final model = context.watch<JournalViewModel>();
     return Scaffold(
-      appBar: AppBar(title: Text(strings.journal('title'))),
+      appBar: showAppBar ? AppBar(title: Text(strings.journal('title'))) : null,
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'journal-add',
         onPressed: () => openEditor(context),

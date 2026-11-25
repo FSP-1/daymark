@@ -9,22 +9,17 @@ import '../../../core/localization/app_localizations.dart';
 import '../../daily/presentation/daily_page.dart';
 import '../../journal/presentation/journal_page.dart';
 import 'home_feature_grid.dart';
+import 'navigation_help_dialog.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({
-    required this.stickyNotesPage,
     required this.locale,
     required this.onLocaleChanged,
-    required this.dailyPage,
-    required this.journalPage,
     super.key,
   });
 
-  final StickyNotesPage stickyNotesPage;
   final Locale locale;
   final ValueChanged<Locale> onLocaleChanged;
-  final DailyPage dailyPage;
-  final JournalPage journalPage;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -69,16 +64,46 @@ class _HomeShellState extends State<HomeShell> {
         onOpenDaily: () => _select(_HomeDestination.daily),
         onOpenCalendar: () => _select(_HomeDestination.calendar),
         onOpenJournal: () => _select(_HomeDestination.journal),
-        onOpenSettings: _openSettings,
       ),
-      widget.stickyNotesPage,
-      if (_calendarVisited) const CalendarPage() else const SizedBox.shrink(),
-      widget.dailyPage,
-      widget.journalPage,
+      const StickyNotesPage(showAppBar: false),
+      if (_calendarVisited)
+        const CalendarPage(showTitle: false)
+      else
+        const SizedBox.shrink(),
+      const DailyPage(showTitle: false),
+      const JournalPage(showAppBar: false),
     ];
     final strings = AppLocalizations.of(context);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          _destination == _HomeDestination.home
+              ? strings.appName
+              : strings.navigation(_destination.name),
+          key: _destination == _HomeDestination.daily
+              ? const Key('daily-title')
+              : null,
+        ),
+        actions: [
+          IconButton(
+            key: const Key('settings-action'),
+            tooltip: strings.navigation('settings'),
+            onPressed: _openSettings,
+            icon: const Icon(Icons.settings_outlined),
+          ),
+          IconButton(
+            key: const Key('information-action'),
+            tooltip: strings.help('title'),
+            onPressed: () => showDialog<void>(
+              context: context,
+              builder: (_) =>
+                  NavigationHelpDialog(destination: _destination.name),
+            ),
+            icon: const Icon(Icons.info_outline),
+          ),
+        ],
+      ),
       body: IndexedStack(index: _destination.index, children: pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _destination.index,
@@ -121,14 +146,12 @@ class _HomeOverview extends StatelessWidget {
     required this.onOpenDaily,
     required this.onOpenCalendar,
     required this.onOpenJournal,
-    required this.onOpenSettings,
   });
 
   final VoidCallback onOpenNotes;
   final VoidCallback onOpenDaily;
   final VoidCallback onOpenCalendar;
   final VoidCallback onOpenJournal;
-  final VoidCallback onOpenSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -155,19 +178,6 @@ class _HomeOverview extends StatelessWidget {
         decoration: BoxDecoration(color: colors.surface),
         child: Column(
           children: [
-            AppBar(
-              title: Text(strings.appName),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              actions: [
-                IconButton(
-                  key: const Key('settings-action'),
-                  tooltip: strings.navigation('settings'),
-                  onPressed: onOpenSettings,
-                  icon: const Icon(Icons.settings_outlined),
-                ),
-              ],
-            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),

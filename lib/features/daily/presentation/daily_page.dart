@@ -11,7 +11,9 @@ import 'daily_view_model.dart';
 import 'widgets/daily_activity_card.dart';
 
 class DailyPage extends StatefulWidget {
-  const DailyPage({super.key});
+  const DailyPage({this.showTitle = true, super.key});
+
+  final bool showTitle;
 
   @override
   State<DailyPage> createState() => _DailyPageState();
@@ -48,6 +50,7 @@ class _DailyPageState extends State<DailyPage> {
           child: Text(strings.error(viewModel.errorMessage ?? 'loadDaily')),
         ),
         _ => _DailyContent(
+          showTitle: widget.showTitle,
           viewModel: viewModel,
           onAdd: () => _showEditor(context),
           onEdit: (activity) => _showEditor(context, activity: activity),
@@ -118,11 +121,13 @@ class _IconOption extends StatelessWidget {
 
 class _DailyContent extends StatelessWidget {
   const _DailyContent({
+    required this.showTitle,
     required this.viewModel,
     required this.onAdd,
     required this.onEdit,
   });
 
+  final bool showTitle;
   final DailyViewModel viewModel;
   final VoidCallback onAdd;
   final ValueChanged<DailyActivity> onEdit;
@@ -145,25 +150,27 @@ class _DailyContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              strings.daily('eyebrow').toUpperCase(),
-              style: TextStyle(
-                color: colors.primary,
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 2,
+            if (showTitle) ...[
+              Text(
+                strings.daily('eyebrow').toUpperCase(),
+                style: TextStyle(
+                  color: colors.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              strings.daily('title'),
-              key: const Key('daily-title'),
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: colors.onSurface,
-                fontWeight: FontWeight.w800,
+              const SizedBox(height: 10),
+              Text(
+                strings.daily('title'),
+                key: const Key('daily-title'),
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
-            const SizedBox(height: 6),
+              const SizedBox(height: 6),
+            ],
             Text(
               date,
               style: Theme.of(context).textTheme.labelLarge

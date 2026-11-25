@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../features/sticky_notes/data/local/app_database.dart';
 import '../features/sticky_notes/data/sticky_notes_repository.dart';
-import '../features/sticky_notes/presentation/sticky_notes_page.dart';
 import '../features/sticky_notes/presentation/sticky_notes_view_model.dart';
 import '../features/home/presentation/home_shell.dart';
 import '../features/settings/data/theme_preferences_repository.dart';
@@ -14,10 +13,8 @@ import '../core/theme/app_theme.dart';
 import '../core/notifications/platform_notification_service.dart';
 import '../features/daily/data/daily_notification_coordinator.dart';
 import '../features/daily/data/daily_repository.dart';
-import '../features/daily/presentation/daily_page.dart';
 import '../features/daily/presentation/daily_view_model.dart';
 import '../features/journal/data/journal_repository.dart';
-import '../features/journal/presentation/journal_page.dart';
 import '../features/journal/presentation/journal_view_model.dart';
 
 class DaymarkApp extends StatefulWidget {
@@ -86,9 +83,6 @@ class _DaymarkAppState extends State<DaymarkApp> {
                       DriftJournalRepository(widget.database),
                     )..load(),
                     child: HomeShell(
-                      stickyNotesPage: const StickyNotesPage(),
-                      dailyPage: const DailyPage(),
-                      journalPage: const JournalPage(),
                       locale: _locale,
                       onLocaleChanged: (locale) =>
                           setState(() => _locale = locale),

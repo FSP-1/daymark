@@ -19,6 +19,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('daymark.'), findsAtLeastNWidgets(1));
+    final settings = find.byKey(const Key('settings-action'));
+    final information = find.byKey(const Key('information-action'));
+    final settingsPosition = tester.getCenter(settings);
+    final informationPosition = tester.getCenter(information);
+    expect(informationPosition.dx, greaterThan(settingsPosition.dx));
+    expect(informationPosition.dy, settingsPosition.dy);
+    for (final destination in ['daily', 'journal', 'calendar', 'notes']) {
+      await tester.tap(find.byKey(Key('$destination-nav')));
+      await tester.pumpAndSettle();
+      expect(tester.getCenter(settings), settingsPosition);
+      expect(tester.getCenter(information), informationPosition);
+    }
     await tester.tap(find.byKey(const Key('notes-nav')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('add-note-action')), findsOneWidget);
@@ -39,6 +51,25 @@ void main() {
     await tester.tap(find.byKey(const Key('calendar-nav')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('calendar-page')), findsOneWidget);
+    await tester.tap(information);
+    await tester.pumpAndSettle();
+    expect(find.text('Información'), findsOneWidget);
+    expect(find.text('Vuelve a hoy en la vista mensual.'), findsOneWidget);
+    expect(find.text('Herramientas de dibujo'), findsOneWidget);
+    expect(find.text('Deshace el último trazo.'), findsNothing);
+    expect(find.text('Busca notas por texto.'), findsNothing);
+    expect(find.text('Navegación de la app'), findsOneWidget);
+    expect(
+      find.text('Inicio abre los accesos a las funciones de Daymark.'),
+      findsNothing,
+    );
+    await tester.ensureVisible(find.text('Herramientas de dibujo'));
+    await tester.tap(find.text('Herramientas de dibujo'));
+    await tester.pumpAndSettle();
+    expect(find.text('Deshace el último trazo.'), findsOneWidget);
+    expect(find.byIcon(Icons.undo), findsOneWidget);
+    await tester.tap(find.text('Cerrar'));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('journal-nav')));
     await tester.pumpAndSettle();
     expect(find.byType(FloatingActionButton), findsOneWidget);
@@ -57,9 +88,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('calendar-page')), findsNothing);
     expect(find.text('Diario'), findsAtLeastNWidgets(2));
-    await tester.tap(find.byType(NavigationDestination).first);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('settings-action')));
+    await tester.tap(settings);
     await tester.pumpAndSettle();
 
     expect(find.text('Estilo visual'), findsAtLeastNWidgets(1));

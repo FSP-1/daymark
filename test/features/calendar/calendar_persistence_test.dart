@@ -29,6 +29,9 @@ void main() {
       await old.customStatement(
         'ALTER TABLE notes DROP COLUMN associated_date',
       );
+      await old.customStatement('ALTER TABLE app_preferences DROP COLUMN navigation');
+      await old.customStatement('DROP TABLE goal_milestones');
+      await old.customStatement('DROP TABLE goals');
       await old.customStatement('PRAGMA user_version = 7');
       await old.close();
 

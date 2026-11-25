@@ -12,7 +12,9 @@ import 'calendar_view_model.dart';
 import 'widgets/calendar_grid.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+  const CalendarPage({this.showTitle = true, super.key});
+
+  final bool showTitle;
 
   @override
   State<CalendarPage> createState() => _CalendarPageState();
@@ -80,11 +82,15 @@ class _CalendarPageState extends State<CalendarPage>
                 children: [
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      strings.navigation('calendar'),
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    subtitle: Text(strings.calendar('description')),
+                    title: widget.showTitle
+                        ? Text(
+                            strings.navigation('calendar'),
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          )
+                        : Text(strings.calendar('description')),
+                    subtitle: widget.showTitle
+                        ? Text(strings.calendar('description'))
+                        : null,
                     trailing: IconButton(
                       tooltip: strings.calendar('today'),
                       onPressed: _model.goToToday,
