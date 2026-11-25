@@ -49,6 +49,7 @@
     "drawingOptional": "Add a drawing (optional)",
     "size": "Size",
     "clearDrawing": "Clear drawing",
+    "undoDrawing": "Undo stroke",
     "erase": "Erase",
     "usePen": "Use pen"
   },
@@ -83,6 +84,16 @@
     "cancel": "Cancel",
     "save": "Save",
     "permissionDenied": "Notifications are not available. You can try again in settings."
+  },
+  "drawing": {
+    "createDrawing": "Create drawing",
+    "editDrawing": "Edit drawing",
+    "drawingEditorTitle": "My drawing",
+    "deleteDrawing": "Delete drawing",
+    "deleteDrawingConfirmation": "Remove this drawing? The removal takes effect when you save.",
+    "confirmDeleteDrawing": "Delete",
+    "saveDrawing": "Save drawing",
+    "cancel": "Cancel"
   },
   "journal": {
     "title": "Journal",

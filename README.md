@@ -31,7 +31,8 @@ private Personal Journal.
 - Filter notes by text across title, subtitle, and content, or by a creation-date range.
 - Date filtering is limited to today and earlier.
 - Notes with drawings show a localized drawing icon instead of a drawing preview.
-- Create a freehand drawing with erase and clear controls; drawing data is persisted locally.
+- Create or edit a freehand drawing in a separate dialog. Saving the drawing shows
+  a preview in the note editor, and saving the note persists drawing changes locally.
 - Use the Home screen and bottom navigation to reach Sticky Notes, future feature
   areas, and Settings.
 - Use Home as the feature launcher with a responsive two-column grid for Sticky
@@ -76,7 +77,8 @@ the implementation owner.
 - Browse entries in reverse chronological order with localized month grouping.
 - Keep multiple entries on the same date.
 - Create entries with optional titles, text, dates, and drawings.
-- Reuse the shared `core/drawing` canvas and serialization.
+- Create and edit drawings in a separate dialog using the shared `core/drawing`
+  canvas and serialization. Saving the drawing shows a preview in the entry editor.
 - Show a localized drawing icon in the journal index instead of a drawing preview;
   the complete drawing remains available in the reading view.
 - Read entries in a dedicated view and edit them without losing the updated

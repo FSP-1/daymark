@@ -49,6 +49,7 @@
     "drawingOptional": "Añade un dibujo (opcional)",
     "size": "Tamaño",
     "clearDrawing": "Limpiar dibujo",
+    "undoDrawing": "Deshacer trazo",
     "erase": "Borrar",
     "usePen": "Usar lápiz"
   },
@@ -83,6 +84,16 @@
     "cancel": "Cancelar",
     "save": "Guardar",
     "permissionDenied": "Las notificaciones no están disponibles. Puedes intentarlo de nuevo en Ajustes."
+  },
+  "drawing": {
+    "createDrawing": "Crear dibujo",
+    "editDrawing": "Editar dibujo",
+    "drawingEditorTitle": "Mi dibujo",
+    "deleteDrawing": "Eliminar dibujo",
+    "deleteDrawingConfirmation": "¿Quieres eliminar este dibujo? El cambio se aplicará al guardar.",
+    "confirmDeleteDrawing": "Eliminar",
+    "saveDrawing": "Guardar dibujo",
+    "cancel": "Cancelar"
   },
   "journal": {
     "title": "Diario",

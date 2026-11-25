@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/drawing/drawing_attachment.dart';
 import '../../../core/drawing/drawing_canvas.dart';
 import '../../../core/drawing/drawing_stroke.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -304,9 +305,11 @@ class _JournalEditorPageState extends State<_JournalEditorPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              DrawingCanvas(
-                initialStrokes: _strokes,
-                onChanged: (value) => _strokes = value,
+              DrawingAttachment(
+                strokes: _strokes,
+                onChanged: _isSaving
+                    ? null
+                    : (strokes) => setState(() => _strokes = strokes),
               ),
             ],
           ),

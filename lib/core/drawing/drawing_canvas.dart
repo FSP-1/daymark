@@ -8,12 +8,16 @@ class DrawingCanvas extends StatefulWidget {
     required this.onChanged,
     this.initialStrokes = const [],
     this.resetVersion = 0,
+    this.initialExpanded = false,
+    this.fitAvailableHeight = false,
     super.key,
   });
 
   final List<DrawingStroke> initialStrokes;
   final ValueChanged<List<DrawingStroke>> onChanged;
   final int resetVersion;
+  final bool initialExpanded;
+  final bool fitAvailableHeight;
 
   @override
   State<DrawingCanvas> createState() => _DrawingCanvasState();
@@ -50,7 +54,7 @@ class DrawingPreview extends StatelessWidget {
 class _DrawingCanvasState extends State<DrawingCanvas> {
   late List<DrawingStroke> _strokes;
   bool _eraseMode = false;
-  bool _expanded = false;
+  late bool _expanded;
   double _brushWidth = 3;
   int _brushColor = 0xff4527a0;
 
@@ -58,6 +62,7 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
   void initState() {
     super.initState();
     _strokes = [...widget.initialStrokes];
+    _expanded = widget.initialExpanded;
   }
 
   @override
@@ -112,18 +117,29 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
     widget.onChanged(_strokes);
   }
 
+  void _undo() {
+    setState(() => _strokes = _strokes.sublist(0, _strokes.length - 1));
+    widget.onChanged(_strokes);
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
+    final surface = SizedBox(
+      height: _expanded ? 300 : 56,
+      child: _buildSurface(),
+    );
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
-            Text(
-              strings.notes('drawingOptional'),
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
+            if (!widget.fitAvailableHeight)
+              Text(
+                strings.notes('drawingOptional'),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
             const Spacer(),
             IconButton(
               tooltip: _eraseMode
@@ -132,13 +148,22 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
               icon: Icon(_eraseMode ? Icons.edit : Icons.auto_fix_high),
               onPressed: () => setState(() => _eraseMode = !_eraseMode),
             ),
-            IconButton(
-              tooltip: _expanded
-                  ? 'Reduce drawing area'
-                  : 'Expand drawing area',
-              icon: Icon(_expanded ? Icons.fullscreen_exit : Icons.fullscreen),
-              onPressed: () => setState(() => _expanded = !_expanded),
-            ),
+            if (widget.fitAvailableHeight)
+              IconButton(
+                tooltip: strings.notes('undoDrawing'),
+                icon: const Icon(Icons.undo),
+                onPressed: _strokes.isEmpty ? null : _undo,
+              )
+            else
+              IconButton(
+                tooltip: _expanded
+                    ? 'Reduce drawing area'
+                    : 'Expand drawing area',
+                icon: Icon(
+                  _expanded ? Icons.fullscreen_exit : Icons.fullscreen,
+                ),
+                onPressed: () => setState(() => _expanded = !_expanded),
+              ),
             IconButton(
               tooltip: strings.notes('clearDrawing'),
               icon: const Icon(Icons.delete_outline),
@@ -186,37 +211,35 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
               ),
           ],
         ),
-        SizedBox(
-          height: _expanded ? 300 : 56,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final size = Size(constraints.maxWidth, constraints.maxHeight);
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.55),
-                    border: Border.all(color: Colors.black12),
-                  ),
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onPanStart: (details) =>
-                        _startStroke(details.localPosition, size),
-                    onPanUpdate: (details) =>
-                        _extendStroke(details.localPosition, size),
-                    child: CustomPaint(
-                      painter: _DrawingPainter(_strokes),
-                      child: const SizedBox.expand(),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+        if (widget.fitAvailableHeight) Flexible(child: surface) else surface,
       ],
     );
   }
+
+  Widget _buildSurface() => LayoutBuilder(
+    builder: (context, constraints) {
+      final size = Size(constraints.maxWidth, constraints.maxHeight);
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.55),
+            border: Border.all(color: Colors.black12),
+          ),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onPanStart: (details) => _startStroke(details.localPosition, size),
+            onPanUpdate: (details) =>
+                _extendStroke(details.localPosition, size),
+            child: CustomPaint(
+              painter: _DrawingPainter(_strokes),
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class _DrawingPainter extends CustomPainter {

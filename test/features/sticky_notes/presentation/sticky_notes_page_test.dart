@@ -157,6 +157,60 @@ void main() {
     expect(find.byType(DrawingPreview), findsNothing);
   });
 
+  testWidgets('saves and deletes a drawing through the note dialog', (
+    tester,
+  ) async {
+    final repository = _FakeRepository();
+    await tester.pumpWidget(_buildPage(repository));
+    await tester.pumpAndSettle();
+    await _openEditor(tester);
+    expect(find.byType(DrawingCanvas), findsNothing);
+
+    await tester.tap(find.text('Create drawing'));
+    await tester.pumpAndSettle();
+    final surface = find.descendant(
+      of: find.byType(DrawingCanvas),
+      matching: find.byWidgetPredicate(
+        (widget) => widget is GestureDetector && widget.onPanStart != null,
+      ),
+    );
+    await tester.drag(surface, const Offset(20, 70), touchSlopY: 0);
+    await tester.tap(find.text('Save drawing'));
+    await tester.pumpAndSettle();
+    expect(find.byType(DrawingPreview), findsOneWidget);
+    expect(repository.notes, isEmpty);
+
+    await tester.enterText(find.byKey(const Key('note-content')), 'Drawn note');
+    await _tapAddNote(tester);
+    await tester.pumpAndSettle();
+    final drawingData = repository.notes.single.drawingData;
+    expect(drawingData, isNotNull);
+
+    await tester.tap(find.text('Drawn note'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit drawing'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Clear drawing'));
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.byType(DrawingPreview), findsOneWidget);
+
+    await tester.tap(find.text('Edit drawing'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete drawing'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    expect(find.byType(DrawingPreview), findsNothing);
+    expect(repository.notes.single.drawingData, drawingData);
+
+    await _tapAddNote(tester);
+    await tester.pumpAndSettle();
+    expect(repository.notes.single.drawingData, isNull);
+  });
+
   testWidgets('filters notes by text', (tester) async {
     final repository = _FakeRepository([
       StickyNote.create(content: 'Shopping', createdAt: DateTime(2026, 10, 17)),

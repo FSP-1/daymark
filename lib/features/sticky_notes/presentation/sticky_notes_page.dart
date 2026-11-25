@@ -275,6 +275,7 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
   final _subtitleController = TextEditingController();
   final _contentController = TextEditingController();
   late List<DrawingStroke> _drawingStrokes;
+  var _isSaving = false;
 
   StickyNote? get _note => widget.note;
 
@@ -327,41 +328,49 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
               titleController: _titleController,
               subtitleController: _subtitleController,
               controller: _contentController,
-              onDrawingChanged: (strokes) => _drawingStrokes = strokes,
-              onSubmit: () async {
-                final model = context.read<StickyNotesViewModel>();
-                final note =
-                    _note?.copyWith(
-                      content: _contentController.text,
-                      title: _titleController.text.trim().isEmpty
-                          ? null
-                          : _titleController.text,
-                      subtitle: _subtitleController.text.trim().isEmpty
-                          ? null
-                          : _subtitleController.text,
-                      drawingData: _drawingStrokes.isEmpty
-                          ? null
-                          : encodeDrawing(_drawingStrokes),
-                      clearTitle: _titleController.text.trim().isEmpty,
-                      clearSubtitle: _subtitleController.text.trim().isEmpty,
-                      clearDrawing: _drawingStrokes.isEmpty,
-                    ) ??
-                    StickyNote.create(
-                      content: _contentController.text,
-                      title: _titleController.text,
-                      subtitle: _subtitleController.text,
-                      drawingData: _drawingStrokes.isEmpty
-                          ? null
-                          : encodeDrawing(_drawingStrokes),
-                    );
-                final saved = await model.saveNote(note);
-                if (!context.mounted) return;
-                if (saved == null) {
-                  setState(() {});
-                } else {
-                  Navigator.pop(context, saved);
-                }
-              },
+              initialStrokes: _drawingStrokes,
+              onDrawingChanged: _isSaving
+                  ? null
+                  : (strokes) => setState(() => _drawingStrokes = strokes),
+              onSubmit: _isSaving
+                  ? null
+                  : () async {
+                      setState(() => _isSaving = true);
+                      final model = context.read<StickyNotesViewModel>();
+                      final note =
+                          _note?.copyWith(
+                            content: _contentController.text,
+                            title: _titleController.text.trim().isEmpty
+                                ? null
+                                : _titleController.text,
+                            subtitle: _subtitleController.text.trim().isEmpty
+                                ? null
+                                : _subtitleController.text,
+                            drawingData: _drawingStrokes.isEmpty
+                                ? null
+                                : encodeDrawing(_drawingStrokes),
+                            clearTitle: _titleController.text.trim().isEmpty,
+                            clearSubtitle: _subtitleController.text
+                                .trim()
+                                .isEmpty,
+                            clearDrawing: _drawingStrokes.isEmpty,
+                          ) ??
+                          StickyNote.create(
+                            content: _contentController.text,
+                            title: _titleController.text,
+                            subtitle: _subtitleController.text,
+                            drawingData: _drawingStrokes.isEmpty
+                                ? null
+                                : encodeDrawing(_drawingStrokes),
+                          );
+                      final saved = await model.saveNote(note);
+                      if (!context.mounted) return;
+                      if (saved == null) {
+                        setState(() => _isSaving = false);
+                      } else {
+                        Navigator.pop(context, saved);
+                      }
+                    },
             ),
           ],
         ),

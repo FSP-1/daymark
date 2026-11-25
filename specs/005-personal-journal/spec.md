@@ -69,8 +69,10 @@ As a user, I want to write without being forced to provide a title.
 
 As a user, I want drawings to feel part of the journal page.
 
-1. **Given** the editor is open, **when** the user draws, **then** the
-   existing `DrawingCanvas` tools are used.
+1. **Given** the entry editor is open, **when** the user creates or edits a
+   drawing, **then** the shared `DrawingCanvas` opens in a modal dialog and
+   drawing gestures leave the entry scroll position unchanged. Saving shows a
+   preview in the editor. Canceling preserves the previous drawing.
 2. **Given** an entry has a drawing, **when** it is listed or read, **then**
    the index shows a localized attached-drawing icon and the reading view shows
    the serialized drawing.

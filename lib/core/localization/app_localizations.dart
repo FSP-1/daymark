@@ -59,6 +59,7 @@ class AppLocalizations {
       'drawingOptional': 'Add a drawing (optional)',
       'size': 'Size',
       'clearDrawing': 'Clear drawing',
+      'undoDrawing': 'Undo stroke',
       'erase': 'Erase',
       'usePen': 'Use pen',
     },
@@ -95,6 +96,17 @@ class AppLocalizations {
       'save': 'Save',
       'permissionDenied':
           'Notifications are not available. You can try again in settings.',
+    },
+    'drawing': {
+      'createDrawing': 'Create drawing',
+      'editDrawing': 'Edit drawing',
+      'drawingEditorTitle': 'My drawing',
+      'deleteDrawing': 'Delete drawing',
+      'deleteDrawingConfirmation':
+          'Remove this drawing? The removal takes effect when you save.',
+      'confirmDeleteDrawing': 'Delete',
+      'saveDrawing': 'Save drawing',
+      'cancel': 'Cancel',
     },
     'journal': {
       'title': 'Journal',
@@ -177,6 +189,7 @@ class AppLocalizations {
   String notes(String key) => _read('notes.$key', key);
   String daily(String key) => _read('daily.$key', key);
   String journal(String key) => _read('journal.$key', key);
+  String drawing(String key) => _read('drawing.$key', key);
   String notification(String key) => _read('notification.$key', key);
   String settings(String key) => _read('settings.$key', key);
   String error(String key) => _read('errors.$key', key);

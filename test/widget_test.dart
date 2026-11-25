@@ -23,7 +23,22 @@ void main() {
 
     await tester.tap(find.byType(NavigationDestination).first);
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(NavigationDestination).last);
+    expect(find.byType(NavigationDestination), findsNWidgets(5));
+    await tester.tap(find.byKey(const Key('calendar-nav')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('calendar-page')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('journal-nav')));
+    await tester.pumpAndSettle();
+    expect(find.text('Diario personal'), findsAtLeastNWidgets(1));
+    await tester.tap(find.byType(NavigationDestination).first);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('calendar-fast-travel')));
+    await tester.tap(find.byKey(const Key('calendar-fast-travel')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('calendar-page')), findsOneWidget);
+    await tester.tap(find.byType(NavigationDestination).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('settings-action')));
     await tester.pumpAndSettle();
 
     expect(find.text('Estilo visual'), findsAtLeastNWidgets(1));

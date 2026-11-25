@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-import '../../../core/drawing/drawing_canvas.dart';
+import '../../../core/drawing/drawing_attachment.dart';
 import '../../../core/drawing/drawing_stroke.dart';
 import '../../../core/localization/app_localizations.dart';
 
@@ -12,17 +12,15 @@ class NoteEditor extends StatelessWidget {
     required this.onSubmit,
     required this.onDrawingChanged,
     this.initialStrokes = const [],
-    this.resetVersion = 0,
     super.key,
   });
 
   final TextEditingController controller;
   final TextEditingController titleController;
   final TextEditingController subtitleController;
-  final VoidCallback onSubmit;
-  final ValueChanged<List<DrawingStroke>> onDrawingChanged;
+  final VoidCallback? onSubmit;
+  final ValueChanged<List<DrawingStroke>>? onDrawingChanged;
   final List<DrawingStroke> initialStrokes;
-  final int resetVersion;
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +66,10 @@ class NoteEditor extends StatelessWidget {
                 border: InputBorder.none,
               ),
             ),
-            DrawingCanvas(
+            DrawingAttachment(
               key: const Key('note-drawing'),
-              initialStrokes: initialStrokes,
-              resetVersion: resetVersion,
+              strokes: initialStrokes,
+              previewHeight: 120,
               onChanged: onDrawingChanged,
             ),
             Align(
