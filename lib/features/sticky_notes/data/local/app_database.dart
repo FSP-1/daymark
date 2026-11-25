@@ -122,6 +122,20 @@ class DailyGoalCredits extends Table {
   Set<Column<Object>> get primaryKey => {activityId, localDate};
 }
 
+class FocusStateRows extends Table {
+  IntColumn get id => integer()();
+  TextColumn get payload => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class FocusSessionRows extends Table {
+  TextColumn get id => text()();
+  TextColumn get payload => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     Notes,
@@ -132,18 +146,24 @@ class DailyGoalCredits extends Table {
     Goals,
     GoalMilestones,
     DailyGoalCredits,
+    FocusStateRows,
+    FocusSessionRows,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
     onUpgrade: (migrator, from, to) async {
+      if (from < 12) {
+        await migrator.createTable(focusStateRows);
+        await migrator.createTable(focusSessionRows);
+      }
       if (from < 2) {
         await migrator.addColumn(notes, notes.title);
         await migrator.addColumn(notes, notes.subtitle);

@@ -141,4 +141,36 @@ class PlatformNotificationService implements NotificationService {
       );
     }
   }
+
+  Future<void> scheduleFocus({
+    required int id,
+    required DateTime end,
+    required String title,
+    required String body,
+    required bool sound,
+    required bool vibration,
+  }) async {
+    await _initialize();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (android == null || !end.isAfter(DateTime.now())) return;
+    await _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: tz.TZDateTime.from(end, tz.local),
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          'focus_${sound ? 1 : 0}${vibration ? 1 : 0}',
+          'Focus timer',
+          playSound: sound,
+          enableVibration: vibration,
+          importance: Importance.defaultImportance,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+  }
 }

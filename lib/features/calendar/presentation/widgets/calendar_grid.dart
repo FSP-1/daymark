@@ -67,6 +67,7 @@ class CalendarMonthGrid extends StatelessWidget {
             final notes = content.notesByDay.containsKey(day);
             final journal = content.entriesByDay.containsKey(day);
             final goals = content.goalsByDay.containsKey(day);
+            final focus = content.focusByDay.containsKey(day);
             if (compact) {
               return Center(
                 child: Text(
@@ -74,10 +75,10 @@ class CalendarMonthGrid extends StatelessWidget {
                   textScaler: TextScaler.noScaling,
                   style: TextStyle(
                     fontSize: 9,
-                    fontWeight: today || notes || journal || goals
+                    fontWeight: today || notes || journal || goals || focus
                         ? FontWeight.bold
                         : null,
-                    decoration: notes || journal || goals
+                    decoration: notes || journal || goals || focus
                         ? TextDecoration.underline
                         : null,
                     color: notes
@@ -133,6 +134,11 @@ class CalendarMonthGrid extends StatelessWidget {
                                 _Dot(color: calendarJournalColor(context)),
                               if (goals)
                                 _Dot(color: calendarGoalColor(context)),
+                              if (focus)
+                                _Dot(
+                                  color: colors.onSurface,
+                                  icon: Icons.square,
+                                ),
                             ],
                           ),
                         ),
@@ -232,27 +238,34 @@ class CalendarLegend extends StatelessWidget {
           _label(calendarNoteColor(context), strings.navigation('notes')),
           _label(calendarJournalColor(context), strings.navigation('journal')),
           _label(calendarGoalColor(context), strings.navigation('goals')),
+          _label(
+            Theme.of(context).colorScheme.onSurface,
+            strings.navigation('focus'),
+            icon: Icons.square,
+          ),
         ],
       ),
     );
   }
 
-  Widget _label(Color color, String label) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      _Dot(color: color),
-      Text(label),
-    ],
-  );
+  Widget _label(Color color, String label, {IconData icon = Icons.circle}) =>
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _Dot(color: color, icon: icon),
+          Text(label),
+        ],
+      );
 }
 
 class _Dot extends StatelessWidget {
-  const _Dot({required this.color});
+  const _Dot({required this.color, this.icon = Icons.circle});
   final Color color;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 2),
-    child: Icon(Icons.circle, size: 5, color: color),
+    padding: const EdgeInsets.symmetric(horizontal: 1.5),
+    child: Icon(icon, size: 5, color: color),
   );
 }

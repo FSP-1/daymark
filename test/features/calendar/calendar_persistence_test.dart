@@ -38,6 +38,8 @@ void main() {
       await old.customStatement(
         'ALTER TABLE daily_activities DROP COLUMN goal_id',
       );
+      await old.customStatement('DROP TABLE focus_session_rows');
+      await old.customStatement('DROP TABLE focus_state_rows');
       await old.customStatement('PRAGMA user_version = 7');
       await old.close();
 

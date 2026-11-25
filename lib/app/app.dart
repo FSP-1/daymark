@@ -20,6 +20,8 @@ import '../features/journal/data/journal_repository.dart';
 import '../features/journal/presentation/journal_view_model.dart';
 import '../features/goals/data/goal_repository.dart';
 import '../features/goals/presentation/goals_view_model.dart';
+import '../features/focus/data/focus_repository.dart';
+import '../features/focus/presentation/focus_view_model.dart';
 
 class DaymarkApp extends StatefulWidget {
   const DaymarkApp({required this.database, super.key});
@@ -72,6 +74,16 @@ class _DaymarkAppState extends State<DaymarkApp> {
       providers: [
         ChangeNotifierProvider.value(value: _themeViewModel),
         ChangeNotifierProvider.value(value: _navigation),
+        ChangeNotifierProvider(
+          lazy: false,
+          create: (_) => FocusViewModel(
+            FocusRepository(widget.database),
+            notifications: PlatformNotificationService(),
+            notificationText: () => _locale.languageCode == 'es'
+                ? ('Concentración', 'Tu sesión ha terminado.')
+                : ('Focus', 'Your session has ended.'),
+          )..restore(),
+        ),
         ChangeNotifierProvider(
           create: (_) => StickyNotesViewModel(_repository)..load(),
         ),

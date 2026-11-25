@@ -7,6 +7,7 @@ import 'package:daymark/features/sticky_notes/data/local/app_database.dart';
 void main() {
   testWidgets('opens Daily and exposes the empty state', (tester) async {
     final database = AppDatabase.test();
+    await tester.runAsync(() => database.customSelect('SELECT 1').get());
     await tester.pumpWidget(DaymarkApp(database: database));
     await tester.pumpAndSettle(const Duration(seconds: 2));
 
@@ -18,6 +19,7 @@ void main() {
     expect(find.byKey(const Key('daily-add')), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
     await database.close();
   });
 }

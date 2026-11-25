@@ -23,6 +23,7 @@ class NavigationHelpDialog extends StatelessWidget {
     (Icons.check_circle_outline, 'daily'),
     (Icons.menu_book_outlined, 'journal'),
     (Icons.track_changes, 'goals'),
+    (Icons.timer_outlined, 'focus'),
     (Icons.settings_outlined, 'settings'),
     (Icons.info_outline, 'information'),
   ];
@@ -58,6 +59,14 @@ class NavigationHelpDialog extends StatelessWidget {
       (Icons.pin_outlined, 'goalCounter'),
       (Icons.add, 'goalAdvance'),
       (Icons.remove, 'goalDecrease'),
+    ],
+    'focus': [
+      (Icons.info_outline, 'focusHowTo'),
+      (Icons.history, 'focusHistory'),
+      (Icons.tune, 'focusSettings'),
+      (Icons.settings_outlined, 'focusActivities'),
+      (Icons.restart_alt, 'focusReset'),
+      (Icons.stop, 'focusStop'),
     ],
     'home': [(Icons.arrow_outward_rounded, 'shortcut')],
   };

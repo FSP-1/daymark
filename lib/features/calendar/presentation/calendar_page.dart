@@ -8,6 +8,10 @@ import '../../journal/presentation/journal_page.dart';
 import '../../goals/presentation/goal_detail_page.dart';
 import '../../goals/presentation/goal_style.dart';
 import '../../goals/presentation/goals_view_model.dart';
+import '../../focus/domain/focus_session.dart';
+import '../../focus/domain/focus_statistics.dart';
+import '../../focus/presentation/focus_history_page.dart';
+import '../../focus/presentation/focus_view_model.dart';
 import '../../journal/presentation/journal_view_model.dart';
 import '../../sticky_notes/presentation/sticky_notes_page.dart';
 import '../../sticky_notes/presentation/sticky_notes_view_model.dart';
@@ -68,10 +72,14 @@ class _CalendarPageState extends State<CalendarPage>
     final notes = context.watch<StickyNotesViewModel>();
     final journal = context.watch<JournalViewModel>();
     final goals = context.watch<GoalsViewModel?>();
+    final focusHistory = context.select<FocusViewModel?, List<FocusSession>>(
+      (model) => model?.history ?? const [],
+    );
     final content = CalendarContent(
       notes.notes,
       journal.entries,
       goals?.goals ?? [],
+      focusHistory,
     );
     final strings = AppLocalizations.of(context);
     final dates = MaterialLocalizations.of(context);
@@ -203,6 +211,8 @@ class _DayContent extends StatelessWidget {
     final dayNotes = content.notesByDay[day] ?? [];
     final dayEntries = content.entriesByDay[day] ?? [];
     final dayGoals = content.goalsByDay[day] ?? [];
+    final dayFocus = content.focusByDay[day] ?? [];
+    final focus = context.read<FocusViewModel?>();
     final loading =
         notes.status == StickyNotesStatus.loading ||
         journal.status == JournalStatus.loading ||
@@ -235,7 +245,8 @@ class _DayContent extends StatelessWidget {
             !failed &&
             dayNotes.isEmpty &&
             dayEntries.isEmpty &&
-            dayGoals.isEmpty)
+            dayGoals.isEmpty &&
+            dayFocus.isEmpty)
           Text(strings.calendar('empty')),
         for (final note in dayNotes)
           _ContentTile(
@@ -267,6 +278,19 @@ class _DayContent extends StatelessWidget {
             color: calendarGoalColor(context),
             onTap: () => GoalDetailPage.open(context, goal.id!),
           ),
+        if (focus != null && dayFocus.isNotEmpty) ...[
+          const Divider(),
+          Text(
+            '${strings.focus('focus')} · ${focusDurationText(FocusStatistics(dayFocus, day, focusNextDay(day)).concentration)}',
+          ),
+          for (final session in dayFocus)
+            FocusHistoryTile(
+              key: ValueKey(session.id),
+              session: session,
+              model: focus,
+              day: day,
+            ),
+        ],
         const SizedBox(height: 12),
         OverflowBar(
           spacing: 8,

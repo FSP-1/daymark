@@ -168,8 +168,9 @@ class GoalRepository {
       for (final (index, step) in milestones.indexed) {
         final activityId = step.activityId;
         if (activityId != null) {
-          if (activityIds.contains(activityId))
+          if (activityIds.contains(activityId)) {
             throw ArgumentError('Repeated Daily activity');
+          }
           await _linkActivity(id, activityId);
           activityIds.add(activityId);
         }

@@ -7,6 +7,8 @@ import '../../../core/theme/app_styles.dart';
 import '../../../core/theme/theme_presets.dart';
 import 'theme_view_model.dart';
 import 'navigation_settings_page.dart';
+import '../../focus/presentation/focus_settings_page.dart';
+import '../../focus/presentation/focus_view_model.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({
@@ -53,6 +55,14 @@ class SettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(strings.settings('languageDescription')),
+          if (context.read<FocusViewModel?>() case final FocusViewModel focus)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.timer_outlined),
+              title: Text(strings.focus('settings')),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => FocusSettingsPage.open(context, focus),
+            ),
           if (registry != null)
             ListTile(
               key: const Key('navigation-settings'),

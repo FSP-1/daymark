@@ -122,6 +122,22 @@ See the [Calendar specification](specs/007-calendar/spec.md).
 
 See the [Goals and customizable navigation specification](specs/008-goals/spec.md).
 
+### Focus
+
+- Run a concentration timer with configurable short and long breaks. Defaults
+  are 25, 5, and 15 minutes, with a long break after four focus sessions.
+- Pause, resume, reset, or stop a session. The timer keeps its end time across
+  navigation and app restarts, and history records active time without pauses.
+- Associate sessions with custom activities or activities added from Daily.
+- Use the single Break mode. Focus chooses the short or long duration based
+  on the current cycle.
+- Browse recorded sessions in Calendar or open Focus history for totals and
+  activity breakdowns. Focus is available in Home and navigation settings.
+- Android completion notifications are subject to permission and device
+  scheduling. The timer still works if notifications are unavailable.
+
+See the [Focus specification](specs/009-focus/spec.md).
+
 ## Localization and settings
 
 The current language selector is intentionally limited to Spanish and English.

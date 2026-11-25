@@ -8,6 +8,9 @@ import '../../../core/navigation/navigation_view_model.dart';
 import '../../calendar/presentation/calendar_page.dart';
 import '../../daily/presentation/daily_page.dart';
 import '../../goals/presentation/goals_page.dart';
+import '../../focus/domain/focus_session.dart';
+import '../../focus/presentation/focus_page.dart';
+import '../../focus/presentation/focus_view_model.dart';
 import '../../journal/presentation/journal_page.dart';
 import '../../settings/presentation/settings_page.dart';
 import '../../sticky_notes/presentation/sticky_notes_page.dart';
@@ -74,6 +77,13 @@ class _HomeShellState extends State<HomeShell> {
       Icons.track_changes,
       (_) => const GoalsPage(),
       description: (strings) => strings.goals('subtitle'),
+    ),
+    FeatureDefinition(
+      FeatureId.focus,
+      Icons.timer_outlined,
+      Icons.timer,
+      (_) => const FocusPage(),
+      description: (strings) => strings.focus('subtitle'),
     ),
   ]);
 
@@ -207,6 +217,34 @@ class _HomeOverview extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(strings.home('description'), style: theme.textTheme.bodyLarge),
+            Selector<FocusViewModel, (FocusSession?, String)>(
+              selector: (_, model) =>
+                  (model.active, FocusClock.timeText(model.remaining)),
+              builder: (context, snapshot, _) {
+                final (active, remaining) = snapshot;
+                if (active == null) return const SizedBox.shrink();
+                return Card(
+                  key: const Key('focus-active-banner'),
+                  margin: const EdgeInsets.only(top: 14),
+                  child: ListTile(
+                    leading: Icon(
+                      active.running
+                          ? Icons.timer_outlined
+                          : Icons.pause_circle_outline,
+                      color: colors.primary,
+                    ),
+                    title: Text(
+                      active.activityLabel ?? strings.focus(active.mode.name),
+                    ),
+                    subtitle: Text(
+                      '$remaining · ${strings.focus(active.running ? 'running' : 'paused')}',
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => onOpen(FeatureId.focus),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 28),
             HomeFeatureGrid(
               features: [

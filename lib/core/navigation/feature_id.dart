@@ -1,1 +1,1 @@
-enum FeatureId { home, notes, calendar, daily, journal, goals }
+enum FeatureId { home, notes, calendar, daily, journal, goals, focus }

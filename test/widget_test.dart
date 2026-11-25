@@ -167,6 +167,7 @@ void main() {
     expect(tester.widget<OutlinedButton>(write).onPressed, isNull);
     final add = find.byKey(const Key('calendar-add-note'));
     await tester.ensureVisible(add);
+    await tester.pumpAndSettle();
     await tester.tap(add);
     await tester.pumpAndSettle();
     expect(find.text(localizations.formatFullDate(future)), findsOneWidget);
@@ -213,6 +214,7 @@ void main() {
     await tester.tap(find.byKey(ValueKey(past)));
     await tester.pumpAndSettle();
     await tester.ensureVisible(write);
+    await tester.pumpAndSettle();
     await tester.tap(write);
     await tester.pumpAndSettle();
     await tester.enterText(
