@@ -51,14 +51,12 @@ class GoalsViewModel extends ChangeNotifier {
   Future<bool> save(
     Goal goal, {
     int? counterActivityId,
-    String? newCounterActivityName,
     bool updateCounterLink = false,
   }) => _mutate(
     goal.id,
     () => repository.save(
       goal,
       counterActivityId: counterActivityId,
-      newCounterActivityName: newCounterActivityName,
       updateCounterLink: updateCounterLink,
     ),
   );

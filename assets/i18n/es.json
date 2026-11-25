@@ -61,11 +61,13 @@
     "addEntry": "Crea una entrada del diario."
   },
   "goals": {
+    "details": "Fechas y apariencia",
+    "checklistSetup": "Añade tus propios pasos o vincula actividades existentes de Daily como pasos.",
+    "changeDaily": "Cambiar actividad de Daily",
     "chooseDaily": "Elegir actividad de Daily",
-    "createDaily": "Crear actividad de Daily",
-    "noAvailableDaily": "No hay actividades disponibles. Puedes crear una aquí.",
+    "noAvailableDaily": "No hay actividades disponibles para vincular. Añade una desde Daily.",
     "linkedDaily": "Actividad vinculada de Daily",
-    "counterNeedsDaily": "Elige o crea una actividad de Daily antes de guardar el objetivo.",
+    "counterNeedsDaily": "Elige una actividad existente de Daily antes de guardar el objetivo.",
     "counterFromDaily": "Completa la actividad vinculada en Daily para sumar un día a este objetivo.",
     "dailyRequired": "Esta actividad es necesaria para un objetivo cuantitativo. Cámbiala en Objetivos antes de borrarla.",
     "dailyCredits": "Aportes de Daily: {count}",

@@ -39,7 +39,7 @@ Acceptance scenarios:
 - Users select a tracking method when creating a goal.
 - Checklist goals support creating, editing, deleting, reordering and completing milestones.
 - Counter goals require a Daily activity and a positive whole-number target.
-- The goal editor can link an existing activity or create one at save time.
+- The goal editor links existing activities. New activities are created in Daily.
 - A checklist can combine personal steps with multiple distinct Daily activities.
 - Progress is calculated automatically for checklist and counter goals.
 - Progress is constrained between 0 and 100 percent.

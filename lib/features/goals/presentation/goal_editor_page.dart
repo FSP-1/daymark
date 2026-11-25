@@ -33,7 +33,6 @@ class _GoalEditorPageState extends State<GoalEditorPage> {
       ? GoalTracking.counter
       : GoalTracking.checklist;
   DailyActivity? _counterActivity;
-  String? _newCounterActivityName;
   late GoalIcon _icon = widget.goal?.icon ?? GoalIcon.target;
   late GoalColor _color = widget.goal?.color ?? GoalColor.primary;
   late DateTime _start = widget.goal?.startDate ?? Goal.day(DateTime.now());
@@ -75,9 +74,7 @@ class _GoalEditorPageState extends State<GoalEditorPage> {
     final counter =
         _counterActivity ??
         _currentCounter(context.read<DailyViewModel?>()?.activities ?? []);
-    if (_tracking == GoalTracking.counter &&
-        counter == null &&
-        _newCounterActivityName == null) {
+    if (_tracking == GoalTracking.counter && counter == null) {
       setState(() => _error = 'counterNeedsDaily');
       return;
     }
@@ -123,7 +120,6 @@ class _GoalEditorPageState extends State<GoalEditorPage> {
     final saved = await widget.model.save(
       goal,
       counterActivityId: counter?.id,
-      newCounterActivityName: _newCounterActivityName,
       updateCounterLink: _tracking == GoalTracking.counter,
     );
     if (!mounted) return;
@@ -172,7 +168,11 @@ class _GoalEditorPageState extends State<GoalEditorPage> {
           for (final activity in available)
             SimpleDialogOption(
               onPressed: () => Navigator.pop(context, activity),
-              child: Text(activity.name),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.check_circle_outline),
+                title: Text(activity.name),
+              ),
             ),
         ],
       ),
@@ -182,7 +182,6 @@ class _GoalEditorPageState extends State<GoalEditorPage> {
       _error = null;
       if (_tracking == GoalTracking.counter) {
         _counterActivity = selected;
-        _newCounterActivityName = null;
       } else {
         _steps.add(
           GoalMilestone(title: selected.name, activityId: selected.id),
@@ -191,53 +190,15 @@ class _GoalEditorPageState extends State<GoalEditorPage> {
     });
   }
 
-  Future<void> _createActivity() async {
-    final strings = AppLocalizations.of(context);
-    var name = '';
-    final selected = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(strings.goals('createDaily')),
-        content: TextField(
-          key: const Key('goal-new-daily-name'),
-          autofocus: true,
-          decoration: InputDecoration(labelText: strings.daily('name')),
-          onChanged: (value) => name = value.trim(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(strings.goals('cancel')),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (name.isNotEmpty) Navigator.pop(context, name);
-            },
-            child: Text(strings.goals('confirm')),
-          ),
-        ],
-      ),
-    );
-    if (!mounted || selected == null) return;
-    setState(() {
-      _error = null;
-      if (_tracking == GoalTracking.counter) {
-        _newCounterActivityName = selected;
-        _counterActivity = null;
-      } else {
-        _steps.add(GoalMilestone(title: selected, createActivity: true));
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
     final dates = MaterialLocalizations.of(context);
+    final theme = Theme.of(context);
     final activities = context.watch<DailyViewModel?>()?.activities ?? [];
-    final counterName =
-        _newCounterActivityName ??
-        (_counterActivity ?? _currentCounter(activities))?.name;
+    final counter = _counterActivity ?? _currentCounter(activities);
+    final checklist = _tracking == GoalTracking.checklist;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(strings.goals(widget.goal == null ? 'new' : 'edit')),
@@ -250,202 +211,261 @@ class _GoalEditorPageState extends State<GoalEditorPage> {
         ],
       ),
       body: SafeArea(
-        child: Form(
-          key: _form,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  key: const Key('goal-title'),
-                  controller: _title,
-                  decoration: InputDecoration(
-                    labelText: strings.goals('title'),
-                  ),
-                  validator: (value) => value?.trim().isNotEmpty == true
-                      ? null
-                      : strings.goals('required'),
-                ),
-                TextFormField(
-                  controller: _description,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: strings.goals('description'),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<GoalIcon>(
-                  initialValue: _icon,
-                  decoration: InputDecoration(labelText: strings.goals('icon')),
-                  items: [
-                    for (final icon in GoalIcon.values)
-                      DropdownMenuItem(
-                        value: icon,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(goalIcon(icon)),
-                            const SizedBox(width: 8),
-                            Text(strings.goals('icon_${icon.name}')),
-                          ],
-                        ),
-                      ),
-                  ],
-                  onChanged: (value) => setState(() => _icon = value!),
-                ),
-                DropdownButtonFormField<GoalColor>(
-                  initialValue: _color,
-                  decoration: InputDecoration(
-                    labelText: strings.goals('color'),
-                  ),
-                  items: [
-                    for (final color in GoalColor.values)
-                      DropdownMenuItem(
-                        value: color,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.circle,
-                              color: goalColor(context, color),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(strings.goals('color_${color.name}')),
-                          ],
-                        ),
-                      ),
-                  ],
-                  onChanged: (value) => setState(() => _color = value!),
-                ),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.today_outlined),
-                  title: Text(strings.goals('start')),
-                  subtitle: Text(dates.formatMediumDate(_start)),
-                  onTap: () => _pickDate(false),
-                ),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.event_outlined),
-                  title: Text(strings.goals('deadline')),
-                  subtitle: Text(
-                    _deadline == null
-                        ? strings.goals('noDeadline')
-                        : dates.formatMediumDate(_deadline!),
-                  ),
-                  onTap: () => _pickDate(true),
-                  trailing: _deadline == null
-                      ? null
-                      : IconButton(
-                          tooltip: strings.goals('removeDeadline'),
-                          onPressed: () => setState(() {
-                            _deadline = null;
-                            _error = null;
-                          }),
-                          icon: const Icon(Icons.clear),
-                        ),
-                ),
-                DropdownButtonFormField<GoalTracking>(
-                  key: const Key('goal-tracking'),
-                  initialValue: _tracking,
-                  decoration: InputDecoration(
-                    labelText: strings.goals('tracking'),
-                  ),
-                  items: [
-                    for (final type in [
-                      GoalTracking.checklist,
-                      GoalTracking.counter,
-                    ])
-                      DropdownMenuItem(
-                        value: type,
-                        child: Text(strings.goals(type.name)),
-                      ),
-                  ],
-                  onChanged: (value) => setState(() => _tracking = value!),
-                ),
-                if (_tracking == GoalTracking.checklist) ...[
-                  for (final (index, step) in _steps.indexed)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(step.title),
-                      leading: step.linked
-                          ? const Icon(Icons.check_circle_outline)
-                          : null,
-                      trailing: IconButton(
-                        tooltip: strings.goals('deleteStep'),
-                        onPressed: _saving
-                            ? null
-                            : () => setState(() => _steps.removeAt(index)),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ),
-                  TextField(
-                    key: const Key('goal-draft-step'),
-                    controller: _stepTitle,
-                    onSubmitted: (_) => _addStep(),
-                    decoration: InputDecoration(
-                      labelText: strings.goals('addStep'),
-                      suffixIcon: IconButton(
-                        tooltip: strings.goals('addStep'),
-                        onPressed: _saving ? null : _addStep,
-                        icon: const Icon(Icons.add),
-                      ),
-                    ),
-                  ),
-                ],
-                if (_tracking == GoalTracking.counter) ...[
-                  TextFormField(
-                    controller: _target,
-                    key: const Key('goal-target'),
-                    decoration: InputDecoration(
-                      labelText: strings.goals('target'),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      final target = int.tryParse(value?.trim() ?? '');
-                      return target != null && target > 0
-                          ? null
-                          : strings.goals('invalidTarget');
-                    },
-                  ),
-                  if (counterName != null)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.check_circle_outline),
-                      title: Text(counterName),
-                      subtitle: Text(strings.goals('linkedDaily')),
-                    ),
-                ],
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: Form(
+              key: _form,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    OutlinedButton(
-                      key: const Key('goal-choose-daily'),
-                      onPressed: _saving
+                    TextFormField(
+                      key: const Key('goal-title'),
+                      controller: _title,
+                      decoration: InputDecoration(
+                        labelText: strings.goals('title'),
+                        border: const OutlineInputBorder(),
+                      ),
+                      validator: (value) => value?.trim().isNotEmpty == true
                           ? null
-                          : () => _pickActivity(activities),
-                      child: Text(strings.goals('chooseDaily')),
+                          : strings.goals('required'),
                     ),
-                    OutlinedButton(
-                      key: const Key('goal-create-daily'),
-                      onPressed: _saving ? null : _createActivity,
-                      child: Text(strings.goals('createDaily')),
+                    const SizedBox(height: 20),
+                    Text(
+                      strings.goals('tracking'),
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      key: const Key('goal-tracking'),
+                      spacing: 8,
+                      children: [
+                        for (final type in [
+                          GoalTracking.checklist,
+                          GoalTracking.counter,
+                        ])
+                          ChoiceChip(
+                            avatar: Icon(
+                              type == GoalTracking.checklist
+                                  ? Icons.checklist
+                                  : Icons.pin_outlined,
+                              size: 18,
+                            ),
+                            label: Text(strings.goals(type.name)),
+                            selected: _tracking == type,
+                            showCheckmark: false,
+                            onSelected: _saving
+                                ? null
+                                : (_) => setState(() {
+                                    _tracking = type;
+                                    _error = null;
+                                  }),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Card(
+                      margin: EdgeInsets.zero,
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              strings.goals(
+                                checklist
+                                    ? 'checklistSetup'
+                                    : 'counterFromDaily',
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            if (checklist) ...[
+                              for (final (index, step) in _steps.indexed)
+                                ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  dense: true,
+                                  leading: Icon(
+                                    step.linked
+                                        ? Icons.link
+                                        : Icons.check_box_outline_blank,
+                                  ),
+                                  title: Text(step.title),
+                                  trailing: IconButton(
+                                    tooltip: strings.goals('deleteStep'),
+                                    onPressed: _saving
+                                        ? null
+                                        : () => setState(
+                                            () => _steps.removeAt(index),
+                                          ),
+                                    icon: const Icon(Icons.close),
+                                  ),
+                                ),
+                              TextField(
+                                key: const Key('goal-draft-step'),
+                                controller: _stepTitle,
+                                onSubmitted: (_) => _addStep(),
+                                decoration: InputDecoration(
+                                  labelText: strings.goals('addStep'),
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                    tooltip: strings.goals('addStep'),
+                                    onPressed: _saving ? null : _addStep,
+                                    icon: const Icon(Icons.add),
+                                  ),
+                                ),
+                              ),
+                            ] else ...[
+                              TextFormField(
+                                controller: _target,
+                                key: const Key('goal-target'),
+                                decoration: InputDecoration(
+                                  labelText: strings.goals('target'),
+                                  border: const OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  final target = int.tryParse(
+                                    value?.trim() ?? '',
+                                  );
+                                  return target != null && target > 0
+                                      ? null
+                                      : strings.goals('invalidTarget');
+                                },
+                              ),
+                              if (counter != null)
+                                ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: const Icon(Icons.link),
+                                  title: Text(counter.name),
+                                  subtitle: Text(strings.goals('linkedDaily')),
+                                ),
+                            ],
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: OutlinedButton.icon(
+                                key: const Key('goal-choose-daily'),
+                                onPressed: _saving
+                                    ? null
+                                    : () => _pickActivity(activities),
+                                icon: const Icon(Icons.link),
+                                label: Text(
+                                  strings.goals(
+                                    counter != null && !checklist
+                                        ? 'changeDaily'
+                                        : 'chooseDaily',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(
+                          strings.goals(_error!),
+                          style: TextStyle(color: theme.colorScheme.error),
+                        ),
+                      ),
+                    const SizedBox(height: 14),
+                    ExpansionTile(
+                      key: const Key('goal-details'),
+                      tilePadding: EdgeInsets.zero,
+                      title: Text(strings.goals('details')),
+                      expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextFormField(
+                          controller: _description,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            labelText: strings.goals('description'),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<GoalIcon>(
+                          initialValue: _icon,
+                          decoration: InputDecoration(
+                            labelText: strings.goals('icon'),
+                          ),
+                          items: [
+                            for (final icon in GoalIcon.values)
+                              DropdownMenuItem(
+                                value: icon,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(goalIcon(icon)),
+                                    const SizedBox(width: 8),
+                                    Text(strings.goals('icon_${icon.name}')),
+                                  ],
+                                ),
+                              ),
+                          ],
+                          onChanged: (value) => setState(() => _icon = value!),
+                        ),
+                        DropdownButtonFormField<GoalColor>(
+                          initialValue: _color,
+                          decoration: InputDecoration(
+                            labelText: strings.goals('color'),
+                          ),
+                          items: [
+                            for (final color in GoalColor.values)
+                              DropdownMenuItem(
+                                value: color,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.circle,
+                                      color: goalColor(context, color),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(strings.goals('color_${color.name}')),
+                                  ],
+                                ),
+                              ),
+                          ],
+                          onChanged: (value) => setState(() => _color = value!),
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.today_outlined),
+                          title: Text(strings.goals('start')),
+                          subtitle: Text(dates.formatMediumDate(_start)),
+                          onTap: () => _pickDate(false),
+                        ),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.event_outlined),
+                          title: Text(strings.goals('deadline')),
+                          subtitle: Text(
+                            _deadline == null
+                                ? strings.goals('noDeadline')
+                                : dates.formatMediumDate(_deadline!),
+                          ),
+                          onTap: () => _pickDate(true),
+                          trailing: _deadline == null
+                              ? null
+                              : IconButton(
+                                  tooltip: strings.goals('removeDeadline'),
+                                  onPressed: () => setState(() {
+                                    _deadline = null;
+                                    _error = null;
+                                  }),
+                                  icon: const Icon(Icons.clear),
+                                ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                if (_error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Text(
-                      strings.goals(_error!),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
         ),

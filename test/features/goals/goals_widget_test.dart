@@ -17,16 +17,18 @@ void main() {
       final daily = DriftDailyRepository(database);
       await tester.runAsync(() async {
         final today = DateTime.now();
-        await daily.saveActivity(
-          DailyActivity(
-            id: null,
-            name: 'Planificar',
-            schedule: const DailySchedule.anytime(),
-            notificationsEnabled: false,
-            createdAt: today,
-            updatedAt: today,
-          ),
-        );
+        for (final name in ['Planificar', 'Construir', 'Leer']) {
+          await daily.saveActivity(
+            DailyActivity(
+              id: null,
+              name: name,
+              schedule: const DailySchedule.anytime(),
+              notificationsEnabled: false,
+              createdAt: today,
+              updatedAt: today,
+            ),
+          );
+        }
       });
       await tester.pumpWidget(DaymarkApp(database: database));
       await tester.pump(const Duration(seconds: 1));
@@ -49,13 +51,9 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      Future<void> createDaily(String name) async {
-        await tapVisible(find.byKey(const Key('goal-create-daily')));
-        await tester.enterText(
-          find.byKey(const Key('goal-new-daily-name')),
-          name,
-        );
-        await tester.tap(find.text('Confirmar'));
+      Future<void> selectDaily(String name) async {
+        await tapVisible(find.byKey(const Key('goal-choose-daily')));
+        await tester.tap(find.widgetWithText(SimpleDialogOption, name));
         await tester.pumpAndSettle();
       }
 
@@ -77,10 +75,10 @@ void main() {
       await tapVisible(create);
       await tester.enterText(title, 'Proyecto');
       FocusManager.instance.primaryFocus?.unfocus();
-      await tapVisible(find.byKey(const Key('goal-choose-daily')));
-      await tester.tap(find.text('Planificar').last);
-      await tester.pumpAndSettle();
-      await createDaily('Construir');
+      expect(find.text('Fecha de inicio'), findsNothing);
+      expect(find.byKey(const Key('goal-create-daily')), findsNothing);
+      await selectDaily('Planificar');
+      await selectDaily('Construir');
       final draftStep = find.byKey(const Key('goal-draft-step'));
       await tester.ensureVisible(draftStep);
       await tester.enterText(draftStep, 'Publicar');
@@ -104,21 +102,19 @@ void main() {
       await tapVisible(create);
       await tester.enterText(title, 'Lectura');
       FocusManager.instance.primaryFocus?.unfocus();
-      final tracking = find.byKey(const Key('goal-tracking'));
-      await tapVisible(tracking);
       expect(find.text('Manual'), findsNothing);
-      await tester.tap(find.text('Cuantitativo').last);
+      await tapVisible(find.widgetWithText(ChoiceChip, 'Cuantitativo'));
       await tester.pumpAndSettle();
       expect(find.text('Unidad'), findsNothing);
       await tester.tap(save);
       await tester.pumpAndSettle();
       expect(
         find.text(
-          'Elige o crea una actividad de Daily antes de guardar el objetivo.',
+          'Elige una actividad existente de Daily antes de guardar el objetivo.',
         ),
         findsOneWidget,
       );
-      await createDaily('Leer');
+      await selectDaily('Leer');
       await tester.tap(save);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Lectura'));
@@ -127,7 +123,7 @@ void main() {
       expect(find.text('Avanzar'), findsNothing);
       expect(
         (await daily.listActivities()).map((item) => item.name),
-        contains('Leer'),
+        unorderedEquals(['Planificar', 'Construir', 'Leer']),
       );
 
       await tester.pumpWidget(const SizedBox());

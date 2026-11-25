@@ -25,13 +25,22 @@ void main() {
 
     await expectLater(goals.save(draft), throwsArgumentError);
     expect(await goals.watchGoals().first, isEmpty);
+    final activity = await daily.saveActivity(
+      DailyActivity(
+        id: null,
+        name: 'Read daily',
+        schedule: const DailySchedule.anytime(),
+        notificationsEnabled: false,
+        createdAt: start,
+        updatedAt: start,
+      ),
+    );
     final id = await goals.save(
       draft,
-      newCounterActivityName: 'Read daily',
+      counterActivityId: activity.id,
       updateCounterLink: true,
     );
-    final activity = (await daily.listActivities()).single;
-    expect(activity.goalId, id);
+    expect((await daily.listActivities()).single.goalId, id);
     await expectLater(
       daily.deleteActivity(activity.id!),
       throwsA(isA<RequiredGoalActivity>()),
@@ -99,20 +108,29 @@ void main() {
           updatedAt: start,
         ),
       );
+      final build = await daily.saveActivity(
+        DailyActivity(
+          id: null,
+          name: 'Build',
+          schedule: const DailySchedule.anytime(),
+          notificationsEnabled: false,
+          createdAt: start,
+          updatedAt: start,
+        ),
+      );
       final id = await goals.save(
         Goal(
           title: 'Project',
           startDate: start,
           milestones: [
             GoalMilestone(title: 'Plan', activityId: existing.id),
-            GoalMilestone(title: 'Build', createActivity: true),
+            GoalMilestone(title: 'Build', activityId: build.id),
             GoalMilestone(title: 'Publish'),
           ],
         ),
       );
       final activities = await daily.listActivities();
       expect(activities.map((item) => item.goalId), [id, id]);
-      final build = activities.singleWhere((item) => item.name == 'Build');
       await daily.setCompleted(
         activityId: build.id!,
         localDate: '2025-01-04',

@@ -88,7 +88,6 @@ class GoalRepository {
   Future<int> save(
     Goal goal, {
     int? counterActivityId,
-    String? newCounterActivityName,
     bool updateCounterLink = false,
   }) {
     if (!goal.valid || goal.tracking == GoalTracking.manual) {
@@ -135,11 +134,10 @@ class GoalRepository {
       }
       if (goal.tracking == GoalTracking.counter) {
         if (updateCounterLink) {
-          final activityId = newCounterActivityName == null
-              ? counterActivityId
-              : await _createActivity(id, newCounterActivityName, now);
-          if (activityId == null)
+          final activityId = counterActivityId;
+          if (activityId == null) {
             throw ArgumentError('A Daily activity is required');
+          }
           await _linkActivity(id, activityId);
           await _unlinkOtherActivities(id, [activityId]);
         } else {
@@ -168,9 +166,7 @@ class GoalRepository {
           .go();
       final activityIds = <int>[];
       for (final (index, step) in milestones.indexed) {
-        final activityId = step.createActivity
-            ? await _createActivity(id, step.title, now)
-            : step.activityId;
+        final activityId = step.activityId;
         if (activityId != null) {
           if (activityIds.contains(activityId))
             throw ArgumentError('Repeated Daily activity');
@@ -201,22 +197,6 @@ class GoalRepository {
       }
       return id;
     });
-  }
-
-  Future<int> _createActivity(int goalId, String title, DateTime now) {
-    if (title.trim().isEmpty)
-      throw ArgumentError('A Daily activity needs a name');
-    return database
-        .into(database.dailyActivities)
-        .insert(
-          DailyActivitiesCompanion.insert(
-            name: title.trim(),
-            scheduleMode: 'anytime',
-            goalId: Value(goalId),
-            createdAt: Value(now),
-            updatedAt: Value(now),
-          ),
-        );
   }
 
   Future<void> _linkActivity(int goalId, int activityId) async {

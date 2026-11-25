@@ -114,7 +114,7 @@ See the [Calendar specification](specs/007-calendar/spec.md).
   the list by status and check off personal steps from the list or detail screen.
 - Set an optional deadline. Calendar shows dated goals and opens their details.
   An overdue goal remains active until its progress reaches 100%.
-- From the goal editor, link or create one Daily activity for a counter, or
+- From the goal editor, link one existing Daily activity for a counter, or
   several Daily activities as separate checklist items. Each checked day adds
   one to the counter or marks the corresponding checklist item. Unchecking
   removes that day's contribution.

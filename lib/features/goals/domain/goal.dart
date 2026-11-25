@@ -12,7 +12,6 @@ class GoalMilestone {
     this.completedAt,
     this.fromDaily = false,
     this.activityId,
-    this.createActivity = false,
   }) : createdAt = createdAt ?? DateTime.now();
 
   final int? id;
@@ -21,8 +20,7 @@ class GoalMilestone {
   final DateTime? completedAt;
   final bool fromDaily;
   final int? activityId;
-  final bool createActivity;
-  bool get linked => activityId != null || createActivity;
+  bool get linked => activityId != null;
 
   bool get complete => completedAt != null || fromDaily;
   GoalMilestone rename(String value) => GoalMilestone(
@@ -32,7 +30,6 @@ class GoalMilestone {
     completedAt: completedAt,
     fromDaily: fromDaily,
     activityId: activityId,
-    createActivity: createActivity,
   );
   GoalMilestone toggle() => GoalMilestone(
     id: id,
@@ -41,7 +38,6 @@ class GoalMilestone {
     completedAt: complete ? null : DateTime.now(),
     fromDaily: fromDaily,
     activityId: activityId,
-    createActivity: createActivity,
   );
 }
 

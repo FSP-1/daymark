@@ -71,13 +71,15 @@ class AppLocalizations {
       'addEntry': 'Creates a journal entry.',
     },
     'goals': {
+      'details': 'Dates and appearance',
+      'checklistSetup':
+          'Add personal steps or link existing Daily activities as steps.',
+      'changeDaily': 'Change Daily activity',
       'chooseDaily': 'Choose a Daily activity',
-      'createDaily': 'Create Daily activity',
-      'noAvailableDaily':
-          'There are no available activities. You can create one here.',
+      'noAvailableDaily': 'No activities are available to link. Create an activity in Daily first.',
       'linkedDaily': 'Linked Daily activity',
       'counterNeedsDaily':
-          'Choose or create a Daily activity before saving this goal.',
+          'Choose an existing Daily activity before saving this goal.',
       'counterFromDaily': 'Complete the linked activity in Daily to count one day toward this goal.',
       'dailyRequired': 'This activity is required by a counter goal. Change its linked activity in Goals before deleting it.',
       'dailyCredits': 'Daily contributions: {count}',
