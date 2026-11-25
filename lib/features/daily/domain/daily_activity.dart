@@ -9,6 +9,7 @@ class DailyActivity {
     required this.createdAt,
     required this.updatedAt,
     this.iconKey = 'repeat',
+    this.goalId,
   });
 
   final int? id;
@@ -18,6 +19,7 @@ class DailyActivity {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String iconKey;
+  final int? goalId;
 
   bool get isValid =>
       name.trim().isNotEmpty &&
@@ -41,6 +43,7 @@ class DailyActivity {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       iconKey: iconKey ?? this.iconKey,
+      goalId: goalId,
     );
   }
 }

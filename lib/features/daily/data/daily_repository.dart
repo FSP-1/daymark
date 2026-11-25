@@ -4,6 +4,7 @@ import '../../sticky_notes/data/local/app_database.dart' as db;
 import '../domain/daily_activity.dart';
 import '../domain/daily_repository.dart';
 import '../domain/daily_schedule.dart';
+import '../../goals/domain/goal.dart';
 
 class DriftDailyRepository implements DailyRepository {
   DriftDailyRepository(this.database);
@@ -52,6 +53,23 @@ class DriftDailyRepository implements DailyRepository {
   @override
   Future<void> deleteActivity(int id) async {
     await database.transaction(() async {
+      final linked =
+          await (database.select(database.dailyActivities).join([
+                innerJoin(
+                  database.goals,
+                  database.goals.id.equalsExp(database.dailyActivities.goalId),
+                ),
+              ])..where(
+                database.dailyActivities.id.equals(id) &
+                    database.goals.trackingType.equals(
+                      GoalTracking.counter.name,
+                    ),
+              ))
+              .getSingleOrNull();
+      if (linked != null) throw const RequiredGoalActivity();
+      await (database.update(database.goalMilestones)
+            ..where((row) => row.activityId.equals(id)))
+          .write(const db.GoalMilestonesCompanion(activityId: Value(null)));
       await (database.delete(
         database.dailyCompletions,
       )..where((row) => row.activityId.equals(id))).go();
@@ -74,16 +92,20 @@ class DriftDailyRepository implements DailyRepository {
     required int activityId,
     required String localDate,
     required bool completed,
-  }) async {
+  }) => database.transaction(() async {
     final query = database.dailyCompletions;
     if (completed) {
-      await query.insertOnConflictUpdate(
-        db.DailyCompletionsCompanion.insert(
-          activityId: activityId,
-          localDate: localDate,
-          completedAt: Value(DateTime.now()),
-        ),
-      );
+      final inserted = await database
+          .into(query)
+          .insertReturningOrNull(
+            db.DailyCompletionsCompanion.insert(
+              activityId: activityId,
+              localDate: localDate,
+              completedAt: Value(DateTime.now()),
+            ),
+            mode: InsertMode.insertOrIgnore,
+          );
+      if (inserted != null) await _creditGoal(activityId, localDate);
     } else {
       await (database.delete(query)..where(
             (row) =>
@@ -91,7 +113,50 @@ class DriftDailyRepository implements DailyRepository {
                 row.localDate.equals(localDate),
           ))
           .go();
+      await (database.delete(database.dailyGoalCredits)..where(
+            (row) =>
+                row.activityId.equals(activityId) &
+                row.localDate.equals(localDate),
+          ))
+          .go();
     }
+  });
+
+  Future<void> _creditGoal(int activityId, String localDate) async {
+    final activity = await (database.select(
+      database.dailyActivities,
+    )..where((row) => row.id.equals(activityId))).getSingleOrNull();
+    final goalId = activity?.goalId;
+    if (goalId == null) return;
+    final goal = await (database.select(
+      database.goals,
+    )..where((row) => row.id.equals(goalId))).getSingleOrNull();
+    if (goal == null || goal.trackingType == GoalTracking.manual.name) return;
+    int? milestone;
+    if (goal.trackingType == GoalTracking.checklist.name) {
+      final step =
+          await (database.select(database.goalMilestones)
+                ..where(
+                  (row) =>
+                      row.goalId.equals(goalId) &
+                      row.activityId.equals(activityId),
+                )
+                ..orderBy([(row) => OrderingTerm.asc(row.sortOrder)])
+                ..limit(1))
+              .getSingleOrNull();
+      if (step == null) return;
+      milestone = step.id;
+    }
+    await database
+        .into(database.dailyGoalCredits)
+        .insert(
+          db.DailyGoalCreditsCompanion.insert(
+            activityId: activityId,
+            localDate: localDate,
+            goalId: goalId,
+            milestoneId: Value(milestone),
+          ),
+        );
   }
 
   DailyActivity _toDomain(db.DailyActivity row) {
@@ -114,6 +179,7 @@ class DriftDailyRepository implements DailyRepository {
           row.notificationsEnabled && schedule.hasSpecificTime,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
+      goalId: row.goalId,
     );
   }
 }

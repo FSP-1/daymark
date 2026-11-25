@@ -33,8 +33,9 @@ Personal Journal, and a Calendar for browsing dated notes and journal entries.
 - Notes with drawings show a localized drawing icon instead of a drawing preview.
 - Create or edit a freehand drawing in a separate dialog. Saving the drawing shows
   a preview in the note editor, and saving the note persists drawing changes locally.
-- Use the bottom navigation to reach Home, Sticky Notes, Calendar, Daily, and
-  Journal. Each destination shows Settings and icon help in the top bar.
+- Home always provides access to Notes, Calendar, Daily, Journal, and Goals.
+  Use Settings → Navigation to choose and reorder up to four bottom-bar
+  shortcuts. Settings and icon help are available in each feature's top bar.
 - Use Home as the feature launcher with a responsive two-column grid.
 - Change the application language between Spanish and English from Settings.
 - Store Spanish and English interface strings in local JSON assets.
@@ -106,6 +107,20 @@ scope. The complete feature specification is documented in
   are preserved separately from their optional Calendar dates.
 
 See the [Calendar specification](specs/007-calendar/spec.md).
+
+### Goals
+
+- Create personal goals by checklist or by number of Daily completions. Filter
+  the list by status and check off personal steps from the list or detail screen.
+- Set an optional deadline. Calendar shows dated goals and opens their details.
+  An overdue goal remains active until its progress reaches 100%.
+- From the goal editor, link or create one Daily activity for a counter, or
+  several Daily activities as separate checklist items. Each checked day adds
+  one to the counter or marks the corresponding checklist item. Unchecking
+  removes that day's contribution.
+- Goals and navigation preferences are stored locally.
+
+See the [Goals and customizable navigation specification](specs/008-goals/spec.md).
 
 ## Localization and settings
 

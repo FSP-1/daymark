@@ -22,6 +22,7 @@ class NavigationHelpDialog extends StatelessWidget {
     (Icons.calendar_month_outlined, 'calendar'),
     (Icons.check_circle_outline, 'daily'),
     (Icons.menu_book_outlined, 'journal'),
+    (Icons.track_changes, 'goals'),
     (Icons.settings_outlined, 'settings'),
     (Icons.info_outline, 'information'),
   ];
@@ -41,6 +42,7 @@ class NavigationHelpDialog extends StatelessWidget {
       (Icons.circle, 'calendarDots'),
       (Icons.add, 'calendarNote'),
       (Icons.menu_book_outlined, 'calendarWrite'),
+      (Icons.track_changes, 'goalDate'),
     ],
     'daily': [
       (Icons.add, 'addDaily'),
@@ -51,6 +53,12 @@ class NavigationHelpDialog extends StatelessWidget {
       (Icons.notifications_off_outlined, 'noReminder'),
     ],
     'journal': [(Icons.add, 'addEntry'), (Icons.draw_outlined, 'drawing')],
+    'goals': [
+      (Icons.checklist, 'goalChecklist'),
+      (Icons.pin_outlined, 'goalCounter'),
+      (Icons.add, 'goalAdvance'),
+      (Icons.remove, 'goalDecrease'),
+    ],
     'home': [(Icons.arrow_outward_rounded, 'shortcut')],
   };
 

@@ -1,5 +1,9 @@
 import 'daily_activity.dart';
 
+class RequiredGoalActivity implements Exception {
+  const RequiredGoalActivity();
+}
+
 abstract interface class DailyRepository {
   Future<List<DailyActivity>> listActivities();
 

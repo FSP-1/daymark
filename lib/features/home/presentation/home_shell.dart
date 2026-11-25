@@ -1,13 +1,16 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
-import '../../sticky_notes/presentation/sticky_notes_page.dart';
-import '../../settings/presentation/settings_page.dart';
-import '../../settings/presentation/theme_view_model.dart';
-import '../../calendar/presentation/calendar_page.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/navigation/feature_id.dart';
+import '../../../core/navigation/feature_registry.dart';
+import '../../../core/navigation/navigation_view_model.dart';
+import '../../calendar/presentation/calendar_page.dart';
 import '../../daily/presentation/daily_page.dart';
+import '../../goals/presentation/goals_page.dart';
 import '../../journal/presentation/journal_page.dart';
+import '../../settings/presentation/settings_page.dart';
+import '../../sticky_notes/presentation/sticky_notes_page.dart';
 import 'home_feature_grid.dart';
 import 'navigation_help_dialog.dart';
 
@@ -25,244 +28,206 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-enum _HomeDestination { home, notes, calendar, daily, journal }
-
 class _HomeShellState extends State<HomeShell> {
-  var _destination = _HomeDestination.home;
-  var _calendarVisited = false;
+  final _visited = {FeatureId.home};
+  late final FeatureRegistry _registry = FeatureRegistry([
+    FeatureDefinition(
+      FeatureId.home,
+      Icons.home_outlined,
+      Icons.home,
+      (_) => _HomeOverview(registry: _registry, onOpen: _openFeature),
+    ),
+    FeatureDefinition(
+      FeatureId.journal,
+      Icons.menu_book_outlined,
+      Icons.menu_book,
+      (_) => const JournalPage(showAppBar: false),
+      description: (strings) => strings.journal('subtitle'),
+    ),
+    FeatureDefinition(
+      FeatureId.notes,
+      Icons.sticky_note_2_outlined,
+      Icons.sticky_note_2,
+      (_) => const StickyNotesPage(showAppBar: false),
+      description: (strings) => strings.home('stickyNotesDescription'),
+    ),
+    FeatureDefinition(
+      FeatureId.daily,
+      Icons.check_circle_outline,
+      Icons.check_circle,
+      (_) => DailyPage(
+        showTitle: false,
+        onOpenGoals: () => _openFeature(FeatureId.goals),
+      ),
+      description: (strings) => strings.home('dailyDescription'),
+    ),
+    FeatureDefinition(
+      FeatureId.calendar,
+      Icons.calendar_month_outlined,
+      Icons.calendar_month,
+      (_) => const CalendarPage(showTitle: false),
+      description: (strings) => strings.calendar('description'),
+    ),
+    FeatureDefinition(
+      FeatureId.goals,
+      Icons.track_changes,
+      Icons.track_changes,
+      (_) => const GoalsPage(),
+      description: (strings) => strings.goals('subtitle'),
+    ),
+  ]);
 
-  void _select(_HomeDestination destination) {
-    setState(() {
-      _destination = destination;
-      if (destination == _HomeDestination.calendar) _calendarVisited = true;
-    });
+  void _openFeature(FeatureId id) {
+    final model = context.read<NavigationViewModel>();
+    if (model.destinations.contains(id) &&
+        ModalRoute.of(context)?.isCurrent == true) {
+      model.select(id);
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (routeContext) => Scaffold(
+            appBar: _appBar(routeContext, id),
+            body: Builder(builder: _registry[id].builder),
+          ),
+        ),
+      );
+    }
   }
 
-  void _openSettings() {
-    final theme = context.read<ThemeViewModel>();
-    Navigator.of(context).push(
+  void _openSettings(BuildContext routeContext) {
+    Navigator.of(routeContext).push(
       MaterialPageRoute<void>(
-        builder: (_) => ChangeNotifierProvider.value(
-          value: theme,
-          child: Scaffold(
-            appBar: AppBar(),
-            body: SettingsPage(
-              locale: widget.locale,
-              onLocaleChanged: widget.onLocaleChanged,
-            ),
+        builder: (_) => Scaffold(
+          appBar: AppBar(),
+          body: SettingsPage(
+            locale: widget.locale,
+            onLocaleChanged: widget.onLocaleChanged,
+            registry: _registry,
           ),
         ),
       ),
     );
   }
 
+  AppBar _appBar(BuildContext context, FeatureId id) {
+    final strings = AppLocalizations.of(context);
+    return AppBar(
+      title: Text(
+        id == FeatureId.home ? strings.appName : _registry[id].label(strings),
+        key: id == FeatureId.daily ? const Key('daily-title') : null,
+      ),
+      actions: [
+        IconButton(
+          key: const Key('settings-action'),
+          tooltip: strings.navigation('settings'),
+          onPressed: () => _openSettings(context),
+          icon: const Icon(Icons.settings_outlined),
+        ),
+        IconButton(
+          key: const Key('information-action'),
+          tooltip: strings.help('title'),
+          onPressed: () => showDialog<void>(
+            context: context,
+            builder: (_) => NavigationHelpDialog(destination: id.name),
+          ),
+          icon: const Icon(Icons.info_outline),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      _HomeOverview(
-        onOpenNotes: () => _select(_HomeDestination.notes),
-        onOpenDaily: () => _select(_HomeDestination.daily),
-        onOpenCalendar: () => _select(_HomeDestination.calendar),
-        onOpenJournal: () => _select(_HomeDestination.journal),
-      ),
-      const StickyNotesPage(showAppBar: false),
-      if (_calendarVisited)
-        const CalendarPage(showTitle: false)
-      else
-        const SizedBox.shrink(),
-      const DailyPage(showTitle: false),
-      const JournalPage(showAppBar: false),
-    ];
+    final model = context.watch<NavigationViewModel>();
     final strings = AppLocalizations.of(context);
+    final destinations = model.destinations;
+    final selected = model.selected;
+    _visited.add(selected);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _destination == _HomeDestination.home
-              ? strings.appName
-              : strings.navigation(_destination.name),
-          key: _destination == _HomeDestination.daily
-              ? const Key('daily-title')
-              : null,
-        ),
-        actions: [
-          IconButton(
-            key: const Key('settings-action'),
-            tooltip: strings.navigation('settings'),
-            onPressed: _openSettings,
-            icon: const Icon(Icons.settings_outlined),
-          ),
-          IconButton(
-            key: const Key('information-action'),
-            tooltip: strings.help('title'),
-            onPressed: () => showDialog<void>(
-              context: context,
-              builder: (_) =>
-                  NavigationHelpDialog(destination: _destination.name),
+      appBar: _appBar(context, selected),
+      body: IndexedStack(
+        index: FeatureId.values.indexOf(selected),
+        children: [
+          for (final id in FeatureId.values)
+            if (_visited.contains(id))
+              Builder(key: ValueKey(id), builder: _registry[id].builder)
+            else
+              SizedBox.shrink(key: ValueKey(id)),
+        ],
+      ),
+      bottomNavigationBar: destinations.length < 2
+          ? null
+          : NavigationBar(
+              selectedIndex: destinations.indexOf(selected),
+              onDestinationSelected: (index) =>
+                  model.select(destinations[index]),
+              destinations: [
+                for (final id in destinations)
+                  _registry[id].destination(strings),
+              ],
             ),
-            icon: const Icon(Icons.info_outline),
-          ),
-        ],
-      ),
-      body: IndexedStack(index: _destination.index, children: pages),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _destination.index,
-        onDestinationSelected: (index) =>
-            _select(_HomeDestination.values[index]),
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            label: strings.navigation('home'),
-          ),
-          NavigationDestination(
-            key: Key('notes-nav'),
-            icon: Icon(Icons.sticky_note_2_outlined),
-            label: strings.navigation('notes'),
-          ),
-          NavigationDestination(
-            key: const Key('calendar-nav'),
-            icon: const Icon(Icons.calendar_month_outlined),
-            label: strings.navigation('calendar'),
-          ),
-          NavigationDestination(
-            key: const Key('daily-nav'),
-            icon: Icon(Icons.check_circle_outline),
-            label: strings.navigation('daily'),
-          ),
-          NavigationDestination(
-            key: const Key('journal-nav'),
-            icon: Icon(Icons.menu_book_outlined),
-            label: strings.navigation('journal'),
-          ),
-        ],
-      ),
     );
   }
 }
 
 class _HomeOverview extends StatelessWidget {
-  const _HomeOverview({
-    required this.onOpenNotes,
-    required this.onOpenDaily,
-    required this.onOpenCalendar,
-    required this.onOpenJournal,
-  });
+  const _HomeOverview({required this.registry, required this.onOpen});
 
-  final VoidCallback onOpenNotes;
-  final VoidCallback onOpenDaily;
-  final VoidCallback onOpenCalendar;
-  final VoidCallback onOpenJournal;
+  final FeatureRegistry registry;
+  final ValueChanged<FeatureId> onOpen;
 
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
-    final featureNotes = Color.alphaBlend(
-      colors.tertiary.withValues(alpha: 0.22),
-      colors.surface,
-    );
-    final featureDaily = Color.alphaBlend(
-      colors.secondary.withValues(alpha: 0.28),
-      colors.surface,
-    );
-    final featureCalendar = Color.alphaBlend(
-      colors.primary.withValues(alpha: 0.16),
-      colors.surface,
-    );
-    final featureFuture = Color.alphaBlend(
-      colors.tertiary.withValues(alpha: 0.12),
-      colors.surface,
-    );
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final backgrounds = [colors.tertiary, colors.secondary, colors.primary];
+
     return SafeArea(
-      child: DecoratedBox(
-        decoration: BoxDecoration(color: colors.surface),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          strings.appName,
-                          style: Theme.of(context).textTheme.displaySmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: colors.primary,
-                              ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Text('☀', style: TextStyle(fontSize: 24)),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      strings.home('welcome'),
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            color: colors.primary,
-                            fontWeight: FontWeight.w800,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      strings.home('description'),
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 28),
-                    HomeFeatureGrid(
-                      features: [
-                        HomeFeature(
-                          key: const Key('journal-fast-travel'),
-                          title: strings.journal('title'),
-                          description: strings.journal('subtitle'),
-                          icon: Icons.menu_book_outlined,
-                          backgroundColor: featureFuture,
-                          foregroundColor: colors.onSurface,
-                          onTap: onOpenJournal,
-                        ),
-                        HomeFeature(
-                          title: strings.home('stickyNotes'),
-                          description: strings.home('stickyNotesDescription'),
-                          icon: Icons.sticky_note_2_outlined,
-                          backgroundColor: featureNotes,
-                          foregroundColor: colors.onSurface,
-                          onTap: onOpenNotes,
-                        ),
-                        HomeFeature(
-                          key: const Key('daily-fast-travel'),
-                          title: strings.daily('title'),
-                          description: strings.home('dailyDescription'),
-                          icon: Icons.check_circle_outline,
-                          backgroundColor: featureDaily,
-                          foregroundColor: colors.onSurface,
-                          onTap: onOpenDaily,
-                        ),
-                        HomeFeature(
-                          key: const Key('calendar-fast-travel'),
-                          title: strings.navigation('calendar'),
-                          description: strings.calendar('description'),
-                          icon: Icons.calendar_month_outlined,
-                          backgroundColor: featureCalendar,
-                          foregroundColor: colors.onSurface,
-                          onTap: onOpenCalendar,
-                        ),
-                        HomeFeature(
-                          title: strings.home('growing'),
-                          description: strings.home('comingSoon'),
-                          icon: Icons.auto_awesome_outlined,
-                          backgroundColor: featureFuture,
-                          foregroundColor: colors.onSurface,
-                          onTap: () {},
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            Text(
+              strings.appName,
+              style: theme.textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: colors.primary,
               ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              strings.home('welcome'),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: colors.primary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(strings.home('description'), style: theme.textTheme.bodyLarge),
+            const SizedBox(height: 28),
+            HomeFeatureGrid(
+              features: [
+                for (final (index, feature) in registry.homeFeatures.indexed)
+                  HomeFeature(
+                    key: Key('${feature.id.name}-fast-travel'),
+                    title: feature.id == FeatureId.notes
+                        ? strings.home('stickyNotes')
+                        : feature.label(strings),
+                    description: feature.description?.call(strings) ?? '',
+                    icon: feature.icon,
+                    backgroundColor: Color.alphaBlend(
+                      backgrounds[index % backgrounds.length].withValues(
+                        alpha: 0.20,
+                      ),
+                      colors.surface,
+                    ),
+                    foregroundColor: colors.onSurface,
+                    onTap: () => onOpen(feature.id),
+                  ),
+              ],
             ),
           ],
         ),

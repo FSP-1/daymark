@@ -16,7 +16,7 @@ Acceptance scenarios:
 
 - Users can create, open, edit and delete goals.
 - Each goal requires a non-empty title.
-- Goals support an optional description, category, icon and color.
+- Goals support an optional description, icon and color.
 - Goals support a start date and an optional target date.
 - The target date cannot precede the start date.
 - Users can create goals without deadlines.
@@ -31,17 +31,16 @@ As a user, I want different progress tracking methods depending on the type of g
 Supported tracking methods:
 
 1. Checklist: progress calculated from completed milestones.
-2. Counter: progress calculated from a current numeric value and target value.
-3. Manual: progress controlled directly through a percentage.
+2. Counter: progress calculated from the number of days a linked Daily activity
+   was completed and a positive whole-number target.
 
 Acceptance scenarios:
 
 - Users select a tracking method when creating a goal.
 - Checklist goals support creating, editing, deleting, reordering and completing milestones.
-- Counter goals support incrementing, decrementing and directly editing their current value.
-- Counter goals require a positive target value.
-- Counter goals support an optional unit, such as books, kilometers or hours.
-- Manual goals support values between 0 and 100 percent.
+- Counter goals require a Daily activity and a positive whole-number target.
+- The goal editor can link an existing activity or create one at save time.
+- A checklist can combine personal steps with multiple distinct Daily activities.
 - Progress is calculated automatically for checklist and counter goals.
 - Progress is constrained between 0 and 100 percent.
 - Empty checklists display zero percent progress.
@@ -57,7 +56,7 @@ Acceptance scenarios:
 
 - The Goals page displays total, active and completed goal counts.
 - Users can filter goals by All, Active and Completed.
-- Goal cards display the title, icon, category, progress bar and percentage.
+- Goal cards display the title, icon, progress bar and percentage.
 - Goal cards display deadlines when available.
 - Overdue active goals display a subtle localized indicator.
 - Completed goals remain accessible.
@@ -71,11 +70,11 @@ As a user, I want to open a goal and manage its individual progress.
 
 Acceptance scenarios:
 
-- The detail screen displays the goal title, description, category and dates.
+- The detail screen displays the goal title, relevant date and status.
 - The detail screen displays the current progress.
 - Checklist goals display interactive milestones.
-- Counter goals display the current value, target value and increment/decrement actions.
-- Manual goals display a percentage slider.
+- Counter goals show the number of completed days and the target. Progress is
+  updated through the linked activity in Daily.
 - Users can edit goal metadata.
 - Users can delete the goal.
 - Returning to the Goals page preserves the selected filter.
@@ -152,12 +151,12 @@ Acceptance scenarios:
 
 - FR-001: Provide a dedicated Goals feature.
 - FR-002: Support goal CRUD operations.
-- FR-003: Support checklist, counter and manual tracking methods.
+- FR-003: Support checklist and Daily-backed counter tracking methods.
 - FR-004: Support goal milestones.
 - FR-005: Calculate progress according to the selected tracking method.
 - FR-006: Automatically derive completion status from progress.
 - FR-007: Support optional goal deadlines.
-- FR-008: Support goal icons, colors and categories.
+- FR-008: Support goal icons and colors.
 - FR-009: Provide goal filters and summary statistics.
 - FR-010: Display overdue active goals.
 - FR-011: Integrate goal deadlines with Calendar.
@@ -187,7 +186,6 @@ Goal entity:
 - id
 - title
 - description
-- category
 - iconId
 - color
 - trackingType
@@ -249,7 +247,6 @@ Goal detail:
 Goal editor:
 
 - Title and description.
-- Category selection.
 - Icon and color selection.
 - Start date and optional deadline.
 - Tracking method selector.
@@ -291,7 +288,6 @@ Unit tests:
 - Checklist progress calculation.
 - Empty checklist progress.
 - Counter progress calculation.
-- Manual progress validation.
 - Completion and reopening behavior.
 - Deadline validation.
 - Overdue status calculation.
@@ -315,8 +311,7 @@ Widget tests:
 - Goals list and filters.
 - Goal creation and editing.
 - Milestone completion.
-- Counter controls.
-- Manual progress slider.
+- Counter validation and progress from Daily.
 - Navigation settings.
 - Live navigation updates.
 - Opening hidden features from Home.
@@ -327,7 +322,7 @@ Widget tests:
 
 ## Success criteria
 
-- Users can create and manage goals using all three tracking methods.
+- Users can create and manage goals using both tracking methods.
 - Progress and completion states remain consistent.
 - Goal deadlines appear in Calendar.
 - All registered features remain accessible from Home.
@@ -345,5 +340,16 @@ Widget tests:
 - Cloud synchronization.
 - AI-generated goals.
 - Goal-specific notification scheduling.
-- Automatic progress synchronization with Daily activities.
+- Synchronization with Daily activities that are not explicitly linked.
 - Financial goal tracking integrations.
+
+## Daymark integration
+
+- Daily provides a shortcut to Goals. Links are configured in Goals. A checked
+  day adds one to the associated counter or completes that activity's checklist
+  item. Unchecking reverses the contribution for that day. Nonconsecutive days
+  count toward the same target.
+- Goals have no category. Checklist steps can be added while creating or editing
+  a goal. The detail shows its relevant date, status, and progress controls.
+- The initial and restored bottom bar preserves the existing order: Home,
+  Notes, Calendar, Daily, and Journal. Goals is available from Home and can be pinned.

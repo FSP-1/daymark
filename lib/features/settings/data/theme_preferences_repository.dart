@@ -29,22 +29,23 @@ class ThemePreferencesRepository {
 
   Future<void> savePalette(AppPalette palette) => _save(null, palette.name);
 
-  Future<void> _save(String? style, String? palette) async {
-    final current = await database
-        .select(database.appPreferences)
-        .getSingleOrNull();
-    await database
-        .into(database.appPreferences)
-        .insertOnConflictUpdate(
-          AppPreferencesCompanion.insert(
-            id: const Value(1),
-            style: Value(style ?? current?.style ?? AppStyle.soft.name),
-            palette: Value(
-              palette ?? current?.palette ?? AppPalette.vanilla.name,
-            ),
+  Future<void> _save(String? style, String? palette) =>
+      database.transaction(() async {
+        await database
+            .into(database.appPreferences)
+            .insert(
+              const AppPreferencesCompanion(id: Value(1)),
+              mode: InsertMode.insertOrIgnore,
+            );
+        await (database.update(
+          database.appPreferences,
+        )..where((row) => row.id.equals(1))).write(
+          AppPreferencesCompanion(
+            style: style == null ? const Value.absent() : Value(style),
+            palette: palette == null ? const Value.absent() : Value(palette),
           ),
         );
-  }
+      });
 
   AppStyle _parseStyle(String? value) => AppStyle.values.firstWhere(
     (candidate) => candidate.name == value,

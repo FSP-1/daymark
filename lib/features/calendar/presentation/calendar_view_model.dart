@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../journal/domain/journal_entry.dart';
 import '../../sticky_notes/domain/sticky_note.dart';
+import '../../goals/domain/goal.dart';
 
 class CalendarViewModel extends ChangeNotifier {
   CalendarViewModel({DateTime Function()? clock})
@@ -90,8 +91,9 @@ class CalendarViewModel extends ChangeNotifier {
 class CalendarContent {
   CalendarContent(
     Iterable<StickyNote> notes,
-    Iterable<JournalEntryModel> entries,
-  ) {
+    Iterable<JournalEntryModel> entries, [
+    Iterable<Goal> goals = const [],
+  ]) {
     for (final note in notes) {
       final date = note.associatedDate;
       if (date != null) {
@@ -103,8 +105,15 @@ class CalendarContent {
         entry,
       );
     }
+    for (final goal in goals) {
+      final date = goal.targetDate;
+      if (date != null) {
+        (goalsByDay[CalendarViewModel.dateOnly(date)] ??= []).add(goal);
+      }
+    }
   }
 
   final notesByDay = <DateTime, List<StickyNote>>{};
   final entriesByDay = <DateTime, List<JournalEntryModel>>{};
+  final goalsByDay = <DateTime, List<Goal>>{};
 }

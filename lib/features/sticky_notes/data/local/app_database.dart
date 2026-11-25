@@ -28,9 +28,12 @@ class AppPreferences extends Table {
   TextColumn get style => text().withDefault(const Constant('soft'))();
 
   TextColumn get palette => text().withDefault(const Constant('vanilla'))();
+
+  TextColumn get navigation => text().nullable()();
 }
 
 class DailyActivities extends Table {
+  IntColumn get goalId => integer().nullable()();
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get name => text()();
@@ -78,6 +81,47 @@ class JournalEntries extends Table {
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
 
+@DataClassName('GoalRow')
+class Goals extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text()();
+  TextColumn get description => text()();
+  TextColumn get category => text()();
+  TextColumn get iconId => text()();
+  TextColumn get color => text()();
+  TextColumn get trackingType => text()();
+  TextColumn get startDate => text()();
+  TextColumn get targetDate => text().nullable()();
+  RealColumn get targetValue => real()();
+  RealColumn get currentValue => real()();
+  TextColumn get unit => text()();
+  IntColumn get manualProgress => integer()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get completedAt => dateTime().nullable()();
+}
+
+@DataClassName('GoalMilestoneRow')
+class GoalMilestones extends Table {
+  IntColumn get activityId => integer().nullable()();
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get goalId => integer().references(Goals, #id)();
+  TextColumn get title => text()();
+  IntColumn get sortOrder => integer()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get completedAt => dateTime().nullable()();
+}
+
+class DailyGoalCredits extends Table {
+  IntColumn get activityId => integer()();
+  TextColumn get localDate => text()();
+  IntColumn get goalId => integer()();
+  IntColumn get milestoneId => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {activityId, localDate};
+}
+
 @DriftDatabase(
   tables: [
     Notes,
@@ -85,13 +129,16 @@ class JournalEntries extends Table {
     DailyActivities,
     DailyCompletions,
     JournalEntries,
+    Goals,
+    GoalMilestones,
+    DailyGoalCredits,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -111,8 +158,7 @@ class AppDatabase extends _$AppDatabase {
       if (from < 5) {
         await migrator.createTable(dailyActivities);
         await migrator.createTable(dailyCompletions);
-      }
-      if (from < 6) {
+      } else if (from < 6) {
         await migrator.addColumn(dailyActivities, dailyActivities.iconKey);
       }
       if (from < 7) {
@@ -120,6 +166,32 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 8) {
         await migrator.addColumn(notes, notes.associatedDate);
+      }
+      if (from < 9) {
+        if (from >= 4) {
+          await migrator.addColumn(appPreferences, appPreferences.navigation);
+        }
+        await migrator.createTable(goals);
+        await migrator.createTable(goalMilestones);
+      }
+      if (from < 10) {
+        if (from >= 5) {
+          await migrator.addColumn(dailyActivities, dailyActivities.goalId);
+        }
+        await migrator.createTable(dailyGoalCredits);
+      }
+      if (from >= 9 && from < 11) {
+        await migrator.addColumn(goalMilestones, goalMilestones.activityId);
+      }
+      if (from >= 10 && from < 11) {
+        await customStatement('''
+          INSERT INTO goal_milestones (goal_id, title, sort_order, created_at, activity_id)
+          SELECT a.goal_id, a.name,
+            COALESCE((SELECT MAX(m.sort_order) FROM goal_milestones m WHERE m.goal_id = a.goal_id AND m.activity_id IS NULL), -1) + a.id,
+            a.created_at, a.id
+          FROM daily_activities a JOIN goals g ON g.id = a.goal_id
+          WHERE g.tracking_type = 'checklist'
+        ''');
       }
     },
   );

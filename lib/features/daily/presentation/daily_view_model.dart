@@ -84,6 +84,7 @@ class DailyViewModel extends ChangeNotifier {
       name: activity.name,
       schedule: activity.schedule,
       notificationsEnabled: enabled,
+      iconKey: activity.iconKey,
     );
   }
 
@@ -154,9 +155,12 @@ class DailyViewModel extends ChangeNotifier {
   Future<void> delete(DailyActivity activity) async {
     if (activity.id == null) return;
     try {
-      await notifications.cancel(activity);
       await repository.deleteActivity(activity.id!);
+      await notifications.cancel(activity);
       await load();
+    } on RequiredGoalActivity {
+      errorMessage = 'dailyRequired';
+      notifyListeners();
     } catch (_) {
       status = DailyStatus.error;
       errorMessage = 'deleteDaily';

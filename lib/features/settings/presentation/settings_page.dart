@@ -2,19 +2,23 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/navigation/feature_registry.dart';
 import '../../../core/theme/app_styles.dart';
 import '../../../core/theme/theme_presets.dart';
 import 'theme_view_model.dart';
+import 'navigation_settings_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({
     required this.locale,
     required this.onLocaleChanged,
+    this.registry,
     super.key,
   });
 
   final Locale locale;
   final ValueChanged<Locale> onLocaleChanged;
+  final FeatureRegistry? registry;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +53,20 @@ class SettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(strings.settings('languageDescription')),
+          if (registry != null)
+            ListTile(
+              key: const Key('navigation-settings'),
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.space_dashboard_outlined),
+              title: Text(strings.navSettings('title')),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push<void>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => NavigationSettingsPage(registry: registry!),
+                ),
+              ),
+            ),
           const SizedBox(height: 24),
           Text(
             strings.settings('styleTitle'),

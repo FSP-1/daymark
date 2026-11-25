@@ -11,9 +11,10 @@ import 'daily_view_model.dart';
 import 'widgets/daily_activity_card.dart';
 
 class DailyPage extends StatefulWidget {
-  const DailyPage({this.showTitle = true, super.key});
+  const DailyPage({this.showTitle = true, this.onOpenGoals, super.key});
 
   final bool showTitle;
+  final VoidCallback? onOpenGoals;
 
   @override
   State<DailyPage> createState() => _DailyPageState();
@@ -51,6 +52,7 @@ class _DailyPageState extends State<DailyPage> {
         ),
         _ => _DailyContent(
           showTitle: widget.showTitle,
+          onOpenGoals: widget.onOpenGoals,
           viewModel: viewModel,
           onAdd: () => _showEditor(context),
           onEdit: (activity) => _showEditor(context, activity: activity),
@@ -122,12 +124,14 @@ class _IconOption extends StatelessWidget {
 class _DailyContent extends StatelessWidget {
   const _DailyContent({
     required this.showTitle,
+    required this.onOpenGoals,
     required this.viewModel,
     required this.onAdd,
     required this.onEdit,
   });
 
   final bool showTitle;
+  final VoidCallback? onOpenGoals;
   final DailyViewModel viewModel;
   final VoidCallback onAdd;
   final ValueChanged<DailyActivity> onEdit;
@@ -188,6 +192,12 @@ class _DailyContent extends StatelessWidget {
               total: total,
               progress: progress,
             ),
+            if (onOpenGoals != null)
+              TextButton.icon(
+                onPressed: onOpenGoals,
+                icon: const Icon(Icons.track_changes),
+                label: Text(strings.navigation('goals')),
+              ),
             const SizedBox(height: 28),
             Row(
               children: [
@@ -712,7 +722,13 @@ class _DailyEditorDialogState extends State<_DailyEditorDialog> {
       ),
     );
     if (confirmed != true || !mounted) return;
-    await context.read<DailyViewModel>().delete(widget.activity!);
-    if (mounted) Navigator.pop(context);
+    final model = context.read<DailyViewModel>();
+    await model.delete(widget.activity!);
+    if (!mounted) return;
+    if (model.errorMessage == 'dailyRequired') {
+      setState(() => _validationError = strings.goals('dailyRequired'));
+    } else {
+      Navigator.pop(context);
+    }
   }
 }

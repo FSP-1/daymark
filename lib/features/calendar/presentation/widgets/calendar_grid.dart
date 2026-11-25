@@ -8,6 +8,9 @@ Color calendarNoteColor(BuildContext context) =>
 Color calendarJournalColor(BuildContext context) =>
     Theme.of(context).colorScheme.primary;
 
+Color calendarGoalColor(BuildContext context) =>
+    Theme.of(context).colorScheme.secondary;
+
 class CalendarMonthGrid extends StatelessWidget {
   const CalendarMonthGrid({
     required this.month,
@@ -63,6 +66,7 @@ class CalendarMonthGrid extends StatelessWidget {
             final selected = day == model.selected;
             final notes = content.notesByDay.containsKey(day);
             final journal = content.entriesByDay.containsKey(day);
+            final goals = content.goalsByDay.containsKey(day);
             if (compact) {
               return Center(
                 child: Text(
@@ -70,16 +74,18 @@ class CalendarMonthGrid extends StatelessWidget {
                   textScaler: TextScaler.noScaling,
                   style: TextStyle(
                     fontSize: 9,
-                    fontWeight: today || notes || journal
+                    fontWeight: today || notes || journal || goals
                         ? FontWeight.bold
                         : null,
-                    decoration: notes || journal
+                    decoration: notes || journal || goals
                         ? TextDecoration.underline
                         : null,
                     color: notes
                         ? calendarNoteColor(context)
                         : journal
                         ? calendarJournalColor(context)
+                        : goals
+                        ? calendarGoalColor(context)
                         : colors.onSurfaceVariant,
                   ),
                 ),
@@ -125,6 +131,8 @@ class CalendarMonthGrid extends StatelessWidget {
                                 _Dot(color: calendarNoteColor(context)),
                               if (journal)
                                 _Dot(color: calendarJournalColor(context)),
+                              if (goals)
+                                _Dot(color: calendarGoalColor(context)),
                             ],
                           ),
                         ),
@@ -223,6 +231,7 @@ class CalendarLegend extends StatelessWidget {
         children: [
           _label(calendarNoteColor(context), strings.navigation('notes')),
           _label(calendarJournalColor(context), strings.navigation('journal')),
+          _label(calendarGoalColor(context), strings.navigation('goals')),
         ],
       ),
     );

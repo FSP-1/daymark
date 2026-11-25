@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 
 import '../../../core/localization/app_localizations.dart';
 import '../../journal/presentation/journal_page.dart';
+import '../../goals/presentation/goal_detail_page.dart';
+import '../../goals/presentation/goal_style.dart';
+import '../../goals/presentation/goals_view_model.dart';
 import '../../journal/presentation/journal_view_model.dart';
 import '../../sticky_notes/presentation/sticky_notes_page.dart';
 import '../../sticky_notes/presentation/sticky_notes_view_model.dart';
@@ -64,7 +67,12 @@ class _CalendarPageState extends State<CalendarPage>
   Widget build(BuildContext context) {
     final notes = context.watch<StickyNotesViewModel>();
     final journal = context.watch<JournalViewModel>();
-    final content = CalendarContent(notes.notes, journal.entries);
+    final goals = context.watch<GoalsViewModel?>();
+    final content = CalendarContent(
+      notes.notes,
+      journal.entries,
+      goals?.goals ?? [],
+    );
     final strings = AppLocalizations.of(context);
     final dates = MaterialLocalizations.of(context);
 
@@ -160,6 +168,7 @@ class _CalendarPageState extends State<CalendarPage>
                       content: content,
                       notes: notes,
                       journal: journal,
+                      goals: goals,
                     ),
                   ],
                 ],
@@ -178,12 +187,14 @@ class _DayContent extends StatelessWidget {
     required this.content,
     required this.notes,
     required this.journal,
+    required this.goals,
   });
 
   final CalendarViewModel model;
   final CalendarContent content;
   final StickyNotesViewModel notes;
   final JournalViewModel journal;
+  final GoalsViewModel? goals;
 
   @override
   Widget build(BuildContext context) {
@@ -191,12 +202,15 @@ class _DayContent extends StatelessWidget {
     final day = model.selected;
     final dayNotes = content.notesByDay[day] ?? [];
     final dayEntries = content.entriesByDay[day] ?? [];
+    final dayGoals = content.goalsByDay[day] ?? [];
     final loading =
         notes.status == StickyNotesStatus.loading ||
-        journal.status == JournalStatus.loading;
+        journal.status == JournalStatus.loading ||
+        goals?.loading == true;
     final failed =
         notes.status == StickyNotesStatus.error ||
-        journal.status == JournalStatus.error;
+        journal.status == JournalStatus.error ||
+        goals?.failed == true;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,11 +226,16 @@ class _DayContent extends StatelessWidget {
             onPressed: () {
               notes.load();
               journal.load();
+              goals?.load();
             },
             icon: const Icon(Icons.refresh),
             label: Text(strings.calendar('loadError')),
           ),
-        if (!loading && !failed && dayNotes.isEmpty && dayEntries.isEmpty)
+        if (!loading &&
+            !failed &&
+            dayNotes.isEmpty &&
+            dayEntries.isEmpty &&
+            dayGoals.isEmpty)
           Text(strings.calendar('empty')),
         for (final note in dayNotes)
           _ContentTile(
@@ -237,6 +256,16 @@ class _DayContent extends StatelessWidget {
             icon: Icons.menu_book_outlined,
             color: calendarJournalColor(context),
             onTap: () => JournalPage.openEntry(context, entry),
+          ),
+        for (final goal in dayGoals)
+          _ContentTile(
+            title: goal.title,
+            type: strings.goals('deadline'),
+            preview: '${goal.percentage}%',
+            drawing: false,
+            icon: goalIcon(goal.icon),
+            color: calendarGoalColor(context),
+            onTap: () => GoalDetailPage.open(context, goal.id!),
           ),
         const SizedBox(height: 12),
         OverflowBar(
