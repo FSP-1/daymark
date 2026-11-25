@@ -7,11 +7,11 @@
     "loading": "Loading..."
   },
   "navigation": {
+    "calendar": "Calendar",
     "home": "Home",
     "notes": "Notes",
     "tasks": "Tasks",
     "daily": "Daily",
-    "dates": "Dates",
     "settings": "Settings",
     "journal": "Journal"
   },
@@ -21,7 +21,6 @@
     "stickyNotes": "Sticky Notes",
     "stickyNotesDescription": "Write down an idea before it gets away.",
     "dailyDescription": "Small steps make a meaningful day.",
-    "datesDescription": "Keep important moments close at hand.",
     "growing": "Your space is growing",
     "comingSoon": "Tasks and important dates will live here."
   },
@@ -95,7 +94,24 @@
     "saveDrawing": "Save drawing",
     "cancel": "Cancel"
   },
+  "calendar": {
+    "description": "Your life, day by day.",
+    "today": "Today",
+    "month": "Month",
+    "year": "Year",
+    "previous": "Previous period",
+    "next": "Next period",
+    "empty": "Nothing scheduled for this day.",
+    "loadError": "Unable to load calendar content. Try again.",
+    "note": "Note",
+    "journalEntry": "Journal entry",
+    "writeJournal": "Write journal",
+    "associatedDate": "Calendar date",
+    "noDate": "No date assigned",
+    "removeDate": "Remove date"
+  },
   "journal": {
+    "futureDate": "Journal entries can only be saved for today or an earlier date.",
     "title": "Journal",
     "subtitle": "A quiet place for your days, in your own words.",
     "newEntry": "New entry",

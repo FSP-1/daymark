@@ -114,7 +114,7 @@ void main() {
       find.text('Unable to save the note. Please try again.'),
       findsOneWidget,
     );
-    expect(find.byType(ListTile), findsNothing);
+    expect(repository.notes, isEmpty);
   });
 
   testWidgets('accepts optional title and displays creation date', (

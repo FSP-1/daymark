@@ -17,11 +17,11 @@ class AppLocalizations {
       'loading': 'Loading...',
     },
     'navigation': {
+      'calendar': 'Calendar',
       'home': 'Home',
       'notes': 'Notes',
       'tasks': 'Tasks',
       'daily': 'Daily',
-      'dates': 'Dates',
       'settings': 'Settings',
       'journal': 'Journal',
     },
@@ -31,7 +31,6 @@ class AppLocalizations {
       'stickyNotes': 'Sticky Notes',
       'stickyNotesDescription': 'Write down an idea before it gets away.',
       'dailyDescription': 'Small steps make a meaningful day.',
-      'datesDescription': 'Keep important moments close at hand.',
       'growing': 'Your space is growing',
       'comingSoon': 'Tasks and important dates will live here.',
     },
@@ -108,7 +107,25 @@ class AppLocalizations {
       'saveDrawing': 'Save drawing',
       'cancel': 'Cancel',
     },
+    'calendar': {
+      'description': 'Your life, day by day.',
+      'today': 'Today',
+      'month': 'Month',
+      'year': 'Year',
+      'previous': 'Previous period',
+      'next': 'Next period',
+      'empty': 'Nothing scheduled for this day.',
+      'loadError': 'Unable to load calendar content. Try again.',
+      'note': 'Note',
+      'journalEntry': 'Journal entry',
+      'writeJournal': 'Write journal',
+      'associatedDate': 'Calendar date',
+      'noDate': 'No date assigned',
+      'removeDate': 'Remove date',
+    },
     'journal': {
+      'futureDate':
+          'Journal entries can only be saved for today or an earlier date.',
       'title': 'Journal',
       'subtitle': 'A quiet place for your days, in your own words.',
       'newEntry': 'New entry',
@@ -189,6 +206,7 @@ class AppLocalizations {
   String notes(String key) => _read('notes.$key', key);
   String daily(String key) => _read('daily.$key', key);
   String journal(String key) => _read('journal.$key', key);
+  String calendar(String key) => _read('calendar.$key', key);
   String drawing(String key) => _read('drawing.$key', key);
   String notification(String key) => _read('notification.$key', key);
   String settings(String key) => _read('settings.$key', key);

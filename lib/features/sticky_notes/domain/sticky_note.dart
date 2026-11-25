@@ -8,6 +8,7 @@ class StickyNote {
     required this.content,
     required this.createdAt,
     required this.drawingData,
+    required this.associatedDate,
     required this.validationError,
   });
 
@@ -17,6 +18,7 @@ class StickyNote {
     String? subtitle,
     DateTime? createdAt,
     String? drawingData,
+    DateTime? associatedDate,
   }) {
     final noteContent = content ?? '';
     return StickyNote._(
@@ -25,6 +27,7 @@ class StickyNote {
       content: noteContent,
       createdAt: createdAt ?? DateTime.now(),
       drawingData: drawingData,
+      associatedDate: _dateOnly(associatedDate),
       validationError: noteContent.trim().isEmpty
           ? StickyNoteValidationError.empty
           : null,
@@ -38,6 +41,7 @@ class StickyNote {
     String? subtitle,
     DateTime? createdAt,
     String? drawingData,
+    DateTime? associatedDate,
   }) {
     return StickyNote._(
       id: id,
@@ -46,6 +50,7 @@ class StickyNote {
       content: content,
       createdAt: createdAt ?? DateTime.now(),
       drawingData: drawingData,
+      associatedDate: _dateOnly(associatedDate),
       validationError: null,
     );
   }
@@ -56,6 +61,7 @@ class StickyNote {
   final String content;
   final DateTime createdAt;
   final String? drawingData;
+  final DateTime? associatedDate;
   final StickyNoteValidationError? validationError;
 
   bool get isValid => validationError == null;
@@ -66,9 +72,11 @@ class StickyNote {
     String? subtitle,
     DateTime? createdAt,
     String? drawingData,
+    DateTime? associatedDate,
     bool clearTitle = false,
     bool clearSubtitle = false,
     bool clearDrawing = false,
+    bool clearAssociatedDate = false,
   }) {
     final nextContent = content ?? this.content;
     return StickyNote._(
@@ -78,9 +86,15 @@ class StickyNote {
       content: nextContent,
       createdAt: createdAt ?? this.createdAt,
       drawingData: clearDrawing ? null : drawingData ?? this.drawingData,
+      associatedDate: clearAssociatedDate
+          ? null
+          : _dateOnly(associatedDate) ?? this.associatedDate,
       validationError: nextContent.trim().isEmpty
           ? StickyNoteValidationError.empty
           : null,
     );
   }
+
+  static DateTime? _dateOnly(DateTime? date) =>
+      date == null ? null : DateTime(date.year, date.month, date.day);
 }

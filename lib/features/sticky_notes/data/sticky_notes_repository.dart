@@ -27,6 +27,7 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
             content: row.content,
             createdAt: row.createdAt,
             drawingData: row.drawingData,
+            associatedDate: DateTime.tryParse(row.associatedDate ?? ''),
           ),
         )
         .toList();
@@ -38,6 +39,10 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
       throw const InvalidStickyNoteException();
     }
 
+    final associatedDate = note.associatedDate
+        ?.toIso8601String()
+        .split('T')
+        .first;
     final id = note.id == null
         ? await database
               .into(database.notes)
@@ -48,6 +53,7 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
                   content: note.content,
                   createdAt: Value(note.createdAt),
                   drawingData: Value(note.drawingData),
+                  associatedDate: Value(associatedDate),
                 ),
               )
         : note.id!;
@@ -61,6 +67,7 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
           content: Value(note.content),
           createdAt: Value(note.createdAt),
           drawingData: Value(note.drawingData),
+          associatedDate: Value(associatedDate),
         ),
       );
     }
@@ -71,6 +78,7 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
       content: note.content,
       createdAt: note.createdAt,
       drawingData: note.drawingData,
+      associatedDate: note.associatedDate,
     );
   }
 

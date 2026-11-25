@@ -20,6 +20,30 @@ class StickyNotesPage extends StatefulWidget {
 
   @override
   State<StickyNotesPage> createState() => _StickyNotesPageState();
+
+  static Future<void> openEditor(BuildContext context, {DateTime? date}) async {
+    final viewModel = context.read<StickyNotesViewModel>();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: viewModel,
+          child: _StickyNoteEditorPage(initialDate: date),
+        ),
+      ),
+    );
+  }
+
+  static void openNote(BuildContext context, StickyNote note) {
+    final viewModel = context.read<StickyNotesViewModel>();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: viewModel,
+          child: _StickyNoteReadingPage(note: note),
+        ),
+      ),
+    );
+  }
 }
 
 class _StickyNotesPageState extends State<StickyNotesPage> {
@@ -44,7 +68,7 @@ class _StickyNotesPageState extends State<StickyNotesPage> {
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('add-note-action'),
         heroTag: 'sticky-notes-add',
-        onPressed: () => _openEditor(context),
+        onPressed: () => StickyNotesPage.openEditor(context),
         icon: const Icon(Icons.add),
         label: Text(strings.notes('addNote')),
       ),
@@ -113,23 +137,11 @@ class _StickyNotesPageState extends State<StickyNotesPage> {
           else if (viewModel.visibleNotes.isEmpty)
             _EmptyNotes(
               filtered: !viewModel.filter.isEmpty,
-              onCreate: () => _openEditor(context),
+              onCreate: () => StickyNotesPage.openEditor(context),
             )
           else
             for (final note in viewModel.visibleNotes) _NoteCard(note: note),
         ],
-      ),
-    );
-  }
-
-  Future<void> _openEditor(BuildContext context, [StickyNote? note]) async {
-    final viewModel = context.read<StickyNotesViewModel>();
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ChangeNotifierProvider.value(
-          value: viewModel,
-          child: _StickyNoteEditorPage(note: note),
-        ),
       ),
     );
   }
@@ -248,23 +260,15 @@ class _NoteCard extends StatelessWidget {
     );
   }
 
-  void _openReading(BuildContext context) {
-    final viewModel = context.read<StickyNotesViewModel>();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ChangeNotifierProvider.value(
-          value: viewModel,
-          child: _StickyNoteReadingPage(note: note),
-        ),
-      ),
-    );
-  }
+  void _openReading(BuildContext context) =>
+      StickyNotesPage.openNote(context, note);
 }
 
 class _StickyNoteEditorPage extends StatefulWidget {
-  const _StickyNoteEditorPage({this.note});
+  const _StickyNoteEditorPage({this.note, this.initialDate});
 
   final StickyNote? note;
+  final DateTime? initialDate;
 
   @override
   State<_StickyNoteEditorPage> createState() => _StickyNoteEditorPageState();
@@ -276,6 +280,7 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
   final _contentController = TextEditingController();
   late List<DrawingStroke> _drawingStrokes;
   var _isSaving = false;
+  DateTime? _associatedDate;
 
   StickyNote? get _note => widget.note;
 
@@ -286,6 +291,17 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
     _subtitleController.text = _note?.subtitle ?? '';
     _contentController.text = _note?.content ?? '';
     _drawingStrokes = decodeDrawing(_note?.drawingData);
+    _associatedDate = _note?.associatedDate ?? widget.initialDate;
+  }
+
+  Future<void> _pickAssociatedDate() async {
+    final date = await showDatePicker(
+      context: context,
+      firstDate: DateTime(1),
+      lastDate: DateTime(9999, 12, 31),
+      initialDate: _associatedDate ?? DateTime.now(),
+    );
+    if (date != null && mounted) setState(() => _associatedDate = date);
   }
 
   @override
@@ -324,6 +340,26 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
+            ListTile(
+              leading: const Icon(Icons.calendar_month_outlined),
+              title: Text(strings.calendar('associatedDate')),
+              subtitle: Text(
+                _associatedDate == null
+                    ? strings.calendar('noDate')
+                    : MaterialLocalizations.of(context)
+                          .formatFullDate(_associatedDate!),
+              ),
+              onTap: _isSaving ? null : _pickAssociatedDate,
+              trailing: _associatedDate == null
+                  ? null
+                  : IconButton(
+                      tooltip: strings.calendar('removeDate'),
+                      onPressed: _isSaving
+                          ? null
+                          : () => setState(() => _associatedDate = null),
+                      icon: const Icon(Icons.clear),
+                    ),
+            ),
             NoteEditor(
               titleController: _titleController,
               subtitleController: _subtitleController,
@@ -354,9 +390,12 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
                                 .trim()
                                 .isEmpty,
                             clearDrawing: _drawingStrokes.isEmpty,
+                            associatedDate: _associatedDate,
+                            clearAssociatedDate: _associatedDate == null,
                           ) ??
                           StickyNote.create(
                             content: _contentController.text,
+                            associatedDate: _associatedDate,
                             title: _titleController.text,
                             subtitle: _subtitleController.text,
                             drawingData: _drawingStrokes.isEmpty

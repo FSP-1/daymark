@@ -18,8 +18,8 @@ explicitly outside the approved scope at this stage.
 
 ## Current functionality
 
-Daymark currently provides local sticky notes, Daily recurring activities, and a
-private Personal Journal.
+Daymark provides local sticky notes, Daily recurring activities, a private
+Personal Journal, and a Calendar for browsing dated notes and journal entries.
 
 ### Sticky Notes
 
@@ -33,10 +33,9 @@ private Personal Journal.
 - Notes with drawings show a localized drawing icon instead of a drawing preview.
 - Create or edit a freehand drawing in a separate dialog. Saving the drawing shows
   a preview in the note editor, and saving the note persists drawing changes locally.
-- Use the Home screen and bottom navigation to reach Sticky Notes, future feature
-  areas, and Settings.
-- Use Home as the feature launcher with a responsive two-column grid for Sticky
-  Notes, Daily, Important Dates, and future features.
+- Use the bottom navigation to reach Home, Sticky Notes, Calendar, Daily, and
+  Journal. Open Settings from the gear in Home.
+- Use Home as the feature launcher with a responsive two-column grid.
 - Change the application language between Spanish and English from Settings.
 - Store Spanish and English interface strings in local JSON assets.
 - Choose one of three appearance styles (Soft, Playful, or Minimal).
@@ -95,6 +94,17 @@ sharing, exporting, rich text, audio, and AI assistance are outside the current
 scope. The complete feature specification is documented in
 [specs/005-personal-journal/spec.md](specs/005-personal-journal/spec.md).
 
+### Calendar
+
+- Browse months or switch to a twelve-month overview. Use Today to return to the
+  current date.
+- See notes with an assigned date and Journal entries grouped by local day.
+- Create notes for any supported day and change or remove their optional dates.
+- Write Journal entries for today or earlier and open existing content directly
+  from Calendar.
+- Existing notes remain available in Sticky Notes. Their creation timestamps
+  are preserved separately from their optional Calendar dates.
+
 ## Localization and settings
 
 The current language selector is intentionally limited to Spanish and English.
@@ -139,6 +149,7 @@ spacer, and each icon has a subtle theme-derived rounded background.
 Run these commands before submitting changes:
 
 ```text
+dart run build_runner build
 dart format lib test
 flutter analyze
 flutter test

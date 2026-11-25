@@ -7,13 +7,13 @@
     "loading": "Cargando..."
   },
   "navigation": {
+    "calendar": "Calendario",
     "home": "Inicio",
     "notes": "Notas",
     "tasks": "Tareas",
-    "daily": "Diario",
-    "dates": "Fechas",
+    "daily": "Daily",
     "settings": "Ajustes",
-    "journal": "Diario personal"
+    "journal": "Diario"
   },
   "home": {
     "welcome": "Un lugar para tus pequeñas ideas.",
@@ -21,7 +21,6 @@
     "stickyNotes": "Notas adhesivas",
     "stickyNotesDescription": "Anota una idea antes de que se escape.",
     "dailyDescription": "Pequeños pasos hacen un día especial.",
-    "datesDescription": "Ten cerca tus momentos importantes.",
     "growing": "Tu espacio está creciendo",
     "comingSoon": "Las tareas y fechas importantes estarán aquí."
   },
@@ -95,7 +94,24 @@
     "saveDrawing": "Guardar dibujo",
     "cancel": "Cancelar"
   },
+  "calendar": {
+    "description": "Tu vida, día a día.",
+    "today": "Hoy",
+    "month": "Mes",
+    "year": "Año",
+    "previous": "Periodo anterior",
+    "next": "Periodo siguiente",
+    "empty": "No hay contenido para este día.",
+    "loadError": "No se pudo cargar el contenido del calendario. Reintentar.",
+    "note": "Nota",
+    "journalEntry": "Entrada del diario",
+    "writeJournal": "Escribir diario",
+    "associatedDate": "Fecha del calendario",
+    "noDate": "Sin fecha asociada",
+    "removeDate": "Quitar fecha"
+  },
   "journal": {
+    "futureDate": "Solo puedes guardar entradas del diario para hoy o una fecha anterior.",
     "title": "Diario",
     "subtitle": "Un lugar tranquilo para tus días, con tus propias palabras.",
     "newEntry": "Nueva entrada",

@@ -30,7 +30,7 @@ class JournalViewModel extends ChangeNotifier {
   Future<JournalEntryModel?> save(JournalEntryModel entry) async {
     if (!entry.isValid) {
       status = JournalStatus.validationError;
-      errorMessage = 'emptyJournal';
+      errorMessage = entry.isValidDate ? 'emptyJournal' : 'futureDate';
       notifyListeners();
       return null;
     }

@@ -1,7 +1,10 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:provider/provider.dart';
 
 import '../../sticky_notes/presentation/sticky_notes_page.dart';
 import '../../settings/presentation/settings_page.dart';
+import '../../settings/presentation/theme_view_model.dart';
+import '../../calendar/presentation/calendar_page.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../daily/presentation/daily_page.dart';
 import '../../journal/presentation/journal_page.dart';
@@ -27,34 +30,60 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
+enum _HomeDestination { home, notes, calendar, daily, journal }
+
 class _HomeShellState extends State<HomeShell> {
-  var _selectedIndex = 0;
+  var _destination = _HomeDestination.home;
+  var _calendarVisited = false;
+
+  void _select(_HomeDestination destination) {
+    setState(() {
+      _destination = destination;
+      if (destination == _HomeDestination.calendar) _calendarVisited = true;
+    });
+  }
+
+  void _openSettings() {
+    final theme = context.read<ThemeViewModel>();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: theme,
+          child: Scaffold(
+            appBar: AppBar(),
+            body: SettingsPage(
+              locale: widget.locale,
+              onLocaleChanged: widget.onLocaleChanged,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final pages = [
       _HomeOverview(
-        onOpenNotes: () => setState(() => _selectedIndex = 1),
-        onOpenDaily: () => setState(() => _selectedIndex = 2),
-        onOpenDates: () => setState(() => _selectedIndex = 3),
-        onOpenJournal: () => setState(() => _selectedIndex = 3),
+        onOpenNotes: () => _select(_HomeDestination.notes),
+        onOpenDaily: () => _select(_HomeDestination.daily),
+        onOpenCalendar: () => _select(_HomeDestination.calendar),
+        onOpenJournal: () => _select(_HomeDestination.journal),
+        onOpenSettings: _openSettings,
       ),
       widget.stickyNotesPage,
+      if (_calendarVisited) const CalendarPage() else const SizedBox.shrink(),
       widget.dailyPage,
       widget.journalPage,
-      SettingsPage(
-        locale: widget.locale,
-        onLocaleChanged: widget.onLocaleChanged,
-      ),
     ];
     final strings = AppLocalizations.of(context);
 
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: pages),
+      body: IndexedStack(index: _destination.index, children: pages),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
+        selectedIndex: _destination.index,
         onDestinationSelected: (index) =>
-            setState(() => _selectedIndex = index),
+            _select(_HomeDestination.values[index]),
         destinations: [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -66,6 +95,11 @@ class _HomeShellState extends State<HomeShell> {
             label: strings.navigation('notes'),
           ),
           NavigationDestination(
+            key: const Key('calendar-nav'),
+            icon: const Icon(Icons.calendar_month_outlined),
+            label: strings.navigation('calendar'),
+          ),
+          NavigationDestination(
             key: const Key('daily-nav'),
             icon: Icon(Icons.check_circle_outline),
             label: strings.navigation('daily'),
@@ -74,10 +108,6 @@ class _HomeShellState extends State<HomeShell> {
             key: const Key('journal-nav'),
             icon: Icon(Icons.menu_book_outlined),
             label: strings.navigation('journal'),
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            label: strings.navigation('settings'),
           ),
         ],
       ),
@@ -89,14 +119,16 @@ class _HomeOverview extends StatelessWidget {
   const _HomeOverview({
     required this.onOpenNotes,
     required this.onOpenDaily,
-    required this.onOpenDates,
+    required this.onOpenCalendar,
     required this.onOpenJournal,
+    required this.onOpenSettings,
   });
 
   final VoidCallback onOpenNotes;
   final VoidCallback onOpenDaily;
-  final VoidCallback onOpenDates;
+  final VoidCallback onOpenCalendar;
   final VoidCallback onOpenJournal;
+  final VoidCallback onOpenSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +142,7 @@ class _HomeOverview extends StatelessWidget {
       colors.secondary.withValues(alpha: 0.28),
       colors.surface,
     );
-    final featureDates = Color.alphaBlend(
+    final featureCalendar = Color.alphaBlend(
       colors.primary.withValues(alpha: 0.16),
       colors.surface,
     );
@@ -127,6 +159,14 @@ class _HomeOverview extends StatelessWidget {
               title: Text(strings.appName),
               backgroundColor: Colors.transparent,
               elevation: 0,
+              actions: [
+                IconButton(
+                  key: const Key('settings-action'),
+                  tooltip: strings.navigation('settings'),
+                  onPressed: onOpenSettings,
+                  icon: const Icon(Icons.settings_outlined),
+                ),
+              ],
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -167,7 +207,7 @@ class _HomeOverview extends StatelessWidget {
                       features: [
                         HomeFeature(
                           key: const Key('journal-fast-travel'),
-                          title: strings.navigation('journal'),
+                          title: strings.journal('title'),
                           description: strings.journal('subtitle'),
                           icon: Icons.menu_book_outlined,
                           backgroundColor: featureFuture,
@@ -192,12 +232,13 @@ class _HomeOverview extends StatelessWidget {
                           onTap: onOpenDaily,
                         ),
                         HomeFeature(
-                          title: strings.navigation('dates'),
-                          description: strings.home('datesDescription'),
-                          icon: Icons.event_outlined,
-                          backgroundColor: featureDates,
+                          key: const Key('calendar-fast-travel'),
+                          title: strings.navigation('calendar'),
+                          description: strings.calendar('description'),
+                          icon: Icons.calendar_month_outlined,
+                          backgroundColor: featureCalendar,
                           foregroundColor: colors.onSurface,
-                          onTap: onOpenDates,
+                          onTap: onOpenCalendar,
                         ),
                         HomeFeature(
                           title: strings.home('growing'),

@@ -18,6 +18,8 @@ class Notes extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   TextColumn get drawingData => text().nullable()();
+
+  TextColumn get associatedDate => text().nullable()();
 }
 
 class AppPreferences extends Table {
@@ -89,7 +91,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -115,6 +117,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 7) {
         await migrator.createTable(journalEntries);
+      }
+      if (from < 8) {
+        await migrator.addColumn(notes, notes.associatedDate);
       }
     },
   );

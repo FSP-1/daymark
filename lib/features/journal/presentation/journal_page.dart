@@ -19,7 +19,7 @@ class JournalPage extends StatelessWidget {
       appBar: AppBar(title: Text(strings.journal('title'))),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'journal-add',
-        onPressed: () => _openEditor(context),
+        onPressed: () => openEditor(context),
         icon: const Icon(Icons.add),
         label: Text(strings.journal('newEntry')),
       ),
@@ -28,7 +28,7 @@ class JournalPage extends StatelessWidget {
           child: CircularProgressIndicator(),
         ),
         JournalStatus.empty => _EmptyJournal(
-          onCreate: () => _openEditor(context),
+          onCreate: () => openEditor(context),
         ),
         JournalStatus.error => Center(
           child: FilledButton.icon(
@@ -70,16 +70,25 @@ class JournalPage extends StatelessWidget {
     );
   }
 
-  Future<void> _openEditor(
-    BuildContext context, [
-    JournalEntryModel? entry,
-  ]) async {
+  static Future<void> openEditor(BuildContext context, {DateTime? date}) async {
     final journalViewModel = context.read<JournalViewModel>();
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ChangeNotifierProvider.value(
           value: journalViewModel,
-          child: _JournalEditorPage(entry: entry),
+          child: _JournalEditorPage(initialDate: date),
+        ),
+      ),
+    );
+  }
+
+  static void openEntry(BuildContext context, JournalEntryModel entry) {
+    final model = context.read<JournalViewModel>();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: model,
+          child: _JournalReadingPage(entry: entry),
         ),
       ),
     );
@@ -139,17 +148,7 @@ class _EntryCard extends StatelessWidget {
         : strings.journal('untitled');
     return Card(
       child: InkWell(
-        onTap: () {
-          final journalViewModel = context.read<JournalViewModel>();
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => ChangeNotifierProvider.value(
-                value: journalViewModel,
-                child: _JournalReadingPage(entry: entry),
-              ),
-            ),
-          );
-        },
+        onTap: () => JournalPage.openEntry(context, entry),
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Row(
@@ -198,8 +197,9 @@ class _EntryCard extends StatelessWidget {
 }
 
 class _JournalEditorPage extends StatefulWidget {
-  const _JournalEditorPage({this.entry});
+  const _JournalEditorPage({this.entry, this.initialDate});
   final JournalEntryModel? entry;
+  final DateTime? initialDate;
   @override
   State<_JournalEditorPage> createState() => _JournalEditorPageState();
 }
@@ -222,7 +222,7 @@ class _JournalEditorPageState extends State<_JournalEditorPage> {
     final entry = widget.entry;
     _title = TextEditingController(text: entry?.title);
     _content = TextEditingController(text: entry?.content);
-    _date = entry?.entryDate ?? DateTime.now();
+    _date = entry?.entryDate ?? widget.initialDate ?? DateTime.now();
     _strokes = decodeDrawing(entry?.drawingData);
     _initialTitle = entry?.title ?? '';
     _initialContent = entry?.content ?? '';
@@ -319,13 +319,14 @@ class _JournalEditorPageState extends State<_JournalEditorPage> {
   }
 
   Future<void> _pickDate() async {
+    final today = DateUtils.dateOnly(DateTime.now());
     final picked = await showDatePicker(
       context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      initialDate: _date,
+      firstDate: DateTime(1),
+      lastDate: today,
+      initialDate: _date.isAfter(today) ? today : _date,
     );
-    if (picked != null) setState(() => _date = picked);
+    if (picked != null && mounted) setState(() => _date = picked);
   }
 
   Future<void> _save() async {
