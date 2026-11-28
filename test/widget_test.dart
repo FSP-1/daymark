@@ -84,12 +84,20 @@ void main() {
           matching: find.byType(Scrollable),
         )
         .first;
+    final notesGroup = find.text('Notas · 1');
     await tester.scrollUntilVisible(
-      find.text('Compras de hoy'),
+      notesGroup,
       200,
       scrollable: calendarScroll,
     );
+    await tester.pumpAndSettle();
+    expect(find.text('Compras de hoy'), findsNothing);
+    await tester.tap(notesGroup);
+    await tester.pumpAndSettle();
     expect(find.text('Compras de hoy'), findsOneWidget);
+    await tester.tap(notesGroup);
+    await tester.pumpAndSettle();
+    expect(find.text('Compras de hoy'), findsNothing);
     final undated = find.text('Notas sin fecha · 1');
     await tester.scrollUntilVisible(undated, 180, scrollable: calendarScroll);
     await tester.pumpAndSettle();
@@ -235,7 +243,13 @@ void main() {
       future,
     );
     final note = find.text('Plan de viaje');
+    final notesGroup = find.text('Notes · 1');
+    await tester.ensureVisible(notesGroup);
+    await tester.pumpAndSettle();
+    await tester.tap(notesGroup);
+    await tester.pumpAndSettle();
     await tester.ensureVisible(note);
+    await tester.pumpAndSettle();
     await tester.tap(note);
     await tester.pumpAndSettle();
     expect(find.text('Preparar equipaje'), findsOneWidget);

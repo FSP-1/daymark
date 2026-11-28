@@ -335,68 +335,96 @@ class _DayContent extends StatelessWidget {
             dayFocus.isEmpty &&
             dayDaily.isEmpty)
           Text(strings.calendar(filtered ? 'noMatches' : 'empty')),
-        if (dayDaily.isNotEmpty) ...[
-          _GroupTitle(strings.calendar('completedDaily'), dayDaily.length),
-          for (final activity in dayDaily)
-            ListTile(
-              leading: Icon(DailyActivityIcons.iconFor(activity.iconKey)),
-              title: Text(activity.name),
-              trailing: const Icon(Icons.check_circle_outline),
-            ),
-        ],
+        if (dayDaily.isNotEmpty)
+          _DayGroup(
+            key: ValueKey((day, 'daily')),
+            title: strings.calendar('completedDaily'),
+            count: dayDaily.length,
+            children: [
+              for (final activity in dayDaily)
+                ListTile(
+                  leading: Icon(DailyActivityIcons.iconFor(activity.iconKey)),
+                  title: Text(activity.name),
+                  trailing: const Icon(Icons.check_circle_outline),
+                ),
+            ],
+          ),
         if (dayNotes.isNotEmpty)
-          _GroupTitle(strings.navigation('notes'), dayNotes.length),
-        for (final note in dayNotes)
-          _ContentTile(
-            title: note.title ?? strings.notes('untitled'),
-            type: strings.calendar('note'),
-            preview: note.content,
-            drawing: note.drawingData?.isNotEmpty == true,
-            icon: Icons.sticky_note_2_outlined,
-            color: calendarNoteColor(context),
-            onTap: () => StickyNotesPage.openNote(context, note),
+          _DayGroup(
+            key: ValueKey((day, 'notes')),
+            title: strings.navigation('notes'),
+            count: dayNotes.length,
+            children: [
+              for (final note in dayNotes)
+                _ContentTile(
+                  title: note.title ?? strings.notes('untitled'),
+                  type: strings.calendar('note'),
+                  preview: note.content,
+                  drawing: note.drawingData?.isNotEmpty == true,
+                  icon: Icons.sticky_note_2_outlined,
+                  color: calendarNoteColor(context),
+                  onTap: () => StickyNotesPage.openNote(context, note),
+                ),
+            ],
           ),
         if (dayEntries.isNotEmpty)
-          _GroupTitle(strings.navigation('journal'), dayEntries.length),
-        for (final entry in dayEntries)
-          _ContentTile(
-            title: entry.title ?? strings.journal('untitled'),
-            type: strings.calendar('journalEntry'),
-            preview: entry.content,
-            drawing: entry.drawingData?.isNotEmpty == true,
-            icon: Icons.menu_book_outlined,
-            color: calendarJournalColor(context),
-            onTap: () => JournalPage.openEntry(context, entry),
+          _DayGroup(
+            key: ValueKey((day, 'journal')),
+            title: strings.navigation('journal'),
+            count: dayEntries.length,
+            children: [
+              for (final entry in dayEntries)
+                _ContentTile(
+                  title: entry.title ?? strings.journal('untitled'),
+                  type: strings.calendar('journalEntry'),
+                  preview: entry.content,
+                  drawing: entry.drawingData?.isNotEmpty == true,
+                  icon: Icons.menu_book_outlined,
+                  color: calendarJournalColor(context),
+                  onTap: () => JournalPage.openEntry(context, entry),
+                ),
+            ],
           ),
         if (dayGoals.isNotEmpty)
-          _GroupTitle(strings.navigation('goals'), dayGoals.length),
-        for (final goal in dayGoals)
-          _ContentTile(
-            title: goal.title,
-            type: strings.goals('deadline'),
-            preview: '${goal.percentage}%',
-            drawing: false,
-            icon: goalIcon(goal.icon),
-            color: calendarGoalColor(context),
-            onTap: () => GoalDetailPage.open(context, goal.id!),
+          _DayGroup(
+            key: ValueKey((day, 'goals')),
+            title: strings.navigation('goals'),
+            count: dayGoals.length,
+            children: [
+              for (final goal in dayGoals)
+                _ContentTile(
+                  title: goal.title,
+                  type: strings.goals('deadline'),
+                  preview: '${goal.percentage}%',
+                  drawing: false,
+                  icon: goalIcon(goal.icon),
+                  color: calendarGoalColor(context),
+                  onTap: () => GoalDetailPage.open(context, goal.id!),
+                ),
+            ],
           ),
-        if (focus != null && dayFocus.isNotEmpty) ...[
-          _GroupTitle(strings.navigation('focus'), dayFocus.length),
-          Text(
-            '${strings.focus('focus')} · ${focusDurationText(FocusStatistics(dayFocus, day, focusNextDay(day)).concentration)}',
-          ),
-          for (final group in focusGroups.entries) ...[
-            if (focusGroups.length > 1)
-              _GroupTitle(group.key, group.value.length),
-            for (final session in group.value)
-              FocusHistoryTile(
-                key: ValueKey(session.id),
-                session: session,
-                model: focus,
-                day: day,
+        if (focus != null && dayFocus.isNotEmpty)
+          _DayGroup(
+            key: ValueKey((day, 'focus')),
+            title: strings.navigation('focus'),
+            count: dayFocus.length,
+            children: [
+              Text(
+                '${strings.focus('focus')} · ${focusDurationText(FocusStatistics(dayFocus, day, focusNextDay(day)).concentration)}',
               ),
-          ],
-        ],
+              for (final group in focusGroups.entries) ...[
+                if (focusGroups.length > 1)
+                  _GroupTitle(group.key, group.value.length),
+                for (final session in group.value)
+                  FocusHistoryTile(
+                    key: ValueKey(session.id),
+                    session: session,
+                    model: focus,
+                    day: day,
+                  ),
+              ],
+            ],
+          ),
         const SizedBox(height: 12),
         OverflowBar(
           spacing: 8,
@@ -420,11 +448,10 @@ class _DayContent extends StatelessWidget {
         ),
         if (!model.canWriteJournal) Text(strings.journal('futureDate')),
         if (undated.isNotEmpty)
-          ExpansionTile(
-            tilePadding: EdgeInsets.zero,
-            title: Text(
-              '${strings.calendar('undatedNotes')} · ${undated.length}',
-            ),
+          _DayGroup(
+            key: const ValueKey('undated-notes'),
+            title: strings.calendar('undatedNotes'),
+            count: undated.length,
             children: [
               for (final note in undated)
                 ListTile(
@@ -444,6 +471,27 @@ class _DayContent extends StatelessWidget {
       ],
     );
   }
+}
+
+class _DayGroup extends StatelessWidget {
+  const _DayGroup({
+    required this.title,
+    required this.count,
+    required this.children,
+    super.key,
+  });
+
+  final String title;
+  final int count;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) => ExpansionTile(
+    title: Text('$title · $count'),
+    tilePadding: EdgeInsets.zero,
+    expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+    children: children,
+  );
 }
 
 class _GroupTitle extends StatelessWidget {
