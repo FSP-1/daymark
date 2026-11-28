@@ -26,6 +26,24 @@ void main() {
     expect(await repository.listNotes(), isEmpty);
   });
 
+  test('persists list formats and preserves checks after editing items', () async {
+    final saved = await repository.saveNote(
+      StickyNote.create(content: 'Milk\nBread', format: NoteFormat.checklist),
+    );
+    await repository.saveNote(saved.copyWith(checkedItems: {1}));
+    final checked = (await repository.listNotes()).single;
+    expect(checked.format, NoteFormat.checklist);
+    expect(checked.checkedItems, {1});
+    await repository.saveNote(checked.copyWith(content: 'Bread\nMilk\nFruit'));
+    final reordered = (await repository.listNotes()).single;
+    expect(reordered.checkedItems, {0});
+    await repository.saveNote(reordered.copyWith(format: NoteFormat.numbered));
+    final numbered = (await repository.listNotes()).single;
+    expect(numbered.format, NoteFormat.numbered);
+    expect(numbered.items, ['Bread', 'Milk', 'Fruit']);
+    expect(numbered.checkedItems, isEmpty);
+  });
+
   test('saves and lists a note', () async {
     final createdAt = DateTime(2026, 10, 17);
     await repository.saveNote(

@@ -122,10 +122,11 @@ class _HomeShellState extends State<HomeShell> {
   AppBar _appBar(BuildContext context, FeatureId id) {
     final strings = AppLocalizations.of(context);
     return AppBar(
-      title: Text(
-        id == FeatureId.home ? strings.appName : _registry[id].label(strings),
-        key: id == FeatureId.daily ? const Key('daily-title') : null,
-      ),
+      title: Text(switch (id) {
+        FeatureId.home => strings.appName,
+        FeatureId.notes => strings.notes('title'),
+        _ => _registry[id].label(strings),
+      }, key: id == FeatureId.daily ? const Key('daily-title') : null),
       actions: [
         IconButton(
           key: const Key('settings-action'),

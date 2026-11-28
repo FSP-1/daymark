@@ -20,6 +20,8 @@ class Notes extends Table {
   TextColumn get drawingData => text().nullable()();
 
   TextColumn get associatedDate => text().nullable()();
+
+  TextColumn get listData => text().nullable()();
 }
 
 class AppPreferences extends Table {
@@ -154,12 +156,15 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
     onUpgrade: (migrator, from, to) async {
+      if (from < 13) {
+        await migrator.addColumn(notes, notes.listData);
+      }
       if (from < 12) {
         await migrator.createTable(focusStateRows);
         await migrator.createTable(focusSessionRows);

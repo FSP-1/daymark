@@ -222,17 +222,26 @@
     "down": "Mover hacia abajo"
   },
   "home": {
-    "welcome": "Un lugar para tus pequeñas ideas.",
+    "welcome": "Tus notas, listas y planes",
     "description": "Escribe, dibuja y guarda tus momentos sin conexión.",
-    "stickyNotes": "Notas adhesivas",
-    "stickyNotesDescription": "Anota una idea antes de que se escape.",
+    "stickyNotes": "Notas y listas",
+    "stickyNotesDescription": "Escribe notas, prepara listas y guarda dibujos.",
     "dailyDescription": "Pequeños pasos hacen un día especial.",
     "growing": "Tu espacio está creciendo",
     "comingSoon": "Las tareas y fechas importantes estarán aquí."
   },
   "notes": {
-    "title": "Notas Adhesivas",
-    "listDescription": "Guarda tus ideas y vuelve a ellas cuando quieras.",
+    "saveChanges": "Guardar cambios",
+    "moreItems": "+{count} más",
+    "checklistProgress": "{checked} de {total} completados",
+    "format_text": "Texto",
+    "format_checklist": "Con casillas",
+    "format_numbered": "Numerada",
+    "itemHint": "Escribe un elemento",
+    "addItem": "Añadir elemento",
+    "removeItem": "Quitar elemento",
+    "title": "Notas y listas",
+    "listDescription": "Reúne tus notas, listas y dibujos en un mismo lugar.",
     "reading": "Nota",
     "editNote": "Editar nota",
     "untitled": "Nota sin título",
@@ -242,7 +251,7 @@
     "dateFilter": "Filtrar por fecha",
     "clearFilters": "Limpiar filtros",
     "empty": "Aún no hay notas",
-    "emptyDescription": "Escribe o dibuja tu primera idea.",
+    "emptyDescription": "Crea una nota, una lista o un dibujo.",
     "noMatches": "No hay coincidencias",
     "noMatchesDescription": "Prueba con otro texto o fecha.",
     "drawingIncluded": "Dibujo incluido",
@@ -304,6 +313,7 @@
     "cancel": "Cancelar"
   },
   "calendar": {
+    "undatedNotes": "Notas sin fecha",
     "filter": "Filtrar por tipo",
     "allTypes": "Todos los tipos",
     "noMatches": "No hay contenido de este tipo para el día seleccionado.",

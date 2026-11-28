@@ -8,12 +8,21 @@ import 'package:daymark/features/journal/data/journal_repository.dart';
 import 'package:daymark/features/journal/presentation/journal_view_model.dart';
 import 'package:daymark/features/sticky_notes/data/local/app_database.dart';
 import 'package:daymark/features/sticky_notes/data/sticky_notes_repository.dart';
+import 'package:daymark/features/sticky_notes/domain/sticky_note.dart';
 import 'package:daymark/features/sticky_notes/presentation/sticky_notes_view_model.dart';
 
 void main() {
   testWidgets('opens main navigation destinations', (tester) async {
     final database = AppDatabase.test();
-    await tester.runAsync(() => database.customSelect('SELECT 1').get());
+    final noteRepository = DriftStickyNotesRepository(database);
+    await tester.runAsync(
+      () => noteRepository.saveNote(
+        StickyNote.create(
+          title: 'Nota anterior',
+          content: 'Sin fecha asignada',
+        ),
+      ),
+    );
     await tester.pumpWidget(DaymarkApp(database: database));
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
@@ -37,8 +46,26 @@ void main() {
     await tester.tap(find.byKey(const Key('add-note-action')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('note-content')), findsOneWidget);
-    await tester.tap(find.byType(BackButton));
+    await tester.enterText(
+      find.byKey(const Key('note-title')),
+      'Compras de hoy',
+    );
+    await tester.enterText(
+      find.byKey(const Key('note-content')),
+      'Pan y leche',
+    );
+    tester.testTextInput.hide();
     await tester.pumpAndSettle();
+    final save = find.byKey(const Key('add-note'));
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    final saved = (await noteRepository.listNotes()).singleWhere(
+      (note) => note.title == 'Compras de hoy',
+    );
+    final today = DateTime.now();
+    expect(saved.associatedDate, DateTime(today.year, today.month, today.day));
 
     await tester.tap(find.byType(NavigationDestination).first);
     await tester.pumpAndSettle();
@@ -51,6 +78,24 @@ void main() {
     await tester.tap(find.byKey(const Key('calendar-nav')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('calendar-page')), findsOneWidget);
+    final calendarScroll = find
+        .descendant(
+          of: find.byKey(const Key('calendar-page')),
+          matching: find.byType(Scrollable),
+        )
+        .first;
+    await tester.scrollUntilVisible(
+      find.text('Compras de hoy'),
+      200,
+      scrollable: calendarScroll,
+    );
+    expect(find.text('Compras de hoy'), findsOneWidget);
+    final undated = find.text('Notas sin fecha · 1');
+    await tester.scrollUntilVisible(undated, 180, scrollable: calendarScroll);
+    await tester.pumpAndSettle();
+    await tester.tap(undated);
+    await tester.pumpAndSettle();
+    expect(find.text('Nota anterior'), findsOneWidget);
     await tester.tap(information);
     await tester.pumpAndSettle();
     expect(find.text('Información'), findsOneWidget);

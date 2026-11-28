@@ -244,6 +244,7 @@ class _CalendarPageState extends State<CalendarPage>
                       journal: journal,
                       goals: goals,
                       filtered: _filter != _CalendarFilter.all,
+                      showUndatedNotes: _includes(_CalendarFilter.notes),
                       dailyFailed:
                           dailyFailed && _includes(_CalendarFilter.daily),
                     ),
@@ -266,6 +267,7 @@ class _DayContent extends StatelessWidget {
     required this.journal,
     required this.goals,
     required this.filtered,
+    required this.showUndatedNotes,
     required this.dailyFailed,
   });
 
@@ -275,12 +277,16 @@ class _DayContent extends StatelessWidget {
   final JournalViewModel journal;
   final GoalsViewModel? goals;
   final bool filtered, dailyFailed;
+  final bool showUndatedNotes;
 
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
     final day = model.selected;
     final dayNotes = content.notesByDay[day] ?? [];
+    final undated = showUndatedNotes
+        ? notes.notes.where((note) => note.associatedDate == null).toList()
+        : const [];
     final dayEntries = content.entriesByDay[day] ?? [];
     final dayGoals = content.goalsByDay[day] ?? [];
     final dayFocus = content.focusByDay[day] ?? [];
@@ -413,6 +419,28 @@ class _DayContent extends StatelessWidget {
           ],
         ),
         if (!model.canWriteJournal) Text(strings.journal('futureDate')),
+        if (undated.isNotEmpty)
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: Text(
+              '${strings.calendar('undatedNotes')} · ${undated.length}',
+            ),
+            children: [
+              for (final note in undated)
+                ListTile(
+                  leading: const Icon(Icons.sticky_note_2_outlined),
+                  title: Text(
+                    note.title?.trim().isNotEmpty == true
+                        ? note.title!
+                        : note.content,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => StickyNotesPage.openNote(context, note),
+                ),
+            ],
+          ),
       ],
     );
   }

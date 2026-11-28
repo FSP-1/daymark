@@ -203,6 +203,9 @@ class _NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
+    final isList = note.format != NoteFormat.text;
+    final title = note.title?.trim();
+    final subtitle = note.subtitle?.trim();
     return Card(
       color: _noteColors[(note.id ?? 0) % _noteColors.length],
       child: InkWell(
@@ -217,9 +220,13 @@ class _NoteCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      note.title?.trim().isNotEmpty == true
-                          ? note.title!
+                      title?.isNotEmpty == true
+                          ? title!
+                          : isList
+                          ? strings.notes('format_${note.format.name}')
                           : note.content,
+                      maxLines: isList ? 2 : null,
+                      overflow: isList ? TextOverflow.ellipsis : null,
                       style: const TextStyle(
                         fontSize: 18,
                         fontStyle: FontStyle.italic,
@@ -227,15 +234,20 @@ class _NoteCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      [
-                        if (note.subtitle?.trim().isNotEmpty == true)
-                          note.subtitle!,
-                        if (note.title?.trim().isNotEmpty == true) note.content,
-                      ].join('\n'),
-                      maxLines: 5,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    if (subtitle?.isNotEmpty == true)
+                      Text(
+                        subtitle!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    if (isList)
+                      _ListPreview(note: note)
+                    else if (title?.isNotEmpty == true)
+                      Text(
+                        note.content,
+                        maxLines: 5,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     const SizedBox(height: 6),
                     Text(
                       MaterialLocalizations.of(context)
@@ -268,6 +280,93 @@ class _NoteCard extends StatelessWidget {
       StickyNotesPage.openNote(context, note);
 }
 
+class _ListPreview extends StatelessWidget {
+  const _ListPreview({required this.note});
+  final StickyNote note;
+  static const _previewLimit = 3;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
+    final style = Theme.of(context).textTheme.bodyMedium;
+    final localizations = MaterialLocalizations.of(context);
+    final items = note.items;
+    final checklist = note.format == NoteFormat.checklist;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (index, item) in items.take(_previewLimit).indexed)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 26,
+                  child: checklist
+                      ? Icon(
+                          note.checkedItems.contains(index)
+                              ? Icons.check_box_outlined
+                              : Icons.check_box_outline_blank,
+                          size: 16,
+                        )
+                      : Text(
+                          '${localizations.formatDecimal(index + 1)}.',
+                          style: style,
+                        ),
+                ),
+                Expanded(
+                  child: Text(
+                    item,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: _itemStyle(
+                      style,
+                      checklist && note.checkedItems.contains(index),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (items.length > _previewLimit)
+          Text(
+            strings
+                .notes('moreItems')
+                .replaceFirst(
+                  '{count}',
+                  localizations.formatDecimal(items.length - _previewLimit),
+                ),
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
+        if (checklist)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              _checklistProgress(context, note, items.length),
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+TextStyle _itemStyle(TextStyle? base, bool checked) =>
+    (base ?? const TextStyle()).copyWith(
+      decoration: checked ? TextDecoration.lineThrough : TextDecoration.none,
+    );
+
+String _checklistProgress(BuildContext context, StickyNote note, int total) {
+  final dates = MaterialLocalizations.of(context);
+  final count = note.checkedItems
+      .where((index) => index >= 0 && index < total)
+      .length;
+  return AppLocalizations.of(context)
+      .notes('checklistProgress')
+      .replaceFirst('{checked}', dates.formatDecimal(count))
+      .replaceFirst('{total}', dates.formatDecimal(total));
+}
+
 class _StickyNoteEditorPage extends StatefulWidget {
   const _StickyNoteEditorPage({this.note, this.initialDate});
 
@@ -284,6 +383,7 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
   final _contentController = TextEditingController();
   late List<DrawingStroke> _drawingStrokes;
   var _isSaving = false;
+  late NoteFormat _format;
   DateTime? _associatedDate;
 
   StickyNote? get _note => widget.note;
@@ -294,8 +394,11 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
     _titleController.text = _note?.title ?? '';
     _subtitleController.text = _note?.subtitle ?? '';
     _contentController.text = _note?.content ?? '';
+    _format = _note?.format ?? NoteFormat.text;
     _drawingStrokes = decodeDrawing(_note?.drawingData);
-    _associatedDate = _note?.associatedDate ?? widget.initialDate;
+    _associatedDate = _note == null
+        ? widget.initialDate ?? DateUtils.dateOnly(DateTime.now())
+        : _note!.associatedDate;
   }
 
   Future<void> _pickAssociatedDate() async {
@@ -365,9 +468,14 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
                     ),
             ),
             NoteEditor(
+              editing: _note != null,
               titleController: _titleController,
               subtitleController: _subtitleController,
               controller: _contentController,
+              format: _format,
+              onFormatChanged: _isSaving
+                  ? null
+                  : (format) => setState(() => _format = format),
               initialStrokes: _drawingStrokes,
               onDrawingChanged: _isSaving
                   ? null
@@ -380,6 +488,7 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
                       final note =
                           _note?.copyWith(
                             content: _contentController.text,
+                            format: _format,
                             title: _titleController.text.trim().isEmpty
                                 ? null
                                 : _titleController.text,
@@ -399,6 +508,7 @@ class _StickyNoteEditorPageState extends State<_StickyNoteEditorPage> {
                           ) ??
                           StickyNote.create(
                             content: _contentController.text,
+                            format: _format,
                             associatedDate: _associatedDate,
                             title: _titleController.text,
                             subtitle: _subtitleController.text,
@@ -433,6 +543,29 @@ class _StickyNoteReadingPage extends StatefulWidget {
 
 class _StickyNoteReadingPageState extends State<_StickyNoteReadingPage> {
   late StickyNote _note = widget.note;
+  bool _savingCheck = false;
+
+  Future<void> _toggleItem(int index, bool value) async {
+    final model = context.read<StickyNotesViewModel>();
+    final strings = AppLocalizations.of(context);
+    final checked = {..._note.checkedItems};
+    if (value) {
+      checked.add(index);
+    } else {
+      checked.remove(index);
+    }
+    setState(() => _savingCheck = true);
+    final saved = await model.saveNote(_note.copyWith(checkedItems: checked));
+    if (!mounted) return;
+    setState(() {
+      _savingCheck = false;
+      if (saved != null) _note = saved;
+    });
+    if (saved == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(strings.error('saveNote'))));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -443,12 +576,12 @@ class _StickyNoteReadingPageState extends State<_StickyNoteReadingPage> {
         actions: [
           IconButton(
             tooltip: strings.notes('editNote'),
-            onPressed: () => _edit(context),
+            onPressed: _savingCheck ? null : () => _edit(context),
             icon: const Icon(Icons.edit_outlined),
           ),
           IconButton(
             tooltip: strings.notes('deleteNote'),
-            onPressed: () => _delete(context),
+            onPressed: _savingCheck ? null : () => _delete(context),
             icon: const Icon(Icons.delete_outline),
           ),
         ],
@@ -467,7 +600,11 @@ class _StickyNoteReadingPageState extends State<_StickyNoteReadingPage> {
             Text(
               _note.title?.trim().isNotEmpty == true
                   ? _note.title!
-                  : strings.notes('untitled'),
+                  : strings.notes(
+                      _note.format == NoteFormat.text
+                          ? 'untitled'
+                          : 'format_${_note.format.name}',
+                    ),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             if (_note.subtitle?.trim().isNotEmpty == true) ...[
@@ -478,7 +615,58 @@ class _StickyNoteReadingPageState extends State<_StickyNoteReadingPage> {
               ),
             ],
             const SizedBox(height: 24),
-            Text(_note.content, style: Theme.of(context).textTheme.bodyLarge),
+            if (_note.format == NoteFormat.text)
+              Text(_note.content, style: Theme.of(context).textTheme.bodyLarge)
+            else ...[
+              if (_note.format == NoteFormat.checklist)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    _checklistProgress(context, _note, _note.items.length),
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                ),
+              Card(
+                margin: EdgeInsets.zero,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  child: Column(
+                    children: [
+                      for (final (index, item) in _note.items.indexed) ...[
+                        if (index > 0) const Divider(height: 1),
+                        if (_note.format == NoteFormat.checklist)
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            title: Text(
+                              item,
+                              style: _itemStyle(
+                                Theme.of(context).textTheme.bodyLarge,
+                                _note.checkedItems.contains(index),
+                              ),
+                            ),
+                            value: _note.checkedItems.contains(index),
+                            onChanged: _savingCheck
+                                ? null
+                                : (value) => _toggleItem(index, value ?? false),
+                          )
+                        else
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Text(
+                              '${MaterialLocalizations.of(context).formatDecimal(index + 1)}.',
+                            ),
+                            title: Text(item),
+                          ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
             if (_note.drawingData?.isNotEmpty == true) ...[
               const SizedBox(height: 24),
               DrawingPreview(

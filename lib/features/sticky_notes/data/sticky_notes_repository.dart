@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 
 import 'local/app_database.dart';
@@ -18,19 +20,20 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
     final rows = await (database.select(
       database.notes,
     )..orderBy([(note) => OrderingTerm.asc(note.id)])).get();
-    return rows
-        .map(
-          (row) => StickyNote.fromStorage(
-            id: row.id,
-            title: row.title,
-            subtitle: row.subtitle,
-            content: row.content,
-            createdAt: row.createdAt,
-            drawingData: row.drawingData,
-            associatedDate: DateTime.tryParse(row.associatedDate ?? ''),
-          ),
-        )
-        .toList();
+    return rows.map((row) {
+      final (format, checked) = _decodeList(row.listData);
+      return StickyNote.fromStorage(
+        id: row.id,
+        title: row.title,
+        subtitle: row.subtitle,
+        content: row.content,
+        createdAt: row.createdAt,
+        drawingData: row.drawingData,
+        associatedDate: DateTime.tryParse(row.associatedDate ?? ''),
+        format: format,
+        checkedItems: checked,
+      );
+    }).toList();
   }
 
   @override
@@ -43,6 +46,12 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
         ?.toIso8601String()
         .split('T')
         .first;
+    final listData = note.format == NoteFormat.text
+        ? null
+        : jsonEncode({
+            'format': note.format.name,
+            'checked': note.checkedItems.toList(),
+          });
     final id = note.id == null
         ? await database
               .into(database.notes)
@@ -54,6 +63,7 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
                   createdAt: Value(note.createdAt),
                   drawingData: Value(note.drawingData),
                   associatedDate: Value(associatedDate),
+                  listData: Value(listData),
                 ),
               )
         : note.id!;
@@ -68,6 +78,7 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
           createdAt: Value(note.createdAt),
           drawingData: Value(note.drawingData),
           associatedDate: Value(associatedDate),
+          listData: Value(listData),
         ),
       );
     }
@@ -79,7 +90,31 @@ class DriftStickyNotesRepository implements StickyNotesRepository {
       createdAt: note.createdAt,
       drawingData: note.drawingData,
       associatedDate: note.associatedDate,
+      format: note.format,
+      checkedItems: note.checkedItems,
     );
+  }
+
+  (NoteFormat, Set<int>) _decodeList(String? raw) {
+    if (raw != null) {
+      try {
+        final data = jsonDecode(raw);
+        if (data is Map<String, dynamic>) {
+          final format = NoteFormat.values.firstWhere(
+            (item) => item.name == data['format'],
+            orElse: () => NoteFormat.text,
+          );
+          final checked = data['checked'];
+          return (
+            format,
+            checked is List ? checked.whereType<int>().toSet() : <int>{},
+          );
+        }
+      } on FormatException {
+        return (NoteFormat.text, const {});
+      }
+    }
+    return (NoteFormat.text, const {});
   }
 
   @override

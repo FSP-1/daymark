@@ -23,6 +23,8 @@ Personal Journal, and a Calendar for browsing dated notes and journal entries.
 
 ### Sticky Notes
 
+- Use plain text, a checklist with saved check marks, or a numbered list.
+
 - Create notes containing at least one non-whitespace character.
 - Optionally add a title and subtitle; every note records its localized creation date.
 - View saved notes and an explicit empty state.
@@ -102,6 +104,8 @@ scope. The complete feature specification is documented in
 - Filter monthly and annual indicators by type. Each day groups dated notes,
   Journal entries, goal deadlines, completed Daily activities, and Focus sessions.
 - Create notes for any supported day and change or remove their optional dates.
+- Notes created from Notes and lists default to today. Open Undated notes in
+  Calendar to find notes without a calendar date.
 - Write Journal entries for today or earlier and open existing content directly
   from Calendar.
 - Existing notes remain available in Sticky Notes. Their creation timestamps

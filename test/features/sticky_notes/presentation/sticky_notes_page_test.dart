@@ -28,6 +28,9 @@ class _FakeRepository implements StickyNotesRepository {
       subtitle: note.subtitle,
       createdAt: note.createdAt,
       drawingData: note.drawingData,
+      format: note.format,
+      checkedItems: note.checkedItems,
+      associatedDate: note.associatedDate,
     );
     final index = notes.indexWhere((item) => item.id == saved.id);
     if (index == -1) {
@@ -67,6 +70,89 @@ Future<void> _openEditor(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('creates a checklist and keeps its marks when reopened', (
+    tester,
+  ) async {
+    final repository = _FakeRepository();
+    await tester.pumpWidget(_buildPage(repository));
+    await tester.pumpAndSettle();
+    await _openEditor(tester);
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Checklist'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Enter an item').first,
+      'Milk',
+    );
+    final addItem = find.byKey(const Key('note-add-item'));
+    await tester.ensureVisible(addItem);
+    await tester.pumpAndSettle();
+    await tester.tap(addItem);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Enter an item').last,
+      'Bread',
+    );
+    await _tapAddNote(tester);
+    await tester.pumpAndSettle();
+    expect(repository.notes.single.items, ['Milk', 'Bread']);
+    expect(find.text('0 of 2 complete'), findsOneWidget);
+    await tester.tap(find.text('Milk'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(CheckboxListTile, 'Milk'));
+    await tester.pumpAndSettle();
+    expect(repository.notes.single.checkedItems, {0});
+    expect(
+      tester.widget<Text>(find.text('Milk')).style?.decoration,
+      TextDecoration.lineThrough,
+    );
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('1 of 2 complete'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text('Milk')).style?.decoration,
+      TextDecoration.lineThrough,
+    );
+    await tester.tap(find.text('Milk'));
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<CheckboxListTile>(
+            find.widgetWithText(CheckboxListTile, 'Milk'),
+          )
+          .value,
+      isTrue,
+    );
+    await tester.tap(find.byTooltip('Edit note'));
+    await tester.pumpAndSettle();
+    expect(find.text('Save changes'), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('note-title')), 'Shopping');
+    await _tapAddNote(tester);
+    await tester.pumpAndSettle();
+    expect(repository.notes.single.title, 'Shopping');
+    expect(repository.notes.single.checkedItems, {0});
+  });
+
+  testWidgets('shows automatic numbering for numbered notes', (tester) async {
+    final repository = _FakeRepository([
+      StickyNote.fromStorage(
+        id: 1,
+        title: 'Recipe',
+        content: 'Mix\nBake\nCool\nServe',
+        format: NoteFormat.numbered,
+      ),
+    ]);
+    await tester.pumpWidget(_buildPage(repository));
+    await tester.pumpAndSettle();
+    expect(find.text('+1 more'), findsOneWidget);
+    expect(find.text('Serve'), findsNothing);
+    await tester.tap(find.text('Recipe'));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(ListTile, '1.'), findsOneWidget);
+    expect(find.widgetWithText(ListTile, '2.'), findsOneWidget);
+    expect(find.widgetWithText(ListTile, '4.'), findsOneWidget);
+    expect(find.byType(CheckboxListTile), findsNothing);
+  });
+
   testWidgets('shows empty state and creates a note', (tester) async {
     final repository = _FakeRepository();
     await tester.pumpWidget(_buildPage(repository));

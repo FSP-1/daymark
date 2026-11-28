@@ -40,6 +40,7 @@ void main() {
       );
       await old.customStatement('DROP TABLE focus_session_rows');
       await old.customStatement('DROP TABLE focus_state_rows');
+      await old.customStatement('ALTER TABLE notes DROP COLUMN list_data');
       await old.customStatement('PRAGMA user_version = 7');
       await old.close();
 
