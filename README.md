@@ -2,6 +2,43 @@
 
 Daymark is an Android-first personal organizer built with Flutter and Dart.
 
+## App flow
+
+```mermaid
+flowchart TD
+    Launch["Launch Daymark"] --> Home["Home"]
+    Home --> Notes["Notes and lists"]
+    Home --> Calendar["Calendar"]
+    Home --> Daily["Daily"]
+    Home --> Journal["Journal"]
+    Home --> Goals["Goals"]
+    Home --> Focus["Focus"]
+    Home --> Settings["Settings"]
+
+    Notes --> NoteEditor["Write a note, make a list, or add a drawing"]
+    Journal --> JournalEditor["Read or write a dated entry"]
+    Daily --> Completion["Check off today's activities"]
+    Goals --> GoalProgress["Track checklist or linked Daily progress"]
+    Focus --> Timer["Start, pause, or resume the timer"]
+    Timer --> History["Session history and statistics"]
+    History --> Session["Open a recorded session"]
+    Calendar --> Day["Select a date and expand a feature group"]
+    Day --> NoteEditor
+    Day --> JournalEditor
+    Day --> GoalProgress
+    Day --> Session
+
+    Completion -. "Updates linked goals" .-> GoalProgress
+    Completion -. "Appears on its date" .-> Day
+    History -. "Sessions appear on their dates" .-> Day
+    Settings --> Nav["Choose and reorder up to four bottom-bar shortcuts"]
+    Nav -. "Home stays first" .-> Home
+```
+
+Home cards open every feature. The default bottom bar shows Home, Notes,
+Calendar, Daily, and Journal. Goals and Focus can also be pinned from
+**Settings → Navigation**.
+
 ## Stack and architecture
 
 - Flutter and Dart, optimized for Android-first use.
