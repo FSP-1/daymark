@@ -145,9 +145,7 @@ void main() {
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
     expect(find.text('Study'), findsOneWidget);
-    await tester.tap(find.byTooltip('Activity options'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Archive'));
+    await tester.tap(find.byTooltip('Archive'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Archive'));
     await tester.pumpAndSettle();

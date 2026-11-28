@@ -142,6 +142,15 @@ class _GoalCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text('${goal.percentage}%', style: TextStyle(color: color)),
+                  IconButton(
+                    tooltip: strings.goals('delete'),
+                    visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: model.busy(goal)
+                        ? null
+                        : () =>
+                              deleteGoalWithConfirmation(context, model, goal),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),

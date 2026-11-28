@@ -76,7 +76,7 @@
     "activityPickerHelp": "Choose what you will do during the session. The name is saved in history. Open Manage activities to add options.",
     "activityManagerHelp": "Activities group your concentration time. You can create your own or add activities you already have in Daily.",
     "customActivities": "Custom activities",
-    "customActivitiesHelp": "Tap an activity to edit it. To remove it from the picker, open its options and choose Archive.",
+    "customActivitiesHelp": "Tap an activity to edit it. Use the trash icon to archive it.",
     "noCustomActivities": "You have no custom activities yet.",
     "activityActions": "Activity options",
     "archiveActivityHelp": "The activity will disappear from the picker. Its sessions will remain in history.",
@@ -304,6 +304,11 @@
     "cancel": "Cancel"
   },
   "calendar": {
+    "filter": "Filter by type",
+    "allTypes": "All types",
+    "noMatches": "No content of this type for the selected day.",
+    "completedDaily": "Completed Daily activities",
+    "dailyLoadError": "Unable to load completed Daily activities.",
     "description": "Your life, day by day.",
     "today": "Today",
     "month": "Month",

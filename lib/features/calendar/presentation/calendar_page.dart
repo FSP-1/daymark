@@ -4,6 +4,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/localization/app_localizations.dart';
+import '../../daily/domain/daily_activity.dart';
+import '../../daily/domain/daily_repository.dart';
+import '../../daily/presentation/daily_activity_icons.dart';
+import '../../daily/presentation/daily_view_model.dart';
 import '../../journal/presentation/journal_page.dart';
 import '../../goals/presentation/goal_detail_page.dart';
 import '../../goals/presentation/goal_style.dart';
@@ -18,6 +22,8 @@ import '../../sticky_notes/presentation/sticky_notes_view_model.dart';
 import 'calendar_view_model.dart';
 import 'widgets/calendar_grid.dart';
 
+enum _CalendarFilter { all, notes, daily, journal, goals, focus }
+
 class CalendarPage extends StatefulWidget {
   const CalendarPage({this.showTitle = true, super.key});
 
@@ -30,7 +36,19 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage>
     with WidgetsBindingObserver {
   final _model = CalendarViewModel();
+  var _filter = _CalendarFilter.all;
+  late final _dailyHistory = _completedDaily();
   Timer? _midnight;
+
+  Stream<Map<DateTime, List<DailyActivity>>>? _completedDaily() {
+    final repository = context.read<DailyViewModel?>()?.repository;
+    return repository is DailyCompletionHistory
+        ? (repository as DailyCompletionHistory).watchCompletedActivities()
+        : null;
+  }
+
+  bool _includes(_CalendarFilter type) =>
+      _filter == _CalendarFilter.all || _filter == type;
 
   @override
   void initState() {
@@ -68,7 +86,21 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      StreamBuilder<Map<DateTime, List<DailyActivity>>>(
+        stream: _dailyHistory,
+        builder: (context, snapshot) => _buildCalendar(
+          context,
+          snapshot.data ?? const {},
+          snapshot.hasError,
+        ),
+      );
+
+  Widget _buildCalendar(
+    BuildContext context,
+    Map<DateTime, List<DailyActivity>> dailyHistory,
+    bool dailyFailed,
+  ) {
     final notes = context.watch<StickyNotesViewModel>();
     final journal = context.watch<JournalViewModel>();
     final goals = context.watch<GoalsViewModel?>();
@@ -76,10 +108,11 @@ class _CalendarPageState extends State<CalendarPage>
       (model) => model?.history ?? const [],
     );
     final content = CalendarContent(
-      notes.notes,
-      journal.entries,
-      goals?.goals ?? [],
-      focusHistory,
+      _includes(_CalendarFilter.notes) ? notes.notes : const [],
+      _includes(_CalendarFilter.journal) ? journal.entries : const [],
+      _includes(_CalendarFilter.goals) ? goals?.goals ?? [] : const [],
+      _includes(_CalendarFilter.focus) ? focusHistory : const [],
+      _includes(_CalendarFilter.daily) ? dailyHistory : const {},
     );
     final strings = AppLocalizations.of(context);
     final dates = MaterialLocalizations.of(context);
@@ -107,10 +140,39 @@ class _CalendarPageState extends State<CalendarPage>
                     subtitle: widget.showTitle
                         ? Text(strings.calendar('description'))
                         : null,
-                    trailing: IconButton(
-                      tooltip: strings.calendar('today'),
-                      onPressed: _model.goToToday,
-                      icon: const Icon(Icons.today_outlined),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PopupMenuButton<_CalendarFilter>(
+                          key: const Key('calendar-filter'),
+                          tooltip: strings.calendar('filter'),
+                          icon: Icon(
+                            _filter == _CalendarFilter.all
+                                ? Icons.filter_list
+                                : Icons.filter_alt,
+                          ),
+                          onSelected: (value) =>
+                              setState(() => _filter = value),
+                          itemBuilder: (_) => [
+                            for (final option in _CalendarFilter.values)
+                              CheckedPopupMenuItem(
+                                key: ValueKey('calendar-filter-${option.name}'),
+                                value: option,
+                                checked: _filter == option,
+                                child: Text(
+                                  option == _CalendarFilter.all
+                                      ? strings.calendar('allTypes')
+                                      : strings.navigation(option.name),
+                                ),
+                              ),
+                          ],
+                        ),
+                        IconButton(
+                          tooltip: strings.calendar('today'),
+                          onPressed: _model.goToToday,
+                          icon: const Icon(Icons.today_outlined),
+                        ),
+                      ],
                     ),
                   ),
                   Align(
@@ -169,7 +231,11 @@ class _CalendarPageState extends State<CalendarPage>
                       onDaySelected: _model.select,
                     ),
                     const SizedBox(height: 12),
-                    const CalendarLegend(),
+                    CalendarLegend(
+                      category: _filter == _CalendarFilter.all
+                          ? null
+                          : _filter.name,
+                    ),
                     const Divider(height: 32),
                     _DayContent(
                       model: _model,
@@ -177,6 +243,9 @@ class _CalendarPageState extends State<CalendarPage>
                       notes: notes,
                       journal: journal,
                       goals: goals,
+                      filtered: _filter != _CalendarFilter.all,
+                      dailyFailed:
+                          dailyFailed && _includes(_CalendarFilter.daily),
                     ),
                   ],
                 ],
@@ -196,6 +265,8 @@ class _DayContent extends StatelessWidget {
     required this.notes,
     required this.journal,
     required this.goals,
+    required this.filtered,
+    required this.dailyFailed,
   });
 
   final CalendarViewModel model;
@@ -203,6 +274,7 @@ class _DayContent extends StatelessWidget {
   final StickyNotesViewModel notes;
   final JournalViewModel journal;
   final GoalsViewModel? goals;
+  final bool filtered, dailyFailed;
 
   @override
   Widget build(BuildContext context) {
@@ -212,6 +284,12 @@ class _DayContent extends StatelessWidget {
     final dayEntries = content.entriesByDay[day] ?? [];
     final dayGoals = content.goalsByDay[day] ?? [];
     final dayFocus = content.focusByDay[day] ?? [];
+    final dayDaily = content.dailyByDay[day] ?? [];
+    final focusGroups = <String, List<FocusSession>>{};
+    for (final session in dayFocus) {
+      final label = session.activityLabel ?? strings.focus(session.mode.name);
+      (focusGroups[label] ??= []).add(session);
+    }
     final focus = context.read<FocusViewModel?>();
     final loading =
         notes.status == StickyNotesStatus.loading ||
@@ -231,6 +309,7 @@ class _DayContent extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         if (loading) const LinearProgressIndicator(),
+        if (dailyFailed) Text(strings.calendar('dailyLoadError')),
         if (failed)
           TextButton.icon(
             onPressed: () {
@@ -243,11 +322,24 @@ class _DayContent extends StatelessWidget {
           ),
         if (!loading &&
             !failed &&
+            !dailyFailed &&
             dayNotes.isEmpty &&
             dayEntries.isEmpty &&
             dayGoals.isEmpty &&
-            dayFocus.isEmpty)
-          Text(strings.calendar('empty')),
+            dayFocus.isEmpty &&
+            dayDaily.isEmpty)
+          Text(strings.calendar(filtered ? 'noMatches' : 'empty')),
+        if (dayDaily.isNotEmpty) ...[
+          _GroupTitle(strings.calendar('completedDaily'), dayDaily.length),
+          for (final activity in dayDaily)
+            ListTile(
+              leading: Icon(DailyActivityIcons.iconFor(activity.iconKey)),
+              title: Text(activity.name),
+              trailing: const Icon(Icons.check_circle_outline),
+            ),
+        ],
+        if (dayNotes.isNotEmpty)
+          _GroupTitle(strings.navigation('notes'), dayNotes.length),
         for (final note in dayNotes)
           _ContentTile(
             title: note.title ?? strings.notes('untitled'),
@@ -258,6 +350,8 @@ class _DayContent extends StatelessWidget {
             color: calendarNoteColor(context),
             onTap: () => StickyNotesPage.openNote(context, note),
           ),
+        if (dayEntries.isNotEmpty)
+          _GroupTitle(strings.navigation('journal'), dayEntries.length),
         for (final entry in dayEntries)
           _ContentTile(
             title: entry.title ?? strings.journal('untitled'),
@@ -268,6 +362,8 @@ class _DayContent extends StatelessWidget {
             color: calendarJournalColor(context),
             onTap: () => JournalPage.openEntry(context, entry),
           ),
+        if (dayGoals.isNotEmpty)
+          _GroupTitle(strings.navigation('goals'), dayGoals.length),
         for (final goal in dayGoals)
           _ContentTile(
             title: goal.title,
@@ -279,17 +375,21 @@ class _DayContent extends StatelessWidget {
             onTap: () => GoalDetailPage.open(context, goal.id!),
           ),
         if (focus != null && dayFocus.isNotEmpty) ...[
-          const Divider(),
+          _GroupTitle(strings.navigation('focus'), dayFocus.length),
           Text(
             '${strings.focus('focus')} · ${focusDurationText(FocusStatistics(dayFocus, day, focusNextDay(day)).concentration)}',
           ),
-          for (final session in dayFocus)
-            FocusHistoryTile(
-              key: ValueKey(session.id),
-              session: session,
-              model: focus,
-              day: day,
-            ),
+          for (final group in focusGroups.entries) ...[
+            if (focusGroups.length > 1)
+              _GroupTitle(group.key, group.value.length),
+            for (final session in group.value)
+              FocusHistoryTile(
+                key: ValueKey(session.id),
+                session: session,
+                model: focus,
+                day: day,
+              ),
+          ],
         ],
         const SizedBox(height: 12),
         OverflowBar(
@@ -316,6 +416,22 @@ class _DayContent extends StatelessWidget {
       ],
     );
   }
+}
+
+class _GroupTitle extends StatelessWidget {
+  const _GroupTitle(this.title, this.count);
+
+  final String title;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 12, bottom: 4),
+    child: Text(
+      '$title · $count',
+      style: Theme.of(context).textTheme.titleSmall,
+    ),
+  );
 }
 
 class _ContentTile extends StatelessWidget {

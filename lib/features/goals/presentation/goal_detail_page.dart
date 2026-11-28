@@ -123,20 +123,29 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   }
 
   Future<void> _delete(GoalsViewModel model, Goal goal) async {
-    if (!await confirmGoalAction(context, 'delete', 'deleteMessage') ||
-        !mounted) {
-      return;
-    }
-    final daily = context.read<DailyViewModel?>();
-    if (await model.delete(goal)) {
-      if (mounted) {
-        daily?.load();
-        Navigator.pop(context);
-      }
-    } else if (mounted) {
-      _showError(context);
+    if (await deleteGoalWithConfirmation(context, model, goal) && mounted) {
+      Navigator.pop(context);
     }
   }
+}
+
+Future<bool> deleteGoalWithConfirmation(
+  BuildContext context,
+  GoalsViewModel model,
+  Goal goal,
+) async {
+  if (!await confirmGoalAction(context, 'delete', 'deleteMessage') ||
+      !context.mounted) {
+    return false;
+  }
+  final daily = context.read<DailyViewModel?>();
+  final deleted = await model.delete(goal);
+  if (deleted) {
+    daily?.load();
+  } else if (context.mounted) {
+    _showError(context);
+  }
+  return deleted;
 }
 
 class _Milestones extends StatelessWidget {

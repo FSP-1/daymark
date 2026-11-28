@@ -240,6 +240,5 @@ Create unit and widget tests covering:
 - Google Calendar integration.
 - Cloud storage.
 - Recurring calendar events.
-- Daily activity history integration.
 - Drag-and-drop scheduling.
 - New notification scheduling mechanisms.

@@ -68,6 +68,7 @@ class CalendarMonthGrid extends StatelessWidget {
             final journal = content.entriesByDay.containsKey(day);
             final goals = content.goalsByDay.containsKey(day);
             final focus = content.focusByDay.containsKey(day);
+            final daily = content.dailyByDay.containsKey(day);
             if (compact) {
               return Center(
                 child: Text(
@@ -75,10 +76,11 @@ class CalendarMonthGrid extends StatelessWidget {
                   textScaler: TextScaler.noScaling,
                   style: TextStyle(
                     fontSize: 9,
-                    fontWeight: today || notes || journal || goals || focus
+                    fontWeight:
+                        today || notes || journal || goals || focus || daily
                         ? FontWeight.bold
                         : null,
-                    decoration: notes || journal || goals || focus
+                    decoration: notes || journal || goals || focus || daily
                         ? TextDecoration.underline
                         : null,
                     color: notes
@@ -138,6 +140,11 @@ class CalendarMonthGrid extends StatelessWidget {
                                 _Dot(
                                   color: colors.onSurface,
                                   icon: Icons.square,
+                                ),
+                              if (daily)
+                                _Dot(
+                                  color: colors.onSurface,
+                                  icon: Icons.change_history,
                                 ),
                             ],
                           ),
@@ -226,7 +233,8 @@ class CalendarYearGrid extends StatelessWidget {
 }
 
 class CalendarLegend extends StatelessWidget {
-  const CalendarLegend({super.key});
+  const CalendarLegend({this.category, super.key});
+  final String? category;
 
   @override
   Widget build(BuildContext context) {
@@ -235,14 +243,27 @@ class CalendarLegend extends StatelessWidget {
       child: Wrap(
         spacing: 12,
         children: [
-          _label(calendarNoteColor(context), strings.navigation('notes')),
-          _label(calendarJournalColor(context), strings.navigation('journal')),
-          _label(calendarGoalColor(context), strings.navigation('goals')),
-          _label(
-            Theme.of(context).colorScheme.onSurface,
-            strings.navigation('focus'),
-            icon: Icons.square,
-          ),
+          if (category == null || category == 'notes')
+            _label(calendarNoteColor(context), strings.navigation('notes')),
+          if (category == null || category == 'journal')
+            _label(
+              calendarJournalColor(context),
+              strings.navigation('journal'),
+            ),
+          if (category == null || category == 'goals')
+            _label(calendarGoalColor(context), strings.navigation('goals')),
+          if (category == null || category == 'focus')
+            _label(
+              Theme.of(context).colorScheme.onSurface,
+              strings.navigation('focus'),
+              icon: Icons.square,
+            ),
+          if (category == null || category == 'daily')
+            _label(
+              Theme.of(context).colorScheme.onSurface,
+              strings.navigation('daily'),
+              icon: Icons.change_history,
+            ),
         ],
       ),
     );
@@ -265,7 +286,7 @@ class _Dot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 1.5),
+    padding: const EdgeInsets.symmetric(horizontal: 0.75),
     child: Icon(icon, size: 5, color: color),
   );
 }

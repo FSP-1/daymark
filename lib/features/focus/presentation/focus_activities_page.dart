@@ -71,37 +71,27 @@ class FocusActivitiesPage extends StatelessWidget {
                     onTap: model.busy
                         ? null
                         : () => _editActivity(context, model, activity),
-                    trailing: PopupMenuButton<String>(
-                      tooltip: strings.focus('activityActions'),
-                      enabled: !model.busy,
-                      onSelected: (action) async {
-                        if (action == 'edit') {
-                          await _editActivity(context, model, activity);
-                        } else if (await _confirmRemoval(
-                          context,
-                          strings,
-                          'archive',
-                          'archiveActivityHelp',
-                        )) {
-                          await model.saveActivity(
-                            activity.title,
-                            existing: activity,
-                            icon: activity.icon,
-                            color: activity.color,
-                            archive: true,
-                          );
-                        }
-                      },
-                      itemBuilder: (_) => [
-                        PopupMenuItem(
-                          value: 'edit',
-                          child: Text(strings.focus('editActivity')),
-                        ),
-                        PopupMenuItem(
-                          value: 'archive',
-                          child: Text(strings.focus('archive')),
-                        ),
-                      ],
+                    trailing: IconButton(
+                      tooltip: strings.focus('archive'),
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: model.busy
+                          ? null
+                          : () async {
+                              if (await _confirmRemoval(
+                                context,
+                                strings,
+                                'archive',
+                                'archiveActivityHelp',
+                              )) {
+                                await model.saveActivity(
+                                  activity.title,
+                                  existing: activity,
+                                  icon: activity.icon,
+                                  color: activity.color,
+                                  archive: true,
+                                );
+                              }
+                            },
                     ),
                   ),
                 Align(
@@ -128,7 +118,7 @@ class FocusActivitiesPage extends StatelessWidget {
                     leading: const Icon(Icons.link),
                     title: Text(item.name),
                     trailing: IconButton(
-                      icon: const Icon(Icons.link_off),
+                      icon: const Icon(Icons.delete_outline),
                       tooltip: strings.focus('unlinkDaily'),
                       onPressed: model.busy
                           ? null

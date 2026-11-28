@@ -272,7 +272,20 @@ class _DailyContent extends StatelessWidget {
       ),
     );
     if (confirmed == true && context.mounted) {
-      await context.read<DailyViewModel>().delete(activity);
+      final model = context.read<DailyViewModel>();
+      await model.delete(activity);
+      final error = model.errorMessage;
+      if (context.mounted && error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error == 'dailyRequired'
+                  ? strings.goals(error)
+                  : strings.error(error),
+            ),
+          ),
+        );
+      }
     }
   }
 }

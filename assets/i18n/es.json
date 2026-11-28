@@ -76,7 +76,7 @@
     "activityPickerHelp": "Elige qué vas a hacer durante la sesión. El nombre se guarda en el historial. Para añadir opciones, abre Gestionar actividades.",
     "activityManagerHelp": "Las actividades sirven para agrupar el tiempo de concentración. Puedes crear las tuyas o añadir actividades que ya tienes en Daily.",
     "customActivities": "Actividades propias",
-    "customActivitiesHelp": "Toca una actividad para editarla. Para quitarla del selector, abre sus opciones y elige Archivar.",
+    "customActivitiesHelp": "Toca una actividad para editarla. Usa la papelera para archivarla.",
     "noCustomActivities": "Todavía no tienes actividades propias.",
     "activityActions": "Opciones de la actividad",
     "archiveActivityHelp": "La actividad dejará de aparecer en el selector. Sus sesiones seguirán en el historial.",
@@ -304,6 +304,11 @@
     "cancel": "Cancelar"
   },
   "calendar": {
+    "filter": "Filtrar por tipo",
+    "allTypes": "Todos los tipos",
+    "noMatches": "No hay contenido de este tipo para el día seleccionado.",
+    "completedDaily": "Daily completadas",
+    "dailyLoadError": "No se pudieron cargar las actividades completadas de Daily.",
     "description": "Tu vida, día a día.",
     "today": "Hoy",
     "month": "Mes",

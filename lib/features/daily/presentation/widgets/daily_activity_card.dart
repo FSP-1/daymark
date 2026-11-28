@@ -130,6 +130,12 @@ class DailyActivityCard extends StatelessWidget {
                 ),
                 onPressed: onEdit,
               ),
+              IconButton(
+                tooltip: strings.daily('delete'),
+                icon: const Icon(Icons.delete_outline, size: 20),
+                visualDensity: VisualDensity.compact,
+                onPressed: onDelete,
+              ),
               Checkbox(
                 value: completed,
                 onChanged: (_) => onCompleted(),

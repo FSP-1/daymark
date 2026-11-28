@@ -126,6 +126,27 @@ void main() {
         unorderedEquals(['Planificar', 'Construir', 'Leer']),
       );
 
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      final card = find.widgetWithText(Card, 'Lectura');
+      final delete = find.descendant(
+        of: card,
+        matching: find.byIcon(Icons.delete_outline),
+      );
+      await tapVisible(delete);
+      await tester.tap(find.text('Cancelar'));
+      await tester.pumpAndSettle();
+      expect(card, findsOneWidget);
+      await tapVisible(delete);
+      await tester.tap(find.text('Confirmar'));
+      await tester.pumpAndSettle();
+      expect(card, findsNothing);
+      final activities = await daily.listActivities();
+      expect(
+        activities.singleWhere((activity) => activity.name == 'Leer').goalId,
+        isNull,
+      );
+
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
     },

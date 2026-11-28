@@ -31,12 +31,16 @@ void main() {
     );
     expect(await repository.completedActivityIds('2026-11-01'), {activity.id});
     expect(await repository.completedActivityIds('2026-11-02'), isEmpty);
+    final history = await repository.watchCompletedActivities().first;
+    expect(history.keys, [now]);
+    expect(history[now]!.single.name, 'Walk');
     await repository.setCompleted(
       activityId: activity.id!,
       localDate: '2026-11-01',
       completed: false,
     );
     expect(await repository.completedActivityIds('2026-11-01'), isEmpty);
+    expect(await repository.watchCompletedActivities().first, isEmpty);
 
     await repository.deleteActivity(activity.id!);
     expect(await repository.listActivities(), isEmpty);

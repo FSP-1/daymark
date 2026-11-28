@@ -4,6 +4,7 @@ import '../../journal/domain/journal_entry.dart';
 import '../../sticky_notes/domain/sticky_note.dart';
 import '../../goals/domain/goal.dart';
 import '../../focus/domain/focus_session.dart';
+import '../../daily/domain/daily_activity.dart';
 
 class CalendarViewModel extends ChangeNotifier {
   CalendarViewModel({DateTime Function()? clock})
@@ -95,6 +96,7 @@ class CalendarContent {
     Iterable<JournalEntryModel> entries, [
     Iterable<Goal> goals = const [],
     Iterable<FocusSession> sessions = const [],
+    this.dailyByDay = const {},
   ]) {
     for (final note in notes) {
       final date = note.associatedDate;
@@ -133,4 +135,5 @@ class CalendarContent {
   final entriesByDay = <DateTime, List<JournalEntryModel>>{};
   final goalsByDay = <DateTime, List<Goal>>{};
   final focusByDay = <DateTime, List<FocusSession>>{};
+  final Map<DateTime, List<DailyActivity>> dailyByDay;
 }

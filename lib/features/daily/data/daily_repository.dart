@@ -6,10 +6,29 @@ import '../domain/daily_repository.dart';
 import '../domain/daily_schedule.dart';
 import '../../goals/domain/goal.dart';
 
-class DriftDailyRepository implements DailyRepository {
+class DriftDailyRepository implements DailyRepository, DailyCompletionHistory {
   DriftDailyRepository(this.database);
 
   final db.AppDatabase database;
+
+  @override
+  Stream<Map<DateTime, List<DailyActivity>>> watchCompletedActivities() {
+    final activities = database.dailyActivities;
+    final completions = database.dailyCompletions;
+    final query = database.select(completions).join([
+      innerJoin(activities, activities.id.equalsExp(completions.activityId)),
+    ])..orderBy([OrderingTerm.asc(activities.name)]);
+    return query.watch().map((rows) {
+      final result = <DateTime, List<DailyActivity>>{};
+      for (final row in rows) {
+        final date = DateTime.tryParse(row.readTable(completions).localDate);
+        if (date != null) {
+          (result[date] ??= []).add(_toDomain(row.readTable(activities)));
+        }
+      }
+      return result;
+    });
+  }
 
   @override
   Future<List<DailyActivity>> listActivities() async {

@@ -206,6 +206,21 @@ void main() {
       -250,
       scrollable: calendarScroll,
     );
+    final filter = find.byKey(const Key('calendar-filter'));
+    await tester.tap(filter);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('calendar-filter-focus')));
+    await tester.pumpAndSettle();
+    expect(find.text('Plan de viaje'), findsNothing);
+    expect(
+      find.text('No content of this type for the selected day.'),
+      findsOneWidget,
+    );
+    await tester.tap(filter);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('calendar-filter-all')));
+    await tester.pumpAndSettle();
+    expect(find.text('Notes · 1'), findsOneWidget);
     await tester.tap(find.byTooltip('Today'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Previous period'));

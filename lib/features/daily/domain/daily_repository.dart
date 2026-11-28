@@ -1,5 +1,9 @@
 import 'daily_activity.dart';
 
+abstract interface class DailyCompletionHistory {
+  Stream<Map<DateTime, List<DailyActivity>>> watchCompletedActivities();
+}
+
 class RequiredGoalActivity implements Exception {
   const RequiredGoalActivity();
 }

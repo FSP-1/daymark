@@ -99,7 +99,8 @@ scope. The complete feature specification is documented in
 
 - Browse months or switch to a twelve-month overview. Use Today to return to the
   current date.
-- See notes with an assigned date and Journal entries grouped by local day.
+- Filter monthly and annual indicators by type. Each day groups dated notes,
+  Journal entries, goal deadlines, completed Daily activities, and Focus sessions.
 - Create notes for any supported day and change or remove their optional dates.
 - Write Journal entries for today or earlier and open existing content directly
   from Calendar.

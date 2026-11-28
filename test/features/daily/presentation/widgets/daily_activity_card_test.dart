@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('wraps reminder metadata on narrow screens', (tester) async {
+    var deleteTapped = false;
     final activity = DailyActivity(
       id: 1,
       name: 'A very long activity name that stays readable',
@@ -26,7 +27,7 @@ void main() {
               onTap: () {},
               onCompleted: () {},
               onEdit: () {},
-              onDelete: () {},
+              onDelete: () => deleteTapped = true,
             ),
           ),
         ),
@@ -39,5 +40,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(DailyReminderIndicator), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    expect(deleteTapped, isTrue);
   });
 }
